@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__plugin_browser-use_browser-use__browser_exec"
+    ]
+  }
+}
