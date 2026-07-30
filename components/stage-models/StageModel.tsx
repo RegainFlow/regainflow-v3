@@ -1,6 +1,17 @@
-import type { CSSProperties } from "react";
-
-import { Box, Footprint, Ground, ISO_VIEWBOX, Marker, segment } from "./iso";
+import {
+  at,
+  Box,
+  box,
+  Flow,
+  Footprint,
+  Ground,
+  ISO_VIEWBOX,
+  Node,
+  port,
+  Route,
+  segment,
+  type BoxSpec,
+} from "./iso";
 
 export type StageModelId = "discover" | "implement" | "scale" | "work";
 
@@ -19,70 +30,95 @@ const STATE: Record<StageModelId, string> = {
   work: "Transferable",
 };
 
-/** Stagger for the play sequence. */
-function at(seconds: number): CSSProperties {
-  return { "--rf-delay": `${seconds}s` } as CSSProperties;
-}
-
 /**
- * Discover — survey the field, then commit to one thing.
- * Candidates arrive one at a time, the chosen cell is marked, and the
- * opportunity rises out of the field.
+ * Discover — one initiative worth funding, found among many.
+ *
+ * The candidates have *different* heights, because the whole point is that they
+ * are not worth the same. A scan sweeps the field, one cell is marked, its block
+ * rises, and the rest fall back. The route runs from the chosen block down to
+ * the marked ground — the decision, attached at both ends.
  */
 function DiscoverModel() {
-  const candidates: [number, number][] = [
-    [-78, -66],
-    [30, -70],
-    [46, -26],
-    [-70, 34],
-    [-34, -18],
-    [8, 40],
-    [58, 46],
+  // The one that turns out to be worth it, at the centre of the field.
+  const chosen = box(-16, -14, 0, 32, 32, 74);
+  // What Discover actually hands over: a plan, not just an opinion.
+  const plan = box(46, 4, 0, 40, 26, 8);
+
+  const candidates: BoxSpec[] = [
+    box(-84, -72, 0, 24, 24, 10),
+    box(-30, -78, 0, 24, 24, 20),
+    box(14, -74, 0, 24, 24, 8),
+    box(-88, -18, 0, 24, 24, 16),
+    box(18, -30, 0, 24, 24, 26),
+    box(-80, 38, 0, 24, 24, 12),
+    box(-24, 44, 0, 24, 24, 22),
+    box(16, 46, 0, 24, 24, 14),
   ];
+
+  // Solids are emitted back to front — ascending a + b — so nearer volumes
+  // occlude farther ones. Sorting here rather than by hand keeps the chosen
+  // block correctly behind the candidates in front of it, which hand-ordering
+  // got wrong.
+  const solids = [
+    ...candidates.map((spec, i) => ({
+      spec,
+      kind: "candidate" as const,
+      delay: 0.1 + i * 0.08,
+    })),
+    { spec: chosen, kind: "chosen" as const, delay: 1.35 },
+    { spec: plan, kind: "plan" as const, delay: 1.75 },
+  ].sort((x, y) => x.spec.a + x.spec.b - (y.spec.a + y.spec.b));
+
+  const from = port(chosen, "a", 0.6, 0.55);
+  const to = port(plan, "top", 0.4, 0.4);
 
   return (
     <>
       <Ground />
 
-      {candidates.map(([a, b], i) => (
-        <g key={`${a}:${b}`} className="rf-anim-appear" style={at(0.1 + i * 0.11)}>
-          <Box a={a} b={b} c={0} w={22} d={22} h={8} />
+      {/* The sweep that finds it. */}
+      <g className="rf-anim-scan" style={at(0.85)}>
+        <path className="rf-iso-scan" d={segment([-96, -14, 1], [96, -14, 1])} />
+      </g>
+
+      <g className="rf-anim-appear" style={at(1.15)}>
+        <Footprint a={-16} b={-14} w={32} d={32} className="rf-iso-select" />
+      </g>
+
+      {solids.map(({ spec, kind, delay }) => (
+        <g
+          key={`${spec.a}:${spec.b}`}
+          className={kind === "chosen" ? "rf-anim-rise" : "rf-anim-appear"}
+          style={at(delay)}
+        >
+          {/* Candidates dim once the choice is made — still on the table, no
+              longer the subject. */}
+          <Box spec={spec} accent={kind === "chosen"} dim={kind === "candidate"} />
         </g>
       ))}
 
-      {/* the cell that turns out to be worth it */}
-      <g className="rf-anim-appear" style={at(1.05)}>
-        <Footprint a={-14} b={-8} w={30} d={30} />
+      {/* The opportunity, committed to a plan. */}
+      <g className="rf-anim-draw" style={at(2.05)}>
+        <Route from={from} to={to} nodes="both" />
       </g>
-
-      {/* lifted out of the field */}
-      <g className="rf-anim-rise" style={at(1.3)}>
-        <Box a={-14} b={-8} c={0} w={30} d={30} h={72} accent />
-        <Marker at={[1, 7, 72]} />
-      </g>
-
-      {/* measured against the rest */}
-      <g className="rf-anim-appear" style={at(1.9)}>
-        <path
-          className="rf-iso-thin"
-          d={segment([16, -8, 0], [46, -8, 0], [46, -8, 72])}
-        />
-        <path className="rf-iso-thin" d={segment([16, -8, 72], [46, -8, 72])} />
-      </g>
+      <Flow from={from} to={to} />
     </>
   );
 }
 
 /**
- * Implement — the layers put together.
- * Plates drop into place bottom-to-top with their supports, then one route is
- * threaded up through every layer.
+ * Implement — the layers assembled and threaded by one system.
+ *
+ * Plates land on their posts bottom to top, then a single continuous route
+ * enters the base plate and threads up through a port on every plate above it.
+ * One line, no gaps: the previous version drew three disconnected segments and
+ * read as a broken wire.
  */
 function ImplementModel() {
-  const layers = [
-    { c: 0, delay: 0.1 },
-    { c: 46, delay: 0.55 },
-    { c: 92, delay: 1.0 },
+  const plates: BoxSpec[] = [
+    box(-56, -56, 0, 112, 112, 12),
+    box(-56, -56, 46, 112, 112, 12),
+    box(-56, -56, 92, 112, 112, 12),
   ];
   const posts: [number, number][] = [
     [-52, -52],
@@ -90,128 +126,161 @@ function ImplementModel() {
     [-52, 40],
   ];
 
+  // One system touching every layer, drawn as three legs that each cross a
+  // real gap between two plates. A single route from base to top would run up
+  // the outside corner and never touch the plates in between — which is what
+  // "threaded through" has to actually mean.
+  const legs = [
+    { from: port(plates[0], "a", 0.62, 1), to: port(plates[1], "a", 0.62, 0) },
+    { from: port(plates[1], "a", 0.62, 1), to: port(plates[2], "a", 0.62, 0) },
+    { from: port(plates[2], "a", 0.62, 1), to: port(plates[2], "top", 0.74, 0.62) },
+  ];
+
   return (
     <>
       <Ground extent={80} step={32} />
 
-      {layers.map((layer, i) => (
-        <g key={layer.c}>
-          {/* supports go in before the plate that lands on them */}
+      {plates.map((spec, i) => (
+        <g key={spec.c}>
+          {/* Supports go in before the plate that lands on them. */}
           {i > 0 ? (
-            <g className="rf-anim-appear" style={at(layer.delay - 0.18)}>
+            <g className="rf-anim-appear" style={at(0.55 * i - 0.18)}>
               {posts.map(([a, b]) => (
                 <path
                   key={`${a}:${b}`}
                   className="rf-iso-thin"
-                  d={segment([a, b, layers[i - 1].c + 12], [a, b, layer.c])}
+                  d={segment([a, b, plates[i - 1].c + 12], [a, b, spec.c])}
                 />
               ))}
             </g>
           ) : null}
-          <g className="rf-anim-drop" style={at(layer.delay)}>
-            <Box a={-56} b={-56} c={layer.c} w={112} d={112} h={12} />
+          <g className="rf-anim-drop" style={at(0.1 + 0.45 * i)}>
+            <Box spec={spec} />
           </g>
         </g>
       ))}
 
-      {/* one route threaded through the finished stack, drawn in the gaps */}
-      <g className="rf-anim-draw" style={at(1.45)}>
-        <path className="rf-iso-route" d={segment([34, 34, 12], [34, 34, 46])} />
-      </g>
-      <g className="rf-anim-draw" style={at(1.65)}>
-        <path className="rf-iso-route" d={segment([34, 34, 58], [34, 34, 92])} />
-      </g>
-      <g className="rf-anim-draw" style={at(1.85)}>
-        <path className="rf-iso-route" d={segment([34, 34, 104], [34, 34, 128])} />
-      </g>
-      <g className="rf-anim-appear" style={at(2.15)}>
-        <Marker at={[34, 34, 128]} />
-      </g>
+      {legs.map((leg, i) => (
+        <g key={i} className="rf-anim-draw" style={at(1.5 + i * 0.22)}>
+          <Route from={leg.from} to={leg.to} nodes="both" />
+        </g>
+      ))}
+      {/* Offset so the pulse reads as one thing climbing the stack. */}
+      {legs.map((leg, i) => (
+        <Flow key={i} from={leg.from} to={leg.to} delay={i * -0.55} />
+      ))}
     </>
   );
 }
 
 /**
- * Scale — one working system becomes many, each iteration taller than the last,
- * with evidence routing back to the start.
+ * Scale — one working system becomes many, and evidence closes the loop.
+ *
+ * Four units, each taller than the last. The return route leaves the tallest
+ * unit's top face and terminates on the *first* unit's side face: a closed
+ * loop with both ends on a solid, rather than a line running out into empty
+ * ground.
  */
 function ScaleModel() {
+  const platform = box(-76, -76, 0, 152, 152, 10);
+
   // Painter order: ascending a + b, so nearer volumes cover farther ones.
-  const units = [
-    { a: -62, b: -62, h: 40, delay: 0.15, accent: false },
-    { a: 6, b: -62, h: 54, delay: 0.55, accent: false },
-    { a: -62, b: 6, h: 68, delay: 0.95, accent: false },
-    { a: 6, b: 6, h: 82, delay: 1.35, accent: true },
+  const units: { spec: BoxSpec; delay: number; accent: boolean }[] = [
+    { spec: box(-62, -62, 10, 56, 56, 40), delay: 0.35, accent: false },
+    { spec: box(6, -62, 10, 56, 56, 54), delay: 0.7, accent: false },
+    { spec: box(-62, 6, 10, 56, 56, 68), delay: 1.05, accent: false },
+    { spec: box(6, 6, 10, 56, 56, 82), delay: 1.4, accent: true },
   ];
+
+  const newest = units[3].spec;
+  const first = units[0].spec;
+
+  // Out of the newest unit's roof, over the estate, back down into the first
+  // unit. The waypoint sits inside the platform footprint (b < 76) — at b = 84
+  // the run hung off the side of the platform, which is the "line pointing at
+  // nothing" problem in a different place.
+  const from = port(newest, "top", 0.5, 0.5);
+  const to = port(first, "b", 0.5, 0.55);
+  const via: [number, number, number] = [34, 68, 100];
 
   return (
     <>
       <Ground extent={92} step={32} />
 
       <g className="rf-anim-appear" style={at(0.05)}>
-        <Box a={-76} b={-76} c={0} w={152} d={152} h={10} />
+        <Box spec={platform} />
       </g>
 
-      {units.map((u) => (
-        <g key={`${u.a}:${u.b}`} className="rf-anim-rise" style={at(u.delay)}>
-          <Box a={u.a} b={u.b} c={10} w={56} d={56} h={u.h} accent={u.accent} />
+      {units.map((unit) => (
+        <g
+          key={`${unit.spec.a}:${unit.spec.b}`}
+          className="rf-anim-rise"
+          style={at(unit.delay)}
+        >
+          <Box spec={unit.spec} accent={unit.accent} />
         </g>
       ))}
 
-      {/* Evidence returning to the first iteration. Held at b = 88, in front of
-          every unit (b <= 62), so painting it last is also correct depth. */}
-      <g className="rf-anim-draw" style={at(1.8)}>
-        <path
-          className="rf-iso-route"
-          d={segment([34, 34, 92], [34, 88, 92], [-88, 88, 92], [-88, 88, 56])}
-        />
+      {/* Evidence from what is running now, returned to what shipped first. */}
+      <g className="rf-anim-draw" style={at(1.85)}>
+        <Route from={from} to={to} via={via} nodes="both" />
       </g>
-      <g className="rf-anim-appear" style={at(2.35)}>
-        <Marker at={[-88, 88, 56]} />
-      </g>
+      <Flow from={from} to={to} via={via} />
     </>
   );
 }
 
 /**
  * Work — built beside you on shared ground, and able to move fully across.
+ *
+ * The transfer route ends on a node sitting on the destination footprint, so
+ * the handoff visibly lands somewhere instead of stopping in mid-air.
  */
 function WorkModel() {
+  const ours = box(-96, -44, 0, 80, 88, 10);
+  const yours = box(16, -44, 0, 80, 88, 10);
+  const capability = box(-40, -24, 10, 80, 48, 40);
+
+  const destination = { a: 26, b: -24, w: 60, d: 48 };
+  // On the client's platform, not floating above the outline of it.
+  const landing = port(yours, "top", 0.5, 0.5);
+  const from = port(capability, "a", 0.5, 0.8);
+
   return (
     <>
       <Ground extent={88} step={32} />
 
       <g className="rf-anim-appear" style={at(0.1)}>
-        <Box a={-96} b={-44} c={0} w={80} d={88} h={10} />
+        <Box spec={ours} />
       </g>
       <g className="rf-anim-appear" style={at(0.35)}>
-        <Box a={16} b={-44} c={0} w={80} d={88} h={10} />
+        <Box spec={yours} />
       </g>
 
+      {/* Shared ground: the two platforms tied together, not just adjacent. */}
       <g className="rf-anim-appear" style={at(0.6)}>
-        <path className="rf-iso-thin" d={segment([-16, -20, 5], [16, -20, 5])} />
+        <path
+          className="rf-iso-thin"
+          d={segment([-16, -20, 5], [16, -20, 5])}
+        />
         <path className="rf-iso-thin" d={segment([-16, 28, 5], [16, 28, 5])} />
       </g>
 
-      {/* the capability, currently spanning both */}
+      {/* The capability, currently spanning both. */}
       <g className="rf-anim-rise" style={at(0.85)}>
-        <Box a={-40} b={-24} c={10} w={80} d={48} h={40} accent />
+        <Box spec={capability} accent />
       </g>
 
-      {/* and where it sits after a clean transfer */}
+      {/* And where it sits after a clean transfer. */}
       <g className="rf-anim-appear" style={at(1.5)}>
-        <Footprint a={26} b={-24} w={60} d={48} c={10} />
-        <path
-          className="rf-iso-ghost"
-          d={segment([26, -24, 10], [26, -24, 40], [86, -24, 40], [86, -24, 10])}
-        />
+        <Footprint {...destination} c={10} />
+        <Node at={landing} muted />
       </g>
+
       <g className="rf-anim-draw" style={at(1.8)}>
-        <path className="rf-iso-route" d={segment([40, 0, 52], [72, 0, 52])} />
+        <Route from={from} to={landing} nodes="start" />
       </g>
-      <g className="rf-anim-appear" style={at(2.1)}>
-        <Marker at={[72, 0, 52]} />
-      </g>
+      <Flow from={from} to={landing} />
     </>
   );
 }

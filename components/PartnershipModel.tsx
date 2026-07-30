@@ -1,34 +1,15 @@
-﻿import PlayOnView from "@/components/stage-models/PlayOnView";
-import StageModel from "@/components/stage-models/StageModel";
+import Link from "next/link";
 
-const PRINCIPLES = [
-  {
-    index: "01",
-    title: "Strategy through production",
-    // Expansion lines are RegainFlow-authored framing, pending commercial review.
-    detail:
-      "The people who frame the opportunity stay accountable for what ships.",
-  },
-  {
-    index: "02",
-    title: "Embedded collaboration without hidden handoffs",
-    detail:
-      "We work inside your repositories, your review process, and your delivery rhythm.",
-  },
-  {
-    index: "03",
-    title: "Flexible ownership: continue together, scale down, or transfer cleanly",
-    detail:
-      "Documentation, runbooks, and working sessions make a handoff a decision rather than a rescue.",
-  },
-];
+import PlayOnView from "@/components/stage-models/PlayOnView";
+import StageModel from "@/components/stage-models/StageModel";
+import { PRINCIPLES } from "@/lib/content/company";
 
 export default function PartnershipModel() {
   return (
-    <section id="company" className="rf-section">
+    <section id="partnership" className="rf-section">
       <div className="rf-shell rf-grid gap-y-10 py-14 md:py-18 lg:py-22">
         <div className="col-span-full lg:col-span-5">
-          <p className="rf-eyebrow">How we work</p>
+          <p className="rf-eyebrow">The partnership model</p>
           <h2 className="rf-h2 mt-5">
             Senior operators. Shared context. One accountable path.
           </h2>
@@ -64,6 +45,10 @@ export default function PartnershipModel() {
               </li>
             ))}
           </ol>
+
+          <Link href="/company#manifesto" className="rf-nav-link mt-6 inline-block">
+            Read the manifesto &rarr;
+          </Link>
         </div>
       </div>
     </section>

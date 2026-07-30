@@ -1,25 +1,21 @@
 import ClosingCTA from "@/components/ClosingCTA";
 import Hero from "@/components/Hero";
+import LayerSummary from "@/components/LayerSummary";
 import PartnershipModel from "@/components/PartnershipModel";
 import ProductionGap from "@/components/ProductionGap";
-import RegainFlowSystem from "@/components/RegainFlowSystem";
-import SiteFooter from "@/components/SiteFooter";
-import SiteHeader from "@/components/SiteHeader";
+import ProofStrip from "@/components/ProofStrip";
+import StageSummary from "@/components/StageSummary";
 
 export default function Home() {
   return (
     <>
-      <SiteHeader />
-
-      <main id="main">
-        <Hero />
-        <ProductionGap />
-        <RegainFlowSystem />
-        <PartnershipModel />
-        <ClosingCTA />
-      </main>
-
-      <SiteFooter />
+      <Hero />
+      <ProductionGap />
+      <StageSummary />
+      <LayerSummary />
+      <ProofStrip />
+      <PartnershipModel />
+      <ClosingCTA />
     </>
   );
 }

@@ -1,4 +1,4 @@
-import { CONTACT_HREF, PRIMARY_CTA } from "@/lib/site";
+import { BOOKING_HREF, PRIMARY_CTA } from "@/lib/site";
 
 export default function ClosingCTA() {
   return (
@@ -15,7 +15,7 @@ export default function ClosingCTA() {
           </p>
 
           <div className="mt-8">
-            <a href={CONTACT_HREF} className="rf-cta-primary">
+            <a href={BOOKING_HREF} className="rf-cta-primary">
               {PRIMARY_CTA}
             </a>
           </div>
@@ -43,6 +43,24 @@ export default function ClosingCTA() {
             <path className="rf-route" d="M178 100 H230" />
             <path className="rf-route" d="M178 160 H230 V100" />
             <path className="rf-route" d="M230 100 H256" />
+
+            {/* Pulses running the full journey from each input into the mark.
+                Offset so the three don't march in lockstep. */}
+            <path
+              className="rf-cta-pulse"
+              d="M178 40 H230 V100 H256"
+              style={{ animationDelay: "0s" }}
+            />
+            <path
+              className="rf-cta-pulse"
+              d="M178 100 H256"
+              style={{ animationDelay: "-0.75s" }}
+            />
+            <path
+              className="rf-cta-pulse"
+              d="M178 160 H230 V100 H256"
+              style={{ animationDelay: "-1.5s" }}
+            />
 
             <rect x="227" y="97" width="6" height="6" fill="var(--color-rf-flow)" />
             <path className="rf-head" d="M270 100 L256 93 L256 107 Z" />

@@ -1,6 +1,6 @@
-import Image from "next/image";
+import Link from "next/link";
 
-import { LOCATION, NAV_ITEMS } from "@/lib/site";
+import { LOCATION, NAV, TAGLINE } from "@/lib/site";
 
 export default function SiteFooter() {
   const year = new Date().getFullYear();
@@ -9,55 +9,44 @@ export default function SiteFooter() {
     <footer className="bg-rf-void">
       <div className="rf-shell pt-16 md:pt-20">
         <div className="rf-grid gap-y-12 border-t border-rf-hairline pt-12">
-          <div className="col-span-full lg:col-span-5">
-            <p className="flex items-center gap-2.5">
-              <Image
-                src="/brand/regainflow-mark.png"
-                alt=""
-                width={1024}
-                height={1024}
-                className="h-7 w-auto"
-              />
-              <span className="rf-wordmark text-[1.0625rem]">RegainFlow</span>
-            </p>
-            <p className="rf-body mt-4 max-w-[34ch]">
-              AI systems engineering, from ambition to operation.
-            </p>
+          <div className="col-span-full lg:col-span-4">
+            <Link href="/" className="flex items-center">
+              <span className="rf-wordmark rf-wordmark-3d">RegainFlow</span>
+            </Link>
+            <p className="rf-body mt-4 max-w-[34ch]">{TAGLINE}</p>
+            <p className="rf-utility mt-8">Location</p>
+            <p className="rf-body mt-3">{LOCATION}</p>
           </div>
 
-          <nav
-            aria-label="Footer"
-            className="col-span-full sm:col-span-6 lg:col-span-3"
-          >
-            <p className="rf-utility">Sections</p>
-            <ul className="mt-4 flex flex-col gap-1.5">
-              {NAV_ITEMS.map((item) => (
-                <li key={item.href}>
-                  <a href={item.href} className="rf-nav-link">
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-              <li>
-                <a href="#contact" className="rf-nav-link">
-                  Map an AI opportunity
-                </a>
-              </li>
-            </ul>
-          </nav>
-
-          {/* The address is reachable through the mailto CTA, not printed here. */}
-          <div className="col-span-full sm:col-span-6 lg:col-span-4">
-            <p className="rf-utility">Location</p>
-            <p className="rf-body mt-4">{LOCATION}</p>
-          </div>
+          {NAV.map((group) => (
+            <nav
+              key={group.href}
+              aria-label={group.label}
+              className="col-span-full sm:col-span-4 lg:col-span-2 lg:col-start-auto"
+            >
+              <p className="rf-utility">
+                <Link href={group.href} className="rf-nav-link">
+                  {group.label}
+                </Link>
+              </p>
+              <ul className="mt-3 flex flex-col gap-1.5">
+                {group.items.map((item) => (
+                  <li key={item.href}>
+                    <Link href={item.href} className="rf-nav-link">
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
         </div>
 
         <div className="mt-14 flex flex-wrap items-center justify-between gap-4 border-t border-rf-hairline pt-6">
           <p className="rf-utility">&copy; {year} RegainFlow</p>
-          <a href="#top" className="rf-nav-link">
-            Back to top &uarr;
-          </a>
+          <Link href="/company#contact" className="rf-nav-link">
+            Contact us &rarr;
+          </Link>
         </div>
       </div>
 

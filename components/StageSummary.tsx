@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import PlayOnView from "@/components/stage-models/PlayOnView";
@@ -7,11 +8,11 @@ import StageModel from "@/components/stage-models/StageModel";
 import { STAGES, type StageId } from "@/lib/content/stages";
 
 /**
- * The full three-stage treatment: every output and capability, with the
- * anchors the navigation dropdown targets. Used on `/services` only — the home
- * page carries the condensed `StageSummary` instead.
+ * The home-page version of the three services: name, promise, and one line
+ * each. The full panels — outputs, capabilities, engagement shape — live on
+ * `/services`, so this section never repeats that page.
  */
-export default function RegainFlowSystem() {
+export default function StageSummary() {
   // Server output — and any client that opts out below — renders the final
   // stage, so the section is fully meaningful without JavaScript.
   const [stage, setStage] = useState<StageId>("scale");
@@ -48,14 +49,14 @@ export default function RegainFlowSystem() {
   }, []);
 
   return (
-    <section className="rf-section">
+    <section id="approach" className="rf-section">
       <div className="rf-shell py-14 md:py-18 lg:py-22">
         <div className="rf-grid gap-y-5">
           <div className="col-span-full lg:col-span-7">
-            <p className="rf-eyebrow">The RegainFlow system</p>
-            <h2 className="rf-h2 mt-5">
-              One path from decision to dependable operation.
-            </h2>
+            {/* Deliberately not the `/services` heading — each route makes one
+                claim, and this one is the shape of the path. */}
+            <p className="rf-eyebrow">How we work</p>
+            <h2 className="rf-h2 mt-5">Three stages. One accountable path.</h2>
           </div>
         </div>
 
@@ -73,11 +74,10 @@ export default function RegainFlowSystem() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-8 lg:col-span-6 lg:col-start-1 lg:row-start-1 lg:gap-24">
+          <div className="flex flex-col gap-8 lg:col-span-6 lg:col-start-1 lg:row-start-1 lg:gap-20">
             {STAGES.map((item, i) => (
               <article
                 key={item.id}
-                id={item.id}
                 ref={(el) => {
                   panelRefs.current[i] = el;
                 }}
@@ -93,28 +93,25 @@ export default function RegainFlowSystem() {
                   </h3>
                 </div>
 
-                <p className="rf-body mt-5 max-w-[56ch]">{item.copy}</p>
+                <p className="rf-lead mt-5 max-w-[48ch]">{item.summary}</p>
 
                 {/* Below lg the model belongs with its own stage, in reading order. */}
                 <PlayOnView className="mt-7 lg:hidden">
                   <StageModel model={item.id} />
                 </PlayOnView>
 
-                <p className="rf-utility mt-7">{item.listLabel}</p>
-                <ul className="mt-3">
-                  {item.items.map((entry) => (
-                    <li
-                      key={entry}
-                      className="rf-body border-t border-rf-hairline py-2"
-                    >
-                      {entry}
-                    </li>
-                  ))}
-                </ul>
-
-                <p className="rf-utility mt-6 flex flex-wrap items-center gap-3 border-t border-rf-hairline pt-4 text-rf-flow-soft">
+                <p className="rf-utility mt-6 border-t border-rf-hairline pt-4 text-rf-flow-soft">
                   {item.transformation}
                 </p>
+
+                {/* One expression: JSX splits `What {expr} includes` into
+                    separate text nodes and drops the space before "includes". */}
+                <Link
+                  href={`/services#${item.id}`}
+                  className="rf-nav-link mt-4 inline-block"
+                >
+                  {`What ${item.name.toLowerCase()} includes →`}
+                </Link>
               </article>
             ))}
           </div>

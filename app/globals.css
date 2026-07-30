@@ -64,8 +64,10 @@
     border-radius: 1px;
   }
 
-  /* Clears the sticky header on anchor jumps. */
-  section[id] {
+  /* Clears the sticky header on anchor jumps. Not scoped to `section` any
+     more: dropdown links target sub-sections inside a page, which are
+     articles and list items as often as they are sections. */
+  [id] {
     scroll-margin-top: 5.5rem;
   }
 
@@ -90,14 +92,19 @@
     column-gap: clamp(1rem, 2.2vw, 2rem);
   }
 
+  /* A plain hairline. A wavy section rule was tried and it read as decoration —
+     the wave belongs to the hero mark, not to every boundary on the site. */
   .rf-section {
+    position: relative;
     border-bottom: 1px solid var(--color-rf-hairline);
   }
 
   /* --- Type ------------------------------------------------------------ */
 
   .rf-h1 {
-    font-size: clamp(2.1rem, 4.2vw, 3.5rem);
+    /* Capped at 3.25rem: above that the hero headline runs to three lines and
+       pushes the buttons off the fold. */
+    font-size: clamp(2.05rem, 3.9vw, 3.25rem);
     font-weight: 500;
     line-height: 1.05;
     letter-spacing: -0.03em;
@@ -165,6 +172,39 @@
     font-weight: 600;
     letter-spacing: -0.022em;
     color: var(--color-rf-warm);
+  }
+
+  /* The wordmark *is* the logo: the whole word carries the same extrusion the
+     RF glyph had, offset down and to the right along the isometric `+a` axis.
+     Stacked shadows rather than one, so the extrusion reads as a solid side
+     rather than a drop shadow. */
+  .rf-wordmark-3d {
+    font-size: 1.0625rem;
+    color: var(--color-rf-warm);
+    text-shadow:
+      0.5px 0.5px 0 var(--color-rf-flow),
+      1px 1px 0 var(--color-rf-flow),
+      1.5px 1.5px 0 var(--color-rf-flow),
+      2px 2px 0 var(--color-rf-flow),
+      2.5px 2.5px 0 var(--color-rf-flow);
+    transition: text-shadow 0.25s ease;
+  }
+
+  a:hover .rf-wordmark-3d,
+  a:focus-visible .rf-wordmark-3d {
+    text-shadow:
+      0.5px 0.5px 0 var(--color-rf-flow-soft),
+      1px 1px 0 var(--color-rf-flow-soft),
+      1.5px 1.5px 0 var(--color-rf-flow-soft),
+      2px 2px 0 var(--color-rf-flow-soft),
+      2.5px 2.5px 0 var(--color-rf-flow-soft),
+      3px 3px 0 var(--color-rf-flow-soft);
+  }
+
+  @media (min-width: 768px) {
+    .rf-wordmark-3d {
+      font-size: 1.1875rem;
+    }
   }
 
   /* --- Controls --------------------------------------------------------- */
@@ -263,6 +303,28 @@
     width: 100%;
   }
 
+  /* On a card that is itself the link, the affordance has to answer to the
+     card — the pointer is rarely over the small "View more" span. */
+  a.rf-card:hover .rf-nav-link,
+  a.rf-card:focus-visible .rf-nav-link {
+    color: var(--color-rf-warm);
+  }
+
+  a.rf-card:hover .rf-nav-link::after,
+  a.rf-card:focus-visible .rf-nav-link::after {
+    width: 100%;
+  }
+
+  /* The current route keeps the underline the others only get on hover. */
+  .rf-nav-link[data-current] {
+    color: var(--color-rf-warm);
+  }
+
+  .rf-nav-link[data-current]::after {
+    width: 100%;
+    background: var(--color-rf-flow-soft);
+  }
+
   .rf-text-link {
     color: var(--color-rf-warm);
     text-decoration: underline;
@@ -293,6 +355,197 @@
     border-radius: 2px;
   }
 
+  /* --- Navigation ------------------------------------------------------- */
+
+  .rf-menu {
+    position: relative;
+  }
+
+  .rf-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.15rem;
+    color: var(--color-rf-slate);
+    transition:
+      color 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .rf-menu:hover .rf-menu-toggle,
+  .rf-menu-toggle[aria-expanded="true"] {
+    color: var(--color-rf-warm);
+  }
+
+  .rf-menu-toggle[aria-expanded="true"] {
+    transform: rotate(180deg);
+  }
+
+  /* Hidden by height rather than `display`, so the panel is still in the
+     accessibility tree order and the transition has something to run on.
+     `visibility` keeps it out of the tab order while closed. */
+  .rf-menu-panel {
+    position: absolute;
+    top: calc(100% + 0.75rem);
+    left: -1.1rem;
+    z-index: 60;
+    min-width: 19rem;
+    padding: 0.5rem 0;
+    border: 1px solid var(--color-rf-hairline);
+    background: var(--color-rf-navy);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition:
+      opacity 0.18s ease,
+      transform 0.18s ease,
+      visibility 0.18s;
+  }
+
+  /* A flat accent along the top edge. A wave was tried here and read as
+     decoration rather than as part of the mark. */
+  .rf-menu-panel::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -1px;
+    height: 2px;
+    background: var(--color-rf-flow);
+    opacity: 0.7;
+  }
+
+  .rf-menu-panel[data-open="true"] {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  /* Secondary routes out of the panel sit below a rule. */
+  .rf-menu-panel li[data-secondary] {
+    margin-top: 0.4rem;
+    padding-top: 0.4rem;
+    border-top: 1px solid var(--color-rf-hairline);
+  }
+
+  .rf-menu-item {
+    display: block;
+    padding: 0.55rem 1.1rem;
+    border-left: 2px solid transparent;
+    transition:
+      border-color 0.18s ease,
+      background-color 0.18s ease;
+  }
+
+  .rf-menu-item-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+  }
+
+  .rf-menu-index {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    color: var(--color-rf-flow-soft);
+  }
+
+  .rf-menu-label {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--color-rf-warm);
+  }
+
+  .rf-menu-hint {
+    display: block;
+    margin-top: 0.15rem;
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    color: var(--color-rf-slate);
+  }
+
+  /* Groups without numerals keep the hint aligned under the label. */
+  .rf-menu-panel li:not(:has(.rf-menu-index)) .rf-menu-hint {
+    margin-left: 0;
+  }
+
+  .rf-menu-panel li:has(.rf-menu-index) .rf-menu-hint {
+    margin-left: 1.7rem;
+  }
+
+  .rf-menu-item:hover,
+  .rf-menu-item:focus-visible {
+    border-left-color: var(--color-rf-flow);
+    background: rgb(242 245 250 / 0.04);
+  }
+
+  /* Items arrive in reading order once the panel is open. */
+  .rf-menu-panel[data-open="true"] li {
+    animation: rf-menu-in 0.24s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+    animation-delay: var(--rf-stagger, 0s);
+  }
+
+  .rf-burger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-right: -0.5rem;
+    color: var(--color-rf-warm);
+  }
+
+  /* Fixed, so it covers the page rather than stretching the header bar. */
+  .rf-mobile-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 4rem;
+    bottom: 0;
+    z-index: 55;
+    overflow-y: auto;
+    background: var(--color-rf-void);
+    border-top: 1px solid var(--color-rf-hairline);
+  }
+
+  .rf-mobile-nav[hidden] {
+    display: none;
+  }
+
+  /* --- Cards and stats ---------------------------------------------------- */
+
+  .rf-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1.35rem;
+    border: 1px solid var(--color-rf-hairline);
+    background: var(--color-rf-navy);
+    transition: border-color 0.25s ease;
+  }
+
+  .rf-card:hover {
+    border-color: var(--color-rf-slate);
+  }
+
+  .rf-stat {
+    font-size: clamp(1.75rem, 3.4vw, 2.6rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--color-rf-warm);
+  }
+
+  .rf-portrait {
+    border: 1px solid var(--color-rf-hairline);
+    background: var(--color-rf-navy);
+  }
+
+  .rf-portrait img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
   /* A small horizontal route mark used to introduce a response line. */
   .rf-route-tick {
     flex: none;
@@ -314,6 +567,77 @@
     background: var(--color-rf-flow);
   }
 
+  /* --- Disclosure --------------------------------------------------------- */
+
+  /* Native `<details>`, so the content it holds is in the server output and
+     stays readable with JavaScript off. Nothing here hides content behind a
+     trigger — it only folds it. */
+
+  .rf-disclosure {
+    border-top: 1px solid var(--color-rf-hairline);
+  }
+
+  .rf-disclosure-summary {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding-block: 1.15rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-rf-slate);
+    cursor: pointer;
+    list-style: none;
+    transition: color 0.2s ease;
+  }
+
+  /* Safari paints its own triangle without this one. */
+  .rf-disclosure-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .rf-disclosure-summary:hover,
+  .rf-disclosure-summary:focus-visible {
+    color: var(--color-rf-warm);
+  }
+
+  /* The CTA's route stub, crossed: a plus that loses its upright and settles
+     into the same 14px mark every control on this site opens with. */
+  .rf-disclosure-marker {
+    flex: none;
+    position: relative;
+    width: 14px;
+    height: 1px;
+    background: var(--color-rf-flow);
+    transition: width 0.22s ease;
+  }
+
+  .rf-disclosure-summary:hover .rf-disclosure-marker,
+  .rf-disclosure-summary:focus-visible .rf-disclosure-marker {
+    width: 24px;
+  }
+
+  .rf-disclosure-marker::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 1px;
+    height: 14px;
+    background: var(--color-rf-flow);
+    transform: translate(-50%, -50%);
+    transition:
+      transform 0.22s ease,
+      opacity 0.22s ease;
+  }
+
+  .rf-disclosure[open] .rf-disclosure-marker::after {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+
   /* --- Converging-routes glyph (ClosingCTA) ------------------------------ */
 
   .rf-route {
@@ -333,6 +657,26 @@
     letter-spacing: 0.14em;
   }
 
+  /* Travelling pulses layered over the static routes. The dash period is 25
+     units and the animation shifts by exactly two periods, so it loops
+     seamlessly. Offsets are in path units, so all three move at one speed
+     regardless of how far each input has to travel. */
+  .rf-cta-pulse {
+    fill: none;
+    stroke: var(--color-rf-flow-soft);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-dasharray: 3 22;
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .rf-cta-pulse {
+      opacity: 1;
+      animation: rf-cta-flow 2.2s linear infinite;
+    }
+  }
+
   /* --- Process stage panels ---------------------------------------------- */
 
   /* The only strongly bordered modules on the page. The active edge is an
@@ -347,6 +691,319 @@
   .rf-stage-panel[data-current="true"] {
     border-color: var(--color-rf-slate);
     box-shadow: inset 3px 0 0 var(--color-rf-flow);
+  }
+
+  /* --- Capability spine --------------------------------------------------- */
+
+  .rf-layers {
+    position: relative;
+    border-top: 1px solid var(--color-rf-hairline);
+  }
+
+  .rf-layers::before {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--color-rf-hairline);
+  }
+
+  .rf-layer {
+    position: relative;
+    padding-left: 1.5rem;
+    border-bottom: 1px solid var(--color-rf-hairline);
+  }
+
+  /* Hairline by default — four static blue squares competed with everything
+     else on the page. Flow Blue only marks the row you are on. */
+  .rf-layer::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: -4px;
+    width: 7px;
+    height: 7px;
+    background: var(--color-rf-void);
+    border: 1px solid var(--color-rf-hairline);
+    transition:
+      border-color 0.2s ease,
+      background-color 0.2s ease;
+    z-index: 1;
+  }
+
+  /* The active row lights its own segment of the spine rather than growing a
+     second border inside itself. A nested rail plus an indent read as a box
+     within a box; this just says "you are here" on the line already present. */
+  .rf-layer::after {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--color-rf-flow);
+    opacity: 0;
+    transition: opacity 0.22s ease;
+  }
+
+  .rf-layer[data-active]::after {
+    opacity: 1;
+  }
+
+  .rf-layer[data-active]::before {
+    background: var(--color-rf-flow);
+    border-color: var(--color-rf-flow);
+  }
+
+  /* --- Layer rows as controls ---------------------------------------------
+     The old treatment shifted one numeral's colour, which nobody would read as
+     "this is interactive". The whole row is the target now: full-width hit
+     area, a rail that grows out of the spine, and a surface that lifts.
+  ------------------------------------------------------------------------- */
+
+  /* No inner border and no indent — the row surface lifts, and the spine
+     outside it carries the accent. */
+  .rf-layer-toggle {
+    display: block;
+    width: 100%;
+    padding: 1.15rem 1rem 1.25rem;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.22s ease;
+  }
+
+  .rf-layer-toggle:hover,
+  .rf-layer-toggle:focus-visible,
+  .rf-layer[data-active] .rf-layer-toggle {
+    background: var(--color-rf-navy);
+  }
+
+  .rf-layer-head {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+  }
+
+  .rf-layer-name {
+    font-size: 1.1rem;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--color-rf-warm);
+  }
+
+  .rf-layer-enables {
+    display: block;
+    max-width: 44ch;
+    margin-top: 0.9rem;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-rf-warm);
+  }
+
+  /* The chips brighten with the row, so the whole block responds rather than
+     one detail of it. */
+  .rf-layer-toggle .rf-mech {
+    margin-top: 0.9rem;
+    transition: color 0.22s ease;
+  }
+
+  .rf-layer-toggle:hover .rf-mech,
+  .rf-layer-toggle:focus-visible .rf-mech,
+  .rf-layer[data-active] .rf-mech {
+    color: var(--color-rf-warm);
+  }
+
+  @media (min-width: 1024px) {
+    .rf-layer-name {
+      font-size: 1.3rem;
+    }
+  }
+
+  /* --- Free assessment steps -----------------------------------------------
+     The layer rows' behaviour, in a flatter register: no spine, because these
+     are four beats of one conversation rather than a stack. The active row is
+     marked with an inset edge so nothing reflows when it lights.
+  ------------------------------------------------------------------------- */
+
+  .rf-assess-steps {
+    border-top: 1px solid var(--color-rf-hairline);
+  }
+
+  .rf-assess-step {
+    border-bottom: 1px solid var(--color-rf-hairline);
+    transition: box-shadow 0.22s ease;
+  }
+
+  .rf-assess-step[data-active] {
+    box-shadow: inset 3px 0 0 var(--color-rf-flow);
+  }
+
+  .rf-assess-toggle {
+    display: block;
+    width: 100%;
+    padding: 1.15rem 1rem 1.25rem;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.22s ease;
+  }
+
+  .rf-assess-toggle:hover,
+  .rf-assess-toggle:focus-visible,
+  .rf-assess-step[data-active] .rf-assess-toggle {
+    background: var(--color-rf-navy);
+  }
+
+  .rf-assess-head {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+  }
+
+  .rf-assess-name {
+    font-size: 1.1rem;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--color-rf-warm);
+  }
+
+  /* The body brightens with the row, so the whole block responds rather than
+     one detail of it. */
+  .rf-assess-toggle .rf-body {
+    transition: color 0.22s ease;
+  }
+
+  .rf-assess-toggle:hover .rf-body,
+  .rf-assess-toggle:focus-visible .rf-body,
+  .rf-assess-step[data-active] .rf-body {
+    color: var(--color-rf-warm);
+  }
+
+  /* --- Free assessment route glyph ---------------------------------------- */
+
+  .rf-assess-route {
+    fill: none;
+    stroke: var(--color-rf-hairline);
+    stroke-width: 1.5;
+    transition: stroke 0.22s ease;
+  }
+
+  .rf-assess-route[data-active] {
+    stroke: var(--color-rf-flow);
+  }
+
+  .rf-assess-node {
+    fill: var(--color-rf-void);
+    stroke: var(--color-rf-hairline);
+    stroke-width: 1;
+    transition:
+      fill 0.22s ease,
+      stroke 0.22s ease;
+  }
+
+  .rf-assess-node[data-active] {
+    fill: var(--color-rf-flow);
+    stroke: var(--color-rf-flow);
+  }
+
+  /* The step numeral answers to its own row, same as the chips do above. */
+  .rf-assess-route ~ .rf-annotation,
+  g > .rf-annotation {
+    transition: fill 0.22s ease;
+  }
+
+  g[data-active] > .rf-annotation {
+    fill: var(--color-rf-warm);
+  }
+
+  @media (min-width: 1024px) {
+    .rf-assess-name {
+      font-size: 1.3rem;
+    }
+  }
+
+  /* --- The layer stack ---------------------------------------------------- */
+
+  /* Drawn before the plates so each plate occludes the segment running through
+     it — the spine threads the stack instead of lying in front of it. */
+  .rf-iso-spine {
+    fill: none;
+    stroke: var(--color-rf-line);
+    stroke-width: 1.5;
+  }
+
+  .rf-plane {
+    transition:
+      transform 0.32s cubic-bezier(0.2, 0.7, 0.3, 1),
+      opacity 0.32s ease;
+  }
+
+  /* Lifting along the isometric up-axis, which is straight up in screen space. */
+  .rf-plane[data-active="true"] {
+    transform: translateY(-9px);
+  }
+
+  .rf-plane[data-dim="true"] {
+    opacity: 0.45;
+  }
+
+  /* Named on the plate. Four unlabelled slabs told you nothing about which
+     layer was which — the diagram was doing no work. */
+  .rf-plane-label,
+  .rf-plane-name {
+    font-family: var(--font-mono);
+    letter-spacing: 0.14em;
+    dominant-baseline: middle;
+    transition: fill 0.25s ease;
+  }
+
+  .rf-plane-label {
+    font-size: 11px;
+    fill: var(--color-rf-flow-soft);
+  }
+
+  .rf-plane-name {
+    font-size: 10px;
+    text-transform: uppercase;
+    fill: var(--color-rf-slate);
+  }
+
+  .rf-plane[data-active="true"] .rf-plane-label,
+  .rf-plane[data-active="true"] .rf-plane-name {
+    fill: var(--color-rf-warm);
+  }
+
+  /* Wraps inline rather than stacking: the model sits alongside now, and a
+     seven-item column would out-run it. */
+  .rf-mech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.9rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--color-rf-slate);
+  }
+
+  /* Direct children, not `li` — the layer rows render these as spans inside a
+     button, where a list would be invalid. */
+  .rf-mech > * {
+    position: relative;
+    padding-right: 0.9rem;
+  }
+
+  .rf-mech > *:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 0.35em;
+    width: 1px;
+    height: 0.8em;
+    background: var(--color-rf-hairline);
   }
 
   /* --- Isometric models --------------------------------------------------- */
@@ -401,6 +1058,56 @@
     stroke-linejoin: round;
   }
 
+  /* Candidates that were considered and not chosen. Still there, no longer
+     the subject. */
+  .rf-iso-dim {
+    fill: var(--color-rf-navy);
+    stroke: var(--color-rf-hairline);
+    stroke-width: 1;
+    stroke-linejoin: round;
+  }
+
+  /* Route terminals. Every route has one at each end — that is what makes it
+     read as attached rather than as a line lying across the drawing. */
+  .rf-iso-node {
+    fill: var(--color-rf-flow);
+  }
+
+  .rf-iso-node-muted {
+    fill: none;
+    stroke: var(--color-rf-flow);
+    stroke-width: 1.5;
+  }
+
+  /* Travelling pulse. Dash period 25, offset shifts by exactly two periods,
+     so the loop has no seam. */
+  .rf-iso-pulse {
+    fill: none;
+    stroke: var(--color-rf-flow-soft);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 3 22;
+    opacity: 0;
+  }
+
+  /* The sweep that finds the opportunity in the Discover field. Invisible at
+     rest — the resting state of this model is "already found", so a static
+     line across the drawing would be one more stroke connecting nothing. */
+  .rf-iso-scan {
+    fill: none;
+    stroke: var(--color-rf-flow);
+    stroke-width: 1.5;
+    opacity: 0;
+  }
+
+  /* The cell that survives the sweep. */
+  .rf-iso-select {
+    fill: none;
+    stroke: var(--color-rf-flow);
+    stroke-width: 1.5;
+  }
+
   .rf-iso-thin {
     fill: none;
     stroke: var(--color-rf-slate);
@@ -437,42 +1144,265 @@
     fill: var(--color-rf-slate);
   }
 
-  /* --- Hero flow field ---------------------------------------------------- */
+  /* --- The wave -----------------------------------------------------------
+     Three stacked waves that drift apart and lock back into phase. The mark in
+     the navigation, the ASCII mark in the hero, and the field behind it are
+     the same idea at three fidelities — nothing else on the site uses it.
+  ------------------------------------------------------------------------- */
 
-  .rf-flow {
+  /* The RF monogram, vector cut. Same geometry as the hero's dot rendering. */
+  /* `flex: none` matters: Firefox will not derive an `auto` width from a
+     viewBox for a flex item and squashes the mark to nothing. */
+  .rf-mark {
+    display: block;
+    flex: none;
+    width: auto;
+    height: 1.375rem;
+  }
+
+  .rf-mark-face {
+    fill: var(--color-rf-warm);
+    transition: fill 0.25s ease;
+  }
+
+  /* The extruded sides, in the accent — the depth is where the colour goes,
+     so the letterform itself stays quiet at 24px. */
+  .rf-mark-depth {
+    fill: var(--color-rf-flow);
+    transition: fill 0.25s ease;
+  }
+
+  a:hover .rf-mark-depth,
+  a:focus-visible .rf-mark-depth {
+    fill: var(--color-rf-flow-soft);
+  }
+
+  /* The query container. `container-type` makes an element a container for its
+     *descendants* — using `cqw` in the same element's own declarations resolves
+     against an ancestor container instead, silently falling back to the
+     viewport. So the wrapper holds the containment and the `pre` reads it. */
+  .rf-ascii {
+    container-type: inline-size;
     position: absolute;
     inset: 0;
     z-index: 0;
     overflow: clip;
     pointer-events: none;
-    /* Strongest behind the render, gone by the time it reaches the copy. */
-    mask-image: radial-gradient(
-      70% 60% at 72% 50%,
-      rgb(0 0 0 / 1) 0%,
-      rgb(0 0 0 / 0.55) 45%,
+  }
+
+  /* A `pre` sizes to its content, so the type scale is derived from the
+     container rather than picked. `line-height` matches the monospace advance
+     width so cells come out square, which the monogram's geometry assumes.
+     Centred rather than top-aligned: the grid deliberately over-fills the
+     height, and anchoring it at the top pushed the drawing out of the bottom of
+     the section instead of clipping it evenly. */
+  .rf-ascii pre {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    translate: 0 -50%;
+    font-family: var(--font-mono);
+    font-size: calc(100cqw / (var(--rf-cols, 232) * 0.6));
+    line-height: 0.6;
+    white-space: pre;
+    user-select: none;
+  }
+
+  /* Atmosphere, edge to edge. No horizontal mask — the texture is the surface
+     the hero sits on, so cutting it off under the headline made the left half
+     look unfinished. Present enough to see, quiet enough to read white type
+     over. The fade keeps it off the eyebrow at the top and the marquee below. */
+  .rf-ascii-field {
+    color: var(--color-rf-line);
+    opacity: 0.85;
+    mask-image: linear-gradient(
+      to bottom,
+      rgb(0 0 0 / 0.45) 0%,
+      rgb(0 0 0 / 1) 24%,
+      rgb(0 0 0 / 1) 76%,
+      rgb(0 0 0 / 0.5) 100%
+    );
+  }
+
+  /* Hidden below lg — the mobile hero needs the whole width for its copy, and a
+     monogram behind the headline is noise, not identity. */
+  .rf-ascii-mono {
+    display: none;
+  }
+
+  /* Two blues, not two hues. The lit front face takes the bright tint and the
+     extruded sides take the deep one, so the value difference between them is
+     what reads as three dimensions — a single flat colour collapsed R and F into
+     one silhouette. */
+  /* White front, blue extrusion — the same two tones as the wordmark, so the
+     hero mark and the nav read as one identity. The face is a window onto a
+     gradient rather than a flat fill so a band of light can travel across it;
+     the gradient stays within white so the face never turns blue.
+     `background-clip: text` needs a transparent colour, and the resting frame —
+     no JavaScript, reduced motion — is the gradient standing still. */
+  .rf-ascii-mono-face {
+    opacity: 0.95;
+    color: transparent;
+    background-image: linear-gradient(
+      100deg,
+      var(--color-rf-warm) 0%,
+      var(--color-rf-warm) 34%,
+      #ffffff 46%,
+      #ffffff 54%,
+      var(--color-rf-warm) 66%,
+      var(--color-rf-warm) 100%
+    );
+    background-size: 260% 100%;
+    background-position: 50% 0;
+    background-clip: text;
+    -webkit-background-clip: text;
+    /* Glow on the element, not `text-shadow` — the glyphs are transparent. */
+    filter: drop-shadow(0 0 5px rgb(110 155 255 / 0.35));
+  }
+
+  .rf-ascii-mono-depth {
+    color: var(--color-rf-flow);
+    opacity: 0.9;
+    filter: drop-shadow(0 0 7px rgb(47 107 255 / 0.4));
+  }
+
+  /* A scrim under the copy column. The field runs the full width, and slate
+     body text over a dotted texture loses legibility — this keeps the reading
+     area calm without cutting the texture off at a hard edge. */
+  .rf-hero-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(
+      to right,
+      rgb(5 9 18 / 0.94) 0%,
+      rgb(5 9 18 / 0.9) 26%,
+      rgb(5 9 18 / 0.6) 44%,
+      rgb(5 9 18 / 0) 62%
+    );
+  }
+
+  @media (min-width: 1024px) {
+    .rf-ascii-mono {
+      display: block;
+    }
+  }
+
+  /* The still reprise below the fold. Low enough that you notice it only after
+     you have stopped reading. Wins over the breakpoint rules above. */
+  .rf-ascii-field.rf-ascii-echo {
+    opacity: 0.13;
+    mask-image: linear-gradient(
+      to bottom,
+      rgb(0 0 0 / 0) 0%,
+      rgb(0 0 0 / 1) 45%,
       rgb(0 0 0 / 0) 100%
     );
   }
 
-  .rf-flow svg {
-    width: 100%;
-    height: 100%;
+  @media (min-width: 1024px) {
+    .rf-mark {
+      height: 1.5rem;
+    }
   }
 
-  .rf-flow-line {
-    fill: none;
-    stroke: var(--color-rf-flow);
-    stroke-width: 1;
-    opacity: 0.16;
+  /* --- Dither reveal -------------------------------------------------------
+     Arrival in the same halftone language as the hero: a screen of dots lifts
+     off as the block settles. Additive only — without the attribute the
+     content is simply visible, so no-JS and reduced motion lose nothing.
+  ------------------------------------------------------------------------- */
+
+  .rf-reveal {
+    position: relative;
   }
 
-  .rf-flow-pulse {
-    fill: none;
-    stroke: var(--color-rf-flow);
-    stroke-width: 1.5;
-    stroke-linecap: round;
-    stroke-dasharray: 2 16;
-    opacity: 0.5;
+  .rf-reveal[data-revealed]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    background-image: radial-gradient(
+      var(--color-rf-void) 0.9px,
+      transparent 0.9px
+    );
+    background-size: 3px 3px;
+  }
+
+  /* --- Industries marquee -------------------------------------------------- */
+
+  .rf-marquee {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: clamp(1rem, 3vw, 2rem);
+    border-top: 1px solid var(--color-rf-hairline);
+    padding-inline: clamp(1.25rem, 4vw, 3.5rem);
+    padding-block: 1.1rem;
+    background: var(--color-rf-void);
+  }
+
+  .rf-marquee-label {
+    flex: none;
+    border-right: 1px solid var(--color-rf-hairline);
+    padding-right: clamp(1rem, 3vw, 2rem);
+  }
+
+  .rf-marquee-viewport {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    /* Items enter and leave rather than appearing at a hard edge. */
+    mask-image: linear-gradient(
+      to right,
+      rgb(0 0 0 / 0) 0,
+      rgb(0 0 0 / 1) 4rem,
+      rgb(0 0 0 / 1) calc(100% - 4rem),
+      rgb(0 0 0 / 0) 100%
+    );
+  }
+
+  .rf-marquee-track {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 2.75rem;
+    padding-right: 2.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-rf-slate);
+    white-space: nowrap;
+  }
+
+  /* A wave tick before each industry, so the row belongs to the mark above it. */
+  .rf-marquee-track li {
+    position: relative;
+    padding-left: 1.4rem;
+  }
+
+  /* A short rule before each industry — the same tick the response lines use,
+     so the row reads in the site's existing vocabulary rather than adding a
+     second wave motif. */
+  .rf-marquee-track li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 12px;
+    height: 1px;
+    translate: 0 -50%;
+    background: var(--color-rf-flow);
+  }
+
+  .rf-marquee:hover .rf-marquee-track,
+  .rf-marquee:focus-within .rf-marquee-track {
+    animation-play-state: paused;
   }
 
   /* Desktop crossfade: every model occupies the same grid cell. The direct
@@ -571,12 +1501,105 @@
   }
 }
 
-@keyframes rf-flow-drift {
+@keyframes rf-cta-flow {
   from {
     stroke-dashoffset: 0;
   }
   to {
-    stroke-dashoffset: -360;
+    stroke-dashoffset: -50;
+  }
+}
+
+@keyframes rf-iso-flow {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -50;
+  }
+}
+
+@keyframes rf-iso-sweep {
+  0% {
+    opacity: 0;
+    transform: translateY(-26px);
+  }
+  25% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+}
+
+/* A band of light travelling across the monogram. Slow — the mark should look
+   like it is catching light, not flashing. */
+@keyframes rf-mono-sheen {
+  from {
+    background-position: 165% 0;
+  }
+  to {
+    background-position: -65% 0;
+  }
+}
+
+@keyframes rf-mono-breathe {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 4px rgb(47 107 255 / 0.35));
+  }
+  50% {
+    filter: drop-shadow(0 0 11px rgb(47 107 255 / 0.6));
+  }
+}
+
+@keyframes rf-reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* The dot screen coarsens and clears as the block settles. */
+@keyframes rf-reveal-screen {
+  from {
+    opacity: 1;
+    background-size: 3px 3px;
+  }
+  to {
+    opacity: 0;
+    background-size: 9px 9px;
+  }
+}
+
+@keyframes rf-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Two identical sibling tracks, each shifting exactly one track-width. When
+   the first has moved fully out, the second sits where the first began, so the
+   loop has no seam. */
+@keyframes rf-marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
   }
 }
 
@@ -604,9 +1627,40 @@
     animation-delay: var(--rf-delay, 0s);
   }
 
-  /* The one continuous animation on the page: slow enough to read as ambient. */
-  .rf-flow-pulse {
-    animation: rf-flow-drift 24s linear infinite;
+  .rf-ascii-mono-face {
+    animation: rf-mono-sheen 9s linear infinite;
+  }
+
+  .rf-ascii-mono-depth {
+    animation: rf-mono-breathe 9s ease-in-out infinite;
+  }
+
+  .rf-reveal[data-revealed] {
+    animation: rf-reveal-in 0.62s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+    animation-delay: var(--rf-reveal-delay, 0ms);
+  }
+
+  .rf-reveal[data-revealed]::after {
+    animation: rf-reveal-screen 0.72s ease-out both;
+    animation-delay: var(--rf-reveal-delay, 0ms);
+  }
+
+  [data-play="true"] .rf-anim-scan {
+    animation: rf-iso-sweep 1.1s ease-in-out both;
+    animation-delay: var(--rf-delay, 0s);
+  }
+
+  /* Pulses run continuously rather than being gated on the build sequence:
+     the models replay every nine seconds, and a route that only carried
+     traffic just after it was drawn would sit dead most of the time. */
+  .rf-iso-pulse {
+    opacity: 1;
+    animation: rf-iso-flow 2.6s linear infinite;
+  }
+
+  /* Slow enough to read as a standing row rather than a ticker. */
+  .rf-marquee-track {
+    animation: rf-marquee-scroll 38s linear infinite;
   }
 }
 
@@ -614,7 +1668,37 @@
   .rf-iso-stack .rf-iso-frame,
   .rf-stage-panel,
   .rf-nav-link::after,
-  .rf-cta-primary::before {
+  .rf-cta-primary::before,
+  .rf-menu-panel,
+  .rf-menu-toggle,
+  .rf-menu-item,
+  .rf-mark-wave,
+  .rf-plane,
+  .rf-card,
+  .rf-disclosure-marker,
+  .rf-disclosure-marker::after,
+  .rf-assess-step {
     transition: none;
+  }
+
+  /* The row stops and wraps instead of scrolling; the duplicate copy would
+     just repeat every item, so it goes. */
+  .rf-marquee-viewport {
+    mask-image: none;
+    overflow: visible;
+  }
+
+  .rf-marquee-track {
+    flex-wrap: wrap;
+    gap: 0.5rem 1.75rem;
+    white-space: normal;
+  }
+
+  .rf-marquee-track[aria-hidden="true"] {
+    display: none;
+  }
+
+  .rf-menu-panel[data-open="true"] li {
+    animation: none;
   }
 }
