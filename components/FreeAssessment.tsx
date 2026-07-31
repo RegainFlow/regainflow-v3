@@ -59,11 +59,14 @@ export default function FreeAssessment() {
         </dl>
 
         <p className="rf-utility mt-14 text-rf-flow-soft">
-          Hover a step to trace it
+          <span className="rf-on-touch">Tap</span>
+          <span className="rf-on-pointer">Hover</span> a step to trace it
         </p>
 
-        <div className="mt-6 grid gap-10 lg:grid-cols-12 lg:gap-x-14">
-          <div className="lg:col-span-5 lg:col-start-8 lg:row-start-1">
+        {/* Grid only from `lg` — see the note in `LayerSystem`; below that the
+            block container is what the pinned route travels inside. */}
+        <div className="mt-6 lg:grid lg:grid-cols-12 lg:gap-x-14">
+          <div className="rf-model-pin sticky top-16 lg:static lg:col-span-5 lg:col-start-8 lg:row-start-1">
             <div className="lg:sticky lg:top-24">
               <AssessmentRoute active={active} />
             </div>
@@ -71,7 +74,7 @@ export default function FreeAssessment() {
 
           {/* `self-start`: the row is as tall as the sticky diagram beside it,
               and a stretched list drags its last rule into empty space. */}
-          <ol className="rf-assess-steps self-start lg:col-span-7 lg:col-start-1 lg:row-start-1">
+          <ol className="rf-assess-steps mt-10 self-start lg:col-span-7 lg:col-start-1 lg:row-start-1 lg:mt-0">
             {ASSESSMENT_STEPS.map((step) => (
               <li
                 key={step.index}
@@ -89,9 +92,10 @@ export default function FreeAssessment() {
                   aria-pressed={active === step.index}
                   onFocus={() => setActive(step.index)}
                   onBlur={() => setActive(null)}
-                  onClick={() =>
-                    setActive((id) => (id === step.index ? null : step.index))
-                  }
+                  // Sets rather than toggles — see the note in `LayerSystem`:
+                  // on touch, focus lands before click, so a toggle undid the
+                  // tap that caused it.
+                  onClick={() => setActive(step.index)}
                 >
                   <span className="rf-assess-head">
                     <span className="rf-index">{step.index}</span>
@@ -124,7 +128,9 @@ function AssessmentRoute({ active }: { active: string | null }) {
   return (
     <svg
       viewBox="0 0 400 270"
-      className="w-full max-w-[420px]"
+      // Centred while it is pinned above the steps; left-aligned in its own
+      // column from `lg`, which is where it was to begin with.
+      className="mx-auto w-full max-w-[420px] lg:mx-0"
       aria-hidden="true"
       focusable="false"
     >

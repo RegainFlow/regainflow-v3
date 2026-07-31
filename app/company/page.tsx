@@ -43,23 +43,44 @@ export default function CompanyPage() {
             </p>
           </div>
 
+          {/* Stacked while the column is narrow; from `lg` the portrait moves
+              beside the copy. Stacked at that width left most of a ~600px grid
+              cell empty to the right of a 240px portrait and a 42ch bio. */}
           <ul className="mt-12 grid gap-8 sm:grid-cols-2 lg:gap-12">
             {TEAM.map((member) => (
-              <li key={member.name}>
-                {/* Placeholder frames. Drop real photographs at the same paths
-                    and the layout does not move. */}
-                <div className="rf-portrait">
+              <li key={member.name} className="lg:flex lg:items-start lg:gap-6">
+                {/* Drop real photographs at the same paths and the layout does
+                    not move — the frame declares its own ratio. */}
+                {/* Grows with the card rather than taking one fixed width: at
+                    `lg` the cell is only ~447px, so a portrait sized for the
+                    1280px layout would squeeze the bio to under 30 characters. */}
+                <div className="rf-portrait lg:w-48 lg:flex-none xl:w-56">
                   <Image
                     src={member.image}
                     alt={`${member.name}, ${member.role} of RegainFlow`}
                     width={480}
                     height={600}
-                    sizes="(min-width: 640px) 40vw, 100vw"
+                    // The widest the frame ever gets is the 16rem stacked cap,
+                    // so ask for that rather than a share of the viewport —
+                    // `40vw` was requesting ~576px to fill a 240px slot.
+                    sizes="256px"
+                    // `next/image` will not send an SVG through the optimizer
+                    // unless `dangerouslyAllowSVG` is set, and it fails rather
+                    // than falling back — which is why the pending placeholder
+                    // rendered as alt text. Serving these 657 bytes straight
+                    // from `/public` costs nothing and keeps the optimizer
+                    // closed to SVG everywhere else, which is the safe default.
+                    unoptimized={member.image.endsWith(".svg")}
                   />
                 </div>
-                <h3 className="rf-h3 mt-5">{member.name}</h3>
-                <p className="rf-utility mt-2">{member.role}</p>
-                <p className="rf-body mt-3 max-w-[42ch]">{member.bio}</p>
+
+                {/* One flex item, not three — otherwise the name, role, and bio
+                    each become their own column beside the portrait. */}
+                <div className="mt-5 lg:mt-0 lg:min-w-0">
+                  <h3 className="rf-h3">{member.name}</h3>
+                  <p className="rf-utility mt-2">{member.role}</p>
+                  <p className="rf-body mt-3 max-w-[42ch]">{member.bio}</p>
+                </div>
               </li>
             ))}
           </ul>

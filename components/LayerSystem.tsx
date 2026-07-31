@@ -19,11 +19,19 @@ export default function LayerSystem({ detailed = false }: { detailed?: boolean }
   return (
     <>
       <p className="rf-utility mt-8 text-rf-flow-soft">
-        Hover a layer to see where it sits
+        <span className="rf-on-touch">Tap</span>
+        <span className="rf-on-pointer">Hover</span> a layer to see where it sits
       </p>
 
-      <div className="mt-6 grid gap-10 lg:grid-cols-12 lg:gap-x-14">
-        <div className="lg:col-span-6 lg:col-start-7 lg:row-start-1">
+      {/* Grid only from `lg`. Below that it is a plain block container, which is
+          what gives the pinned model something to travel inside — a grid item's
+          containing block is its own grid area, so `sticky` there has nowhere
+          to go. */}
+      <div className="mt-6 lg:grid lg:grid-cols-12 lg:gap-x-14">
+        {/* Below `lg` this element does the sticking, against the tall block
+            container. From `lg` it is a stretched grid item and the inner
+            wrapper sticks inside it instead. */}
+        <div className="rf-model-pin sticky top-16 lg:static lg:col-span-6 lg:col-start-7 lg:row-start-1">
           <div className="lg:sticky lg:top-24">
             <LayerStack active={active} />
           </div>
@@ -32,7 +40,7 @@ export default function LayerSystem({ detailed = false }: { detailed?: boolean }
         {/* `self-start`: the grid row is as tall as the sticky diagram beside it,
             and a stretched list drags its spine down into empty space below the
             last layer. */}
-        <ol className="rf-layers self-start lg:col-span-6 lg:col-start-1 lg:row-start-1">
+        <ol className="rf-layers mt-10 self-start lg:col-span-6 lg:col-start-1 lg:row-start-1 lg:mt-0">
           {LAYERS.map((layer) => (
             <li
               key={layer.index}
@@ -50,9 +58,12 @@ export default function LayerSystem({ detailed = false }: { detailed?: boolean }
                 aria-pressed={active === layer.index}
                 onFocus={() => setActive(layer.index)}
                 onBlur={() => setActive(null)}
-                onClick={() =>
-                  setActive((id) => (id === layer.index ? null : layer.index))
-                }
+                // Sets rather than toggles, and that is the whole fix for
+                // touch: a tap fires focus before click, so by the time a
+                // toggle ran, `active` was already this row and the tap
+                // cleared it again — the row looked dead. Deselection happens
+                // on blur, or by choosing another row.
+                onClick={() => setActive(layer.index)}
               >
                 <span className="rf-layer-head">
                   <span className="rf-index">{layer.index}</span>

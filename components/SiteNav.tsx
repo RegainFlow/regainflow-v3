@@ -8,11 +8,27 @@ import {
   useId,
   useRef,
   useState,
+  useSyncExternalStore,
   type CSSProperties,
   type ReactNode,
 } from "react";
+import { createPortal } from "react-dom";
 
 import { NAV, type NavGroup } from "@/lib/site";
+
+/** Never fires — `useClient` below only needs the server/client split, not
+ *  updates. Defined out here so the subscription is stable across renders. */
+const noSubscribe = () => () => {};
+
+/** False while server-rendering and on the hydration pass, true afterwards.
+ *  `useSyncExternalStore` gets this right without a setState-in-effect. */
+function useClient() {
+  return useSyncExternalStore(
+    noSubscribe,
+    () => true,
+    () => false,
+  );
+}
 
 /** True for the group whose route we are currently on. */
 function isCurrent(pathname: string, group: NavGroup) {
@@ -144,12 +160,42 @@ export default function SiteNav({ cta }: { cta: ReactNode }) {
     setMobileOpen(false);
   }
 
+  // The panel is rendered through a portal (see below), and `document.body`
+  // only exists once we are on the client.
+  const mounted = useClient();
+
+  // Rotating a phone to landscape can cross `md` — a 14 Pro Max is 932px wide
+  // that way. CSS hides the panel there, but the scroll lock below is keyed to
+  // state, so without this the page stays frozen with no visible way to unfreeze
+  // it. Closing on the breakpoint keeps the two in step.
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 768px)");
+    const sync = () => {
+      if (desktop.matches) setMobileOpen(false);
+    };
+    desktop.addEventListener("change", sync);
+    return () => desktop.removeEventListener("change", sync);
+  }, []);
+
   // Hold focus inside the mobile panel while it covers the page, and stop the
   // page behind it from scrolling.
   useEffect(() => {
     if (!mobileOpen) return;
 
-    const previousOverflow = document.body.style.overflow;
+    // `overflow: hidden` on the body does not hold in iOS Safari — the page
+    // behind the panel still scrolls. Taking the body out of flow at a negative
+    // offset does, at the cost of having to put the scroll position back by
+    // hand on close.
+    const scrollY = window.scrollY;
+    const previous = {
+      position: document.body.style.position,
+      top: document.body.style.top,
+      width: document.body.style.width,
+      overflow: document.body.style.overflow,
+    };
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
     document.body.style.overflow = "hidden";
 
     const node = panelRef.current;
@@ -173,7 +219,12 @@ export default function SiteNav({ cta }: { cta: ReactNode }) {
 
     node?.addEventListener("keydown", onKeyDown);
     return () => {
-      document.body.style.overflow = previousOverflow;
+      document.body.style.position = previous.position;
+      document.body.style.top = previous.top;
+      document.body.style.width = previous.width;
+      document.body.style.overflow = previous.overflow;
+      // Restoring `position` alone would drop the page back to the top.
+      window.scrollTo(0, scrollY);
       node?.removeEventListener("keydown", onKeyDown);
     };
   }, [mobileOpen]);
@@ -223,51 +274,69 @@ export default function SiteNav({ cta }: { cta: ReactNode }) {
         </svg>
       </button>
 
-      <div
-        id="rf-mobile-nav"
-        ref={panelRef}
-        className="rf-mobile-nav md:hidden"
-        data-open={mobileOpen}
-        hidden={!mobileOpen}
-      >
-        <nav aria-label="Primary (mobile)" className="rf-shell py-8">
-          {/* Every link closes the panel explicitly. The render-phase reset
-              above only fires on a pathname change, and most of these targets
-              are same-page anchors — which would leave a full-screen overlay
-              sitting on top of the section just jumped to. */}
-          {NAV.map((group) => (
-            <div key={group.href} className="border-t border-rf-hairline py-5">
-              <Link
-                href={group.href}
-                className="rf-h3 block"
-                data-current={isCurrent(pathname, group) || undefined}
-                onClick={dismissMobile}
-              >
-                {group.label}
-              </Link>
-              <ul className="mt-3 flex flex-col">
-                {group.items.map((item) => (
-                  <li key={item.href}>
+      {/* Portalled to `body` rather than left in the header, and this is
+          load-bearing. The header carries `backdrop-blur`, and a non-`none`
+          `backdrop-filter` makes an element the containing block for its
+          fixed-position descendants — so `top: 4rem; bottom: 0` resolved
+          against the 4rem-tall header and the panel computed to zero height.
+          Escaping to `body` also makes it immune to any filter or transform
+          the header picks up later. */}
+      {mounted
+        ? createPortal(
+            <div
+              id="rf-mobile-nav"
+              ref={panelRef}
+              className="rf-mobile-nav md:hidden"
+              data-open={mobileOpen}
+              hidden={!mobileOpen}
+            >
+              <nav aria-label="Primary (mobile)" className="rf-shell py-8">
+                {/* Every link closes the panel explicitly. The render-phase
+                    reset above only fires on a pathname change, and most of
+                    these targets are same-page anchors — which would leave a
+                    full-screen overlay sitting on top of the section just
+                    jumped to. */}
+                {NAV.map((group) => (
+                  <div
+                    key={group.href}
+                    className="border-t border-rf-hairline py-5"
+                  >
                     <Link
-                      href={item.href}
-                      className="rf-menu-item"
+                      href={group.href}
+                      className="rf-h3 block"
+                      data-current={isCurrent(pathname, group) || undefined}
                       onClick={dismissMobile}
                     >
-                      <span className="rf-menu-item-head">
-                        {item.index ? (
-                          <span className="rf-menu-index">{item.index}</span>
-                        ) : null}
-                        <span className="rf-menu-label">{item.label}</span>
-                      </span>
-                      <span className="rf-menu-hint">{item.hint}</span>
+                      {group.label}
                     </Link>
-                  </li>
+                    <ul className="mt-3 flex flex-col">
+                      {group.items.map((item) => (
+                        <li key={item.href}>
+                          <Link
+                            href={item.href}
+                            className="rf-menu-item"
+                            onClick={dismissMobile}
+                          >
+                            <span className="rf-menu-item-head">
+                              {item.index ? (
+                                <span className="rf-menu-index">
+                                  {item.index}
+                                </span>
+                              ) : null}
+                              <span className="rf-menu-label">{item.label}</span>
+                            </span>
+                            <span className="rf-menu-hint">{item.hint}</span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 ))}
-              </ul>
-            </div>
-          ))}
-        </nav>
-      </div>
+              </nav>
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   );
 }

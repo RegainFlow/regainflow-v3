@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { CASE_STUDIES } from "@/lib/content/case-studies";
+import { CASE_STUDIES, type CaseStudy } from "@/lib/content/case-studies";
 import { STAGES } from "@/lib/content/stages";
 import { BOOKING_HREF, CONTACT_EMAIL, SITE_NAME, SITE_URL } from "@/lib/site";
 
@@ -64,6 +64,11 @@ export function organizationJsonLd() {
     name: SITE_NAME,
     url: SITE_URL,
     email: CONTACT_EMAIL,
+    // `logo` is what Google reads for the knowledge panel; `image` is the
+    // general-purpose fallback. Google wants a logo it can crop square, which
+    // is what the 512×512 RF mark is.
+    logo: `${SITE_URL}/icon.png`,
+    image: `${SITE_URL}/opengraph-image`,
     description:
       "AI transformation partner for aerospace, industrial, and federal organizations — AI portfolio direction, production engineering, and managed AI operations.",
     areaServed: "US",
@@ -89,6 +94,26 @@ export function organizationJsonLd() {
         },
       })),
     },
+  };
+}
+
+/**
+ * The site itself, as distinct from the organization that publishes it. Gives
+ * answer engines and crawlers one node to hang the name and publisher on, and
+ * is what a `sameAs`/`publisher` reference resolves against.
+ *
+ * No `SearchAction` — the site has no search endpoint, and declaring one that
+ * 404s is worse than declaring nothing.
+ */
+export function websiteJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
+    name: SITE_NAME,
+    url: SITE_URL,
+    inLanguage: "en-US",
+    publisher: { "@id": `${SITE_URL}/#organization` },
   };
 }
 
@@ -127,6 +152,38 @@ export function breadcrumbJsonLd(
         item: `${SITE_URL}${path}`,
       },
     ],
+  };
+}
+
+/**
+ * A single study, for the detail page — which until now shipped a breadcrumb
+ * and nothing else, so the page's actual subject was invisible to anything
+ * reading structured data.
+ *
+ * `CreativeWork` rather than `Article`: these are anonymized accounts of
+ * delivered work, not dated editorial, and `Article` without a real
+ * `datePublished` invites a rich-result warning for a field we cannot honestly
+ * fill. `about` carries the group and `abstract` the executive line, both
+ * already authored in `lib/content/case-studies.ts`.
+ */
+export function caseStudyJsonLd(study: CaseStudy) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "@id": `${SITE_URL}/insights/${study.slug}/#work`,
+    name: study.title,
+    headline: study.title,
+    abstract: study.summary,
+    description: study.summary,
+    about: study.group,
+    // The environment the work ran in — the closest thing to a subject these
+    // deliberately unnamed studies have.
+    keywords: [study.group, study.industry],
+    url: `${SITE_URL}/insights/${study.slug}`,
+    inLanguage: "en-US",
+    isPartOf: { "@id": `${SITE_URL}/#website` },
+    author: { "@id": `${SITE_URL}/#organization` },
+    publisher: { "@id": `${SITE_URL}/#organization` },
   };
 }
 

@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
 
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
-import { organizationJsonLd, serializeJsonLd } from "@/lib/seo";
+import { organizationJsonLd, serializeJsonLd, websiteJsonLd } from "@/lib/seo";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 import "./globals.css";
@@ -27,6 +27,22 @@ const TITLE = "RegainFlow | AI Transformation Partner";
 const DESCRIPTION =
   "RegainFlow is an AI transformation partner for aerospace, industrial, and federal organizations. We find the AI work worth doing, engineer the production system around it, and leave your team able to run it.";
 
+/**
+ * `viewportFit` is deliberately left at its default rather than set to
+ * `"cover"`. Cover is all-or-nothing: `env(safe-area-inset-*)` reads 0 without
+ * it, and turning it on makes every edge-touching surface — the shell, the
+ * marquee, the watermark, the sticky header — responsible for its own inset, or
+ * hero copy runs under the notch in landscape. Nothing here needs to reach the
+ * physical edge, and with `themeColor` matching Void the default letterbox is
+ * invisible.
+ */
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#050912",
+  colorScheme: "dark",
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -36,6 +52,27 @@ export const metadata: Metadata = {
   description: DESCRIPTION,
   applicationName: SITE_NAME,
   alternates: { canonical: "/" },
+  // Without these Google will not use a large image or a full-length snippet,
+  // which is most of what a mobile result is.
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  // `black`, not `black-translucent`: translucent puts content behind the
+  // status bar, which is the standalone-mode equivalent of the `viewport-fit`
+  // decision above, and would slide the sticky header under the clock.
+  appleWebApp: {
+    capable: true,
+    title: SITE_NAME,
+    statusBarStyle: "black",
+  },
   openGraph: {
     title: TITLE,
     description: DESCRIPTION,
@@ -71,11 +108,19 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <SiteFooter />
 
         {/* Static, RegainFlow-authored structured data. `serializeJsonLd`
-            escapes `<` so no copy change can close the tag early. */}
+            escapes `<` so no copy change can close the tag early. The site node
+            is separate from the organization node so per-page graphs can
+            reference either by `@id`. */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: serializeJsonLd(organizationJsonLd()),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(websiteJsonLd()),
           }}
         />
       </body>

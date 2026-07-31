@@ -38,6 +38,17 @@
     -webkit-text-size-adjust: 100%;
   }
 
+  /* Safari's grey flash box is the wrong shape on every control here — it
+     ignores the border-radius and paints over the hairlines. Removing it is
+     only safe because each control now carries an explicit `:active` state,
+     so a tap is still acknowledged. */
+  a,
+  button,
+  summary,
+  [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     html {
       scroll-behavior: smooth;
@@ -190,7 +201,14 @@
     transition: text-shadow 0.25s ease;
   }
 
-  a:hover .rf-wordmark-3d,
+  /* --- Hover, and why it is gated ----------------------------------------
+     iOS Safari applies `:hover` on tap and holds it until the user taps
+     something else, so an ungated hover rule reads as stuck state on a phone.
+     Every hover-only declaration below therefore sits inside
+     `@media (hover: hover)`; the `:focus-visible` half of each pair stays
+     outside it, because keyboard users need those at every width.
+  ------------------------------------------------------------------------ */
+
   a:focus-visible .rf-wordmark-3d {
     text-shadow:
       0.5px 0.5px 0 var(--color-rf-flow-soft),
@@ -199,6 +217,18 @@
       2px 2px 0 var(--color-rf-flow-soft),
       2.5px 2.5px 0 var(--color-rf-flow-soft),
       3px 3px 0 var(--color-rf-flow-soft);
+  }
+
+  @media (hover: hover) {
+    a:hover .rf-wordmark-3d {
+      text-shadow:
+        0.5px 0.5px 0 var(--color-rf-flow-soft),
+        1px 1px 0 var(--color-rf-flow-soft),
+        1.5px 1.5px 0 var(--color-rf-flow-soft),
+        2px 2px 0 var(--color-rf-flow-soft),
+        2.5px 2.5px 0 var(--color-rf-flow-soft),
+        3px 3px 0 var(--color-rf-flow-soft);
+    }
   }
 
   @media (min-width: 768px) {
@@ -240,12 +270,26 @@
     transition: width 0.22s ease;
   }
 
-  .rf-cta-primary:hover {
+  .rf-cta-primary:focus-visible::before {
+    width: 24px;
+  }
+
+  @media (hover: hover) {
+    .rf-cta-primary:hover {
+      background: #ffffff;
+    }
+
+    .rf-cta-primary:hover::before {
+      width: 24px;
+    }
+  }
+
+  /* Touch gets the same acknowledgement hover gives a pointer. */
+  .rf-cta-primary:active {
     background: #ffffff;
   }
 
-  .rf-cta-primary:hover::before,
-  .rf-cta-primary:focus-visible::before {
+  .rf-cta-primary:active::before {
     width: 24px;
   }
 
@@ -257,9 +301,16 @@
       background-color 0.2s ease;
   }
 
-  .rf-cta-secondary:hover {
+  @media (hover: hover) {
+    .rf-cta-secondary:hover {
+      border-color: var(--color-rf-warm);
+      background: rgb(242 245 250 / 0.05);
+    }
+  }
+
+  .rf-cta-secondary:active {
     border-color: var(--color-rf-warm);
-    background: rgb(242 245 250 / 0.05);
+    background: rgb(242 245 250 / 0.09);
   }
 
   .rf-cta-compact {
@@ -282,6 +333,22 @@
     transition: color 0.2s ease;
   }
 
+  /* These stack tightly in the footer, where ~35px rows sit a few pixels apart.
+     Padding grows the element itself rather than an overlay, so neighbouring
+     targets stay separated instead of overlapping. Touch only — desktop density
+     is untouched. */
+  @media (hover: none) {
+    .rf-nav-link {
+      padding-block: 0.7rem;
+    }
+
+    /* The underline is anchored to the bottom edge, so it has to come back up
+       with the extra padding or it detaches from the word. */
+    .rf-nav-link::after {
+      bottom: 0.55rem;
+    }
+  }
+
   .rf-nav-link::after {
     content: "";
     position: absolute;
@@ -293,26 +360,40 @@
     transition: width 0.24s ease;
   }
 
-  .rf-nav-link:hover,
   .rf-nav-link:focus-visible {
     color: var(--color-rf-warm);
   }
 
-  .rf-nav-link:hover::after,
   .rf-nav-link:focus-visible::after {
     width: 100%;
   }
 
   /* On a card that is itself the link, the affordance has to answer to the
      card — the pointer is rarely over the small "View more" span. */
-  a.rf-card:hover .rf-nav-link,
   a.rf-card:focus-visible .rf-nav-link {
     color: var(--color-rf-warm);
   }
 
-  a.rf-card:hover .rf-nav-link::after,
   a.rf-card:focus-visible .rf-nav-link::after {
     width: 100%;
+  }
+
+  @media (hover: hover) {
+    .rf-nav-link:hover {
+      color: var(--color-rf-warm);
+    }
+
+    .rf-nav-link:hover::after {
+      width: 100%;
+    }
+
+    a.rf-card:hover .rf-nav-link {
+      color: var(--color-rf-warm);
+    }
+
+    a.rf-card:hover .rf-nav-link::after {
+      width: 100%;
+    }
   }
 
   /* The current route keeps the underline the others only get on hover. */
@@ -333,7 +414,13 @@
     transition: text-decoration-color 0.2s ease;
   }
 
-  .rf-text-link:hover {
+  @media (hover: hover) {
+    .rf-text-link:hover {
+      text-decoration-color: var(--color-rf-flow);
+    }
+  }
+
+  .rf-text-link:active {
     text-decoration-color: var(--color-rf-flow);
   }
 
@@ -364,16 +451,23 @@
   .rf-menu-toggle {
     display: inline-flex;
     align-items: center;
-    padding: 0.35rem 0.15rem;
+    /* Wider than it looks: the chevron is 10px, so without this the target is
+       barely a third of a finger. */
+    padding: 0.55rem 0.4rem;
     color: var(--color-rf-slate);
     transition:
       color 0.2s ease,
       transform 0.2s ease;
   }
 
-  .rf-menu:hover .rf-menu-toggle,
   .rf-menu-toggle[aria-expanded="true"] {
     color: var(--color-rf-warm);
+  }
+
+  @media (hover: hover) {
+    .rf-menu:hover .rf-menu-toggle {
+      color: var(--color-rf-warm);
+    }
   }
 
   .rf-menu-toggle[aria-expanded="true"] {
@@ -472,10 +566,17 @@
     margin-left: 1.7rem;
   }
 
-  .rf-menu-item:hover,
-  .rf-menu-item:focus-visible {
+  .rf-menu-item:focus-visible,
+  .rf-menu-item:active {
     border-left-color: var(--color-rf-flow);
     background: rgb(242 245 250 / 0.04);
+  }
+
+  @media (hover: hover) {
+    .rf-menu-item:hover {
+      border-left-color: var(--color-rf-flow);
+      background: rgb(242 245 250 / 0.04);
+    }
   }
 
   /* Items arrive in reading order once the panel is open. */
@@ -484,25 +585,39 @@
     animation-delay: var(--rf-stagger, 0s);
   }
 
+  /* 44px square — the iOS HIG and WCAG 2.5.5 floor. It was 40px, which is the
+     one control on the site a thumb has to hit before anything else works. */
   .rf-burger {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    margin-right: -0.5rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-right: -0.625rem;
     color: var(--color-rf-warm);
   }
 
-  /* Fixed, so it covers the page rather than stretching the header bar. */
+  /* Fixed, so it covers the page rather than stretching the header bar.
+     Rendered into `body` through a portal — inside the header it would be
+     positioned against the header's own box, because `backdrop-filter` there
+     makes it the containing block for fixed descendants. */
   .rf-mobile-nav {
     position: fixed;
     left: 0;
     right: 0;
     top: 4rem;
-    bottom: 0;
     z-index: 55;
+    /* Height, not `bottom: 0`. On iOS the large viewport is what `bottom`
+       resolves against, which parks the last group under the browser toolbar
+       where it cannot be scrolled to. `dvh` tracks the chrome as it collapses. */
+    height: calc(100dvh - 4rem);
     overflow-y: auto;
+    /* Stops a flick past the end of the list from scrolling the page behind. */
+    overscroll-behavior: contain;
+    /* Trailing space so the last link clears the home indicator. On the scroll
+       container rather than the inner `nav`, whose `py-8` is a Tailwind utility
+       and would win against anything set here. */
+    padding-bottom: 3rem;
     background: var(--color-rf-void);
     border-top: 1px solid var(--color-rf-hairline);
   }
@@ -523,7 +638,13 @@
     transition: border-color 0.25s ease;
   }
 
-  .rf-card:hover {
+  @media (hover: hover) {
+    .rf-card:hover {
+      border-color: var(--color-rf-slate);
+    }
+  }
+
+  a.rf-card:active {
     border-color: var(--color-rf-slate);
   }
 
@@ -535,15 +656,28 @@
     color: var(--color-rf-warm);
   }
 
+  /* Capped, and the cap is the point: `width: 100%` with `height: auto` let a
+     portrait grow to the full grid column — about 780px wide and 975px tall at
+     desktop — which pushed the name, role, and bio of the person it belongs to
+     below the fold. You had to scroll past a face to find out whose it was. */
+  /* The cap governs the stacked layout; from `lg` the card sets an explicit
+     width instead. 16rem still clears the ~278px cell at the `sm` breakpoint. */
   .rf-portrait {
+    max-width: 16rem;
     border: 1px solid var(--color-rf-hairline);
     background: var(--color-rf-navy);
   }
 
+  /* A declared ratio rather than the file's own, so a real photograph and a
+     placeholder occupy the same frame and the row stays level whatever gets
+     dropped in. Faces sit above centre, hence the 25% crop origin. */
   .rf-portrait img {
     display: block;
     width: 100%;
     height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: center 25%;
   }
 
   /* A small horizontal route mark used to introduce a response line. */
@@ -598,9 +732,14 @@
     display: none;
   }
 
-  .rf-disclosure-summary:hover,
   .rf-disclosure-summary:focus-visible {
     color: var(--color-rf-warm);
+  }
+
+  @media (hover: hover) {
+    .rf-disclosure-summary:hover {
+      color: var(--color-rf-warm);
+    }
   }
 
   /* The CTA's route stub, crossed: a plus that loses its upright and settles
@@ -614,9 +753,14 @@
     transition: width 0.22s ease;
   }
 
-  .rf-disclosure-summary:hover .rf-disclosure-marker,
   .rf-disclosure-summary:focus-visible .rf-disclosure-marker {
     width: 24px;
+  }
+
+  @media (hover: hover) {
+    .rf-disclosure-summary:hover .rf-disclosure-marker {
+      width: 24px;
+    }
   }
 
   .rf-disclosure-marker::after {
@@ -757,6 +901,61 @@
     border-color: var(--color-rf-flow);
   }
 
+  /* --- Pinned model, below lg ---------------------------------------------
+     On a phone the model renders above its list, so without this a tap changed
+     a drawing that had already scrolled off the top — the control looked inert.
+     Pinned under the header instead, the highlight is always on screen while
+     the rows are being tapped. From `lg` the model sits alongside the rows and
+     the inner wrapper takes over the sticking, so all of this is switched off.
+  ------------------------------------------------------------------------- */
+
+  .rf-model-pin {
+    z-index: 10;
+    /* The rows scroll underneath, so the model cannot be transparent. `.rf-iso`
+       carries its own Navy fill but the caption above it does not. */
+    background: var(--color-rf-void);
+    padding-bottom: 1rem;
+  }
+
+  /* Keeps the model from taking the whole screen on a short viewport — it has
+     to leave room for the rows it is responding to. Any descendant `svg`, not
+     just the framed one: the layer stack sits inside `.rf-iso`, the assessment
+     route is a bare `svg`, and both pin. `preserveAspectRatio` letterboxes
+     rather than distorts. */
+  .rf-model-pin svg {
+    max-height: 34dvh;
+  }
+
+  @media (min-width: 1024px) {
+    .rf-model-pin {
+      background: none;
+      padding-bottom: 0;
+    }
+
+    .rf-model-pin svg {
+      max-height: none;
+    }
+  }
+
+  /* --- Pointer-aware copy -------------------------------------------------
+     "Hover a layer" is wrong on a phone. Both words ship and CSS picks, so it
+     stays correct with JavaScript off and switches with an attached keyboard.
+  ------------------------------------------------------------------------- */
+
+  .rf-on-touch {
+    display: none;
+  }
+
+  @media (hover: none) {
+    .rf-on-touch {
+      display: inline;
+    }
+
+    .rf-on-pointer {
+      display: none;
+    }
+  }
+
   /* --- Layer rows as controls ---------------------------------------------
      The old treatment shifted one numeral's colour, which nobody would read as
      "this is interactive". The whole row is the target now: full-width hit
@@ -774,10 +973,16 @@
     transition: background-color 0.22s ease;
   }
 
-  .rf-layer-toggle:hover,
   .rf-layer-toggle:focus-visible,
+  .rf-layer-toggle:active,
   .rf-layer[data-active] .rf-layer-toggle {
     background: var(--color-rf-navy);
+  }
+
+  @media (hover: hover) {
+    .rf-layer-toggle:hover {
+      background: var(--color-rf-navy);
+    }
   }
 
   .rf-layer-head {
@@ -810,10 +1015,15 @@
     transition: color 0.22s ease;
   }
 
-  .rf-layer-toggle:hover .rf-mech,
   .rf-layer-toggle:focus-visible .rf-mech,
   .rf-layer[data-active] .rf-mech {
     color: var(--color-rf-warm);
+  }
+
+  @media (hover: hover) {
+    .rf-layer-toggle:hover .rf-mech {
+      color: var(--color-rf-warm);
+    }
   }
 
   @media (min-width: 1024px) {
@@ -850,10 +1060,16 @@
     transition: background-color 0.22s ease;
   }
 
-  .rf-assess-toggle:hover,
   .rf-assess-toggle:focus-visible,
+  .rf-assess-toggle:active,
   .rf-assess-step[data-active] .rf-assess-toggle {
     background: var(--color-rf-navy);
+  }
+
+  @media (hover: hover) {
+    .rf-assess-toggle:hover {
+      background: var(--color-rf-navy);
+    }
   }
 
   .rf-assess-head {
@@ -876,10 +1092,15 @@
     transition: color 0.22s ease;
   }
 
-  .rf-assess-toggle:hover .rf-body,
   .rf-assess-toggle:focus-visible .rf-body,
   .rf-assess-step[data-active] .rf-body {
     color: var(--color-rf-warm);
+  }
+
+  @media (hover: hover) {
+    .rf-assess-toggle:hover .rf-body {
+      color: var(--color-rf-warm);
+    }
   }
 
   /* --- Free assessment route glyph ---------------------------------------- */
@@ -1172,9 +1393,14 @@
     transition: fill 0.25s ease;
   }
 
-  a:hover .rf-mark-depth,
   a:focus-visible .rf-mark-depth {
     fill: var(--color-rf-flow-soft);
+  }
+
+  @media (hover: hover) {
+    a:hover .rf-mark-depth {
+      fill: var(--color-rf-flow-soft);
+    }
   }
 
   /* The query container. `container-type` makes an element a container for its
@@ -1227,8 +1453,43 @@
 
   /* Hidden below lg — the mobile hero needs the whole width for its copy, and a
      monogram behind the headline is noise, not identity. */
+  /* The rest of this rule is a Firefox fix, and it is load-bearing.
+     `container-type` makes this wrapper a containing block, and Firefox clips a
+     `background-clip: text` background to that block — so the face layer lost
+     every glyph on a line sitting outside the wrapper's own box, which is most
+     of them once the grid deliberately over-fills the height. What survived was
+     a horizontal band through the middle of RF. Chrome paints the whole run and
+     hid it completely.
+
+     So the centring moves off the `pre` and onto this wrapper: the wrapper goes
+     auto-height and centres itself, the layers sit at its origin, and the
+     painted box coincides with the container. The glyphs land in exactly the
+     same place on screen either way — only the box they are measured against
+     changes. The field keeps the original arrangement: it paints a plain colour
+     (so it was never affected) and its fade is a mask on a section-sized box,
+     which this would resize. */
   .rf-ascii-mono {
     display: none;
+    inset: auto;
+    top: 50%;
+    left: 0;
+    right: 0;
+    translate: 0 -50%;
+    /* Box and content are the same size here, so there is nothing to clip; the
+       hero section already clips anything that spills. */
+    overflow: visible;
+  }
+
+  .rf-ascii-mono pre {
+    position: static;
+    translate: none;
+  }
+
+  /* Depth stays in flow and gives the wrapper its height; the face overlays it
+     rather than following it down the flow. */
+  .rf-ascii-mono pre + pre {
+    position: absolute;
+    inset: 0;
   }
 
   /* Two blues, not two hues. The lit front face takes the bright tint and the
@@ -1351,17 +1612,27 @@
     padding-right: clamp(1rem, 3vw, 2rem);
   }
 
+  @media (max-width: 30rem) {
+    .rf-marquee-label-tail {
+      display: none;
+    }
+  }
+
   .rf-marquee-viewport {
     display: flex;
     flex: 1;
     min-width: 0;
     overflow: hidden;
-    /* Items enter and leave rather than appearing at a hard edge. */
+    /* Items enter and leave rather than appearing at a hard edge. The fade is
+       proportional rather than a fixed 4rem: on a 375px screen the label eats
+       most of the row, leaving a ~169px viewport of which a fixed fade left
+       about 41px legible — the industries read as ghosts. `clamp` keeps the
+       generous fade on desktop and tightens it where there is no room. */
     mask-image: linear-gradient(
       to right,
       rgb(0 0 0 / 0) 0,
-      rgb(0 0 0 / 1) 4rem,
-      rgb(0 0 0 / 1) calc(100% - 4rem),
+      rgb(0 0 0 / 1) clamp(1rem, 12%, 4rem),
+      rgb(0 0 0 / 1) calc(100% - clamp(1rem, 12%, 4rem)),
       rgb(0 0 0 / 0) 100%
     );
   }
@@ -1400,9 +1671,16 @@
     background: var(--color-rf-flow);
   }
 
-  .rf-marquee:hover .rf-marquee-track,
+  /* Gated, and this one is not cosmetic: ungated, a single tap on the row put
+     iOS into `:hover` and left the marquee paused for the rest of the visit. */
   .rf-marquee:focus-within .rf-marquee-track {
     animation-play-state: paused;
+  }
+
+  @media (hover: hover) {
+    .rf-marquee:hover .rf-marquee-track {
+      animation-play-state: paused;
+    }
   }
 
   /* Desktop crossfade: every model occupies the same grid cell. The direct

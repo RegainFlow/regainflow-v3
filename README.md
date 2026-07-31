@@ -22,28 +22,28 @@ npm run typecheck
 
 ## Routes
 
-| Route | Purpose |
-| --- | --- |
-| `/` | Positioning, the production gap, condensed services, proof, partnership model |
-| `/services` | Full Discover / Implement / Scale, the four capability layers, engagement path, free assessment |
-| `/insights` | Selected enterprise AI and platform experience — six featured, all twelve in a disclosure |
-| `/insights/[slug]` | One case study in full: challenge, solution, capabilities, impact |
-| `/company` | Who we are, manifesto, contact |
-| `/robots.txt`, `/sitemap.xml`, `/llms.txt`, `/opengraph-image` | Generated |
+| Route                                                          | Purpose                                                                                         |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `/`                                                            | Positioning, the production gap, condensed services, proof, partnership model                   |
+| `/services`                                                    | Full Discover / Implement / Scale, the four capability layers, engagement path, free assessment |
+| `/insights`                                                    | Selected enterprise AI and platform experience — six featured, all twelve in a disclosure       |
+| `/insights/[slug]`                                             | One case study in full: challenge, solution, capabilities, impact                               |
+| `/company`                                                     | Who we are, manifesto, contact                                                                  |
+| `/robots.txt`, `/sitemap.xml`, `/llms.txt`, `/opengraph-image` | Generated                                                                                       |
 
 ## Structure
 
-| Path | Purpose |
-| --- | --- |
-| `app/layout.tsx` | Fonts, metadata, header, `main#main`, footer, organization JSON-LD |
-| `app/globals.css` | Palette tokens, type scale, the wave, navigation, cards, model styles, keyframes |
-| `lib/ascii/` | The ASCII engine — `dither`, `field`, `monogram` |
-| `lib/site.ts` | Domain, contact destinations, positioning copy, navigation tree |
-| `lib/content/` | Stages, layers, case studies, company — the single source for every page |
-| `lib/seo.ts` | JSON-LD builders and the `<` escape used before injection |
-| `components/brand/` | `AsciiField` (animated), `AsciiMonogram` (still) |
-| `components/SiteNav.tsx` | Desktop dropdowns and the mobile menu (the only navigation client component) |
-| `components/stage-models/` | The isometric primitives and the four stage models |
+| Path                       | Purpose                                                                          |
+| -------------------------- | -------------------------------------------------------------------------------- |
+| `app/layout.tsx`           | Fonts, metadata, header, `main#main`, footer, organization JSON-LD               |
+| `app/globals.css`          | Palette tokens, type scale, the wave, navigation, cards, model styles, keyframes |
+| `lib/ascii/`               | The ASCII engine — `dither`, `field`, `monogram`                                 |
+| `lib/site.ts`              | Domain, contact destinations, positioning copy, navigation tree                  |
+| `lib/content/`             | Stages, layers, case studies, company — the single source for every page         |
+| `lib/seo.ts`               | JSON-LD builders and the `<` escape used before injection                        |
+| `components/brand/`        | `AsciiField` (animated), `AsciiMonogram` (still)                                 |
+| `components/SiteNav.tsx`   | Desktop dropdowns and the mobile menu (the only navigation client component)     |
+| `components/stage-models/` | The isometric primitives and the four stage models                               |
 
 ### The ASCII engine
 
@@ -100,6 +100,17 @@ Cells are **square**: `line-height` matches the monospace advance width, and
 `--rf-cols` custom property). The monogram's geometry assumes square cells, and
 deriving the size means a grid fills its container by construction rather than
 by a lucky choice of constants.
+
+**The monogram wrapper centres itself; the `pre` inside it must not.** Firefox
+clips a `background-clip: text` background to the box of the containing block,
+and `container-type` makes the wrapper one — so an offset `pre` whose grid
+over-fills the height lost every glyph outside the wrapper's box, leaving a
+horizontal band through the middle of RF. Chrome paints the whole run and hides
+the difference entirely, so this will not show up in normal development.
+`.rf-ascii-mono` therefore goes auto-height and takes the `top: 50%` /
+`translate` itself, with the two layers at its origin. The field keeps the
+original arrangement on purpose: it paints a plain colour, so it was never
+affected, and its fade is a mask on a section-sized box that this would resize.
 
 Past the hero the motif carries through two devices and no more: `DitherReveal`
 resolves blocks out of dot-noise as they arrive, and `ProofStrip` holds one still
@@ -178,8 +189,3 @@ Deliberately absent:
 The industries in `lib/content/industries.ts` are the set the vertical research
 commits to. Banking, insurance, pharma, and healthcare are documented there as
 unvalidated and are deliberately not on the homepage.
-
-Placeholders to replace:
-
-- `public/brand/team/leonardo.svg` and `public/brand/team/will.svg` — drop real
-  photographs at the same paths and the layout does not move.

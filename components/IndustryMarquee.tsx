@@ -10,7 +10,11 @@ import { INDUSTRIES } from "@/lib/content/industries";
 export default function IndustryMarquee() {
   return (
     <div className="rf-marquee">
-      <p className="rf-utility rf-marquee-label">Industries we support</p>
+      {/* The tail drops below 30rem — at 375px the full label took roughly half
+          the row and left the industries themselves inside the edge fade. */}
+      <p className="rf-utility rf-marquee-label">
+        Industries<span className="rf-marquee-label-tail"> we support</span>
+      </p>
 
       <div className="rf-marquee-viewport">
         <ul className="rf-marquee-track">

@@ -23,14 +23,14 @@ export interface TeamMember {
 
 export const TEAM: TeamMember[] = [
   {
-    name: "Leonardo Ramirez",
-    role: "Co-founder",
+    name: "Leonardo J. Ramirez",
+    role: "co-founder & CEO",
     bio: "Builds AI systems inside environments that do not hand you clean data, a clear brief, or spare time — aerospace, defense, and complex enterprise. Works from the opportunity through to the thing running in production.",
-    image: "/brand/team/leonardo.svg",
+    image: "/brand/team/leo.png",
   },
   {
-    name: "Will",
-    role: "Co-founder",
+    name: "William J. Baltus",
+    role: "Co-founder & CTO",
     bio: "Engineering leadership across data, platform, and applied AI. Focused on the layer most AI work skips: making a deployed system dependable, observable, and affordable enough to keep.",
     image: "/brand/team/will.svg",
   },
@@ -52,7 +52,8 @@ export const PRINCIPLES = [
   },
   {
     index: "03",
-    title: "Flexible ownership: continue together, scale down, or transfer cleanly",
+    title:
+      "Flexible ownership: continue together, scale down, or transfer cleanly",
     detail:
       "Documentation, runbooks, and working sessions make a handoff a decision rather than a rescue.",
   },

@@ -11,7 +11,12 @@ import {
   EXPERIENCE_DISCLAIMER,
   studiesInGroup,
 } from "@/lib/content/case-studies";
-import { breadcrumbJsonLd, pageMetadata, serializeJsonLd } from "@/lib/seo";
+import {
+  breadcrumbJsonLd,
+  caseStudyJsonLd,
+  pageMetadata,
+  serializeJsonLd,
+} from "@/lib/seo";
 
 type Params = { slug: string };
 
@@ -163,6 +168,15 @@ export default async function CaseStudyPage({
               path: "/insights",
             }),
           ),
+        }}
+      />
+
+      {/* The study itself. Without this the page declared its position in the
+          site but never what it was about. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: serializeJsonLd(caseStudyJsonLd(study)),
         }}
       />
     </>
