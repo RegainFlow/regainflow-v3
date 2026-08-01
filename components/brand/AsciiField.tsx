@@ -16,8 +16,12 @@ export default function AsciiField({
   className,
   /** Top of the tone range. Pushes the brightest bands up onto the larger dots
    *  — at 0.62 almost every cell landed on the smallest one and the field was
-   *  barely there. */
-  ceiling = 0.88,
+   *  barely there. At 1 the crests reach the largest dot outright, which is what
+   *  pays for the crest shaping in `field.ts`: that gamma drops the midtones, so
+   *  without opening the top of the range the whole field just went quieter
+   *  instead of gaining contrast. Measured over a full grid, the two together
+   *  land within a few percent of the ink the old field carried. */
+  ceiling = 1,
   /** Still fields (below the fold) skip the loop entirely. */
   animate = true,
 }: {

@@ -47,10 +47,16 @@ npm run typecheck
 
 ### The ASCII engine
 
-A dot halftone. `lib/ascii/dither.ts` maps a tone to one of ` · : •` through a
-4×4 Bayer matrix, so *density* traces the gradient and two neighbouring cells at
+A dot halftone. `lib/ascii/dither.ts` maps a tone to one of ` · : •` through an
+8×8 Bayer matrix, so *density* traces the gradient and two neighbouring cells at
 the same tone can disagree. That disagreement is the texture. A per-cell
 threshold would band; random noise would fizz.
+
+The matrix is 8×8 rather than 4×4 because the ramp has only three intervals, so
+*all* the tonal resolution lives in the threshold — 64 steps between one dot and
+the next instead of 16. It is tone-neutral: swapping it changes measured ink
+density by nothing at all. What it buys is the monogram's extruded sides, which
+fade continuously with depth and terraced visibly at the coarser granularity.
 
 **Dots only — never block glyphs.** `▪ ▓ █` were tried and they fail
 structurally, not aesthetically. Square cells force `line-height` down to the
@@ -60,26 +66,64 @@ slab. No opacity or grid size fixes it. Every character in the ramp is ASCII or
 Latin-1: a glyph the font lacks falls back to another family with a different
 advance width and shears the whole grid.
 
-- **`field.ts`** — broad diagonal sweeps bent by a slow vertical warp. A
-  purely horizontal base read as scan lines; the bend is what makes it water.
-  A **black point** (0.46) matters more than it looks: without it the dither
-  marks about a quarter of the dark cells and the whole field turns to grain
-  instead of resolving into bands.
-- **`monogram.ts`** — RF as continuous rectangles plus one slanted leg,
-  extruded along the same `+a` screen axis the isometric diagrams use. Front,
-  top, and side faces carry different tones, which is what makes it read as a
-  solid. Front never reaches 1.0: the mark has to stay a dot texture, not a
-  fill. Deliberately a placeholder — swapping in a real mark means replacing
-  the geometry and nothing else.
+- **`field.ts`** — three wave trains bent by a slow vertical warp: two broad
+  sweeps crossing, and a shorter one at roughly twice the frequency for the
+  detail between them. A purely horizontal base read as scan lines; the bend is
+  what makes it water. A **black point** (0.46) matters more than it looks:
+  without it the dither marks about a quarter of the dark cells and the whole
+  field turns to grain instead of resolving into bands.
+
+  **Crests are shaped, not sinusoidal.** A sine is symmetric, and that symmetry
+  was the main reason the field read as a pattern rather than as water — real
+  swell has broad flat troughs and narrow crests. A gamma on the output buys the
+  asymmetry. It also costs density, because it drops the midtones where most
+  cells live, so it is paired with a `ceiling` of 1: the crests reach the largest
+  dot outright and the two together land within a few percent of the ink the flat
+  version carried. Measure that pairing rather than eyeballing it — the direction
+  is not obvious, and the gamma alone made the field a third *darker*.
+- **`monogram.ts`** — RF traced from `app/icon.png`. The R's bowl is a true
+  annulus, and almost everything else falls out of that: the outer disc reaches
+  back past the stem's right edge unaided, so there is no bottom bar, and the
+  sliver of Void that opens between stem and bowl needs no rule of its own. Two
+  details are easy to lose and both are load-bearing — the R's stem sits on a
+  *raised* baseline while its leg descends past it, and the F has no stem above
+  its mid arm, so its top arm hangs off the R's bowl.
+
+  **The extruded sides fade with depth.** Three flat tones read as an outline;
+  a continuous falloff reads as a solid. The front face, by contrast, is solid at
+  1.0 — the older "front never reaches 1.0" rule was guarding against block
+  glyphs welding into a slab, which is a property of the *ramp*, not of the tone.
+  A dot cannot weld at any density, and letting the face dither put roughly a
+  fifth of its cells on the smaller glyph, which read as noise.
 
 **The wordmark is the logo.** The navigation and footer render `RegainFlow` as
-text with the same extrusion the letterform has — stacked `text-shadow` offsets
-in Flow Blue, down and to the right along the isometric `+a` axis. No glyph
-component to keep in step, and it works at any string length.
+text with a stacked `text-shadow` extrusion in Flow Blue, down and to the right
+along the isometric `+a` axis. No glyph component to keep in step, and it works
+at any string length.
 
-`app/icon.png` is generated from the same `RECTS` and `LEG` geometry by a
-throwaway PNG encoder (Node `zlib`, no dependencies), so the favicon and the hero
-monogram are literally the same letterform.
+**Two extrusion axes, on purpose.** The wordmark and the stage diagrams share the
+isometric `+a` axis (0.866, −0.5, about 30°). The monogram does not: the icon's
+extrusion is steeper — a 4:5 slope, about 53° — and the mark follows the icon.
+Within the mark that slope does double duty, because the R's leg runs exactly
+parallel to the extrusion; both derive from one constant so they cannot drift
+apart, and that alignment is much of why it reads as one solid rather than as a
+letter with a shadow behind it.
+
+**`app/icon.png` is the source of truth for the mark, and the direction matters.**
+The letterform is drawn, not generated: the geometry in `monogram.ts` was traced
+off the PNG by sampling it and fitting primitives, so the favicon and the hero
+monogram are the same letterform because the code follows the file. (An earlier
+version of this ran the other way, generating the PNG from the geometry with a
+throwaway zlib encoder. That generator no longer exists.)
+
+Re-tracing, if the mark ever changes again: sample the PNG classifying each pixel
+to the *nearest* of Void / Flow Blue / warm white rather than thresholding on
+brightness — a strict threshold drops the antialiased boundary and insets every
+edge by a pixel or two, which shows up as a consistent one-cell shortfall on
+every outer edge at once. Then diff `isSolid()` against that mask on a fine grid.
+Check that diff and the rendered mark as two separate questions: at ~74 cells
+across, a letter unit is well under a cell, and chasing a sub-cell discrepancy
+into the geometry is how the letter-space definition gets corrupted.
 
 **Two tones, not two hues.** The hero monogram renders as two layers — front
 faces and extrusion — so they can be coloured separately. Both are blue; the
@@ -89,11 +133,20 @@ gradient (`background-clip: text`) so a band of light can travel across it.
 
 **Only the field animates.** The letterform is static, so `AsciiMonogram` is a
 plain server component with no loop and no hydration contract. `AsciiField`
-runs one `requestAnimationFrame` loop at 9fps, paused off-screen and on hidden
+runs one `requestAnimationFrame` loop at 7fps, paused off-screen and on hidden
 tabs, and its phase advances with scroll offset as well as time — scrolling
 moves the water. It writes `textContent` through a ref and never through React
 (`suppressHydrationWarning` is there for exactly that), because an ancestor
 re-render would otherwise restore React's own child and snap the animation back.
+
+A drift was tried on the mark — its extrusion angle and depth breathing on two
+slow cycles — and taken back out. Two reasons, and the second is the real one.
+The front face is drift-invariant by construction (its silhouette is `isSolid`,
+which knows nothing about the extrusion), so animating cost a wasted 25,000-cell
+DOM write per frame for a layer that never changed. And the extrusion is only
+about five cells deep at the size this renders, so any amplitude small enough to
+read as calm moved its edge by well under a cell — what you saw was the dither
+flickering, not the mark turning. The grid is too coarse to carry the motion.
 
 Cells are **square**: `line-height` matches the monospace advance width, and
 `font-size` is derived from the container (`container-type: inline-size` plus a

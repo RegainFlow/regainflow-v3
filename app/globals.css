@@ -1502,8 +1502,11 @@
      the gradient stays within white so the face never turns blue.
      `background-clip: text` needs a transparent colour, and the resting frame —
      no JavaScript, reduced motion — is the gradient standing still. */
+  /* The face is a solid field of the largest dot now rather than a dithered one,
+     so it needs less help: a heavier glow on an already-dense glyph run just
+     fogs the counter and softens the bowl's edge. */
   .rf-ascii-mono-face {
-    opacity: 0.95;
+    opacity: 0.92;
     color: transparent;
     background-image: linear-gradient(
       100deg,
@@ -1519,13 +1522,18 @@
     background-clip: text;
     -webkit-background-clip: text;
     /* Glow on the element, not `text-shadow` — the glyphs are transparent. */
-    filter: drop-shadow(0 0 5px rgb(110 155 255 / 0.35));
+    filter: drop-shadow(0 0 4px rgb(110 155 255 / 0.28));
   }
 
+  /* The extrusion fades with distance back now, so the depth it reads as comes
+     from the dot density itself rather than from a glow standing in for it. The
+     old 7px bloom washed that gradient flat — the near edge and the far edge lit
+     each other and the whole extrusion returned to one tone. Kept just wide
+     enough to keep the sparse far end from disappearing against Void. */
   .rf-ascii-mono-depth {
     color: var(--color-rf-flow);
-    opacity: 0.9;
-    filter: drop-shadow(0 0 7px rgb(47 107 255 / 0.4));
+    opacity: 0.95;
+    filter: drop-shadow(0 0 3px rgb(47 107 255 / 0.3));
   }
 
   /* A scrim under the copy column. The field runs the full width, and slate
