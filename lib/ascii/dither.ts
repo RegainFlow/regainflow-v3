@@ -25,11 +25,24 @@
  */
 const RAMP = [" ", "·", ":", "•"] as const;
 
-const BAYER4 = [
-  [0, 8, 2, 10],
-  [12, 4, 14, 6],
-  [3, 11, 1, 9],
-  [15, 7, 13, 5],
+/**
+ * 8×8, not 4×4.
+ *
+ * The ramp only has three intervals, so *all* the tonal resolution lives in the
+ * threshold: a 4×4 matrix offers 16 steps between one dot and the next, and the
+ * monogram's extruded sides — which now fade continuously with depth rather than
+ * sitting on two flat values — banded into visible terraces at that granularity.
+ * 8×8 gives 64, and costs one extra bit of masking.
+ */
+const BAYER8 = [
+  [0, 32, 8, 40, 2, 34, 10, 42],
+  [48, 16, 56, 24, 50, 18, 58, 26],
+  [12, 44, 4, 36, 14, 46, 6, 38],
+  [60, 28, 52, 20, 62, 30, 54, 22],
+  [3, 35, 11, 43, 1, 33, 9, 41],
+  [51, 19, 59, 27, 49, 17, 57, 25],
+  [15, 47, 7, 39, 13, 45, 5, 37],
+  [63, 31, 55, 23, 61, 29, 53, 21],
 ];
 
 /**
@@ -43,7 +56,7 @@ export function shade(tone: number, x: number, y: number): string {
   const t = tone < 0 ? 0 : tone > 1 ? 1 : tone;
   const level = t * (RAMP.length - 1);
   const step = Math.floor(level);
-  const threshold = (BAYER4[y & 3][x & 3] + 0.5) / 16;
+  const threshold = (BAYER8[y & 7][x & 7] + 0.5) / 64;
   const index = level - step > threshold ? step + 1 : step;
   return RAMP[index < RAMP.length ? index : RAMP.length - 1];
 }
