@@ -7,6 +7,7 @@ import {
   EXPERIENCE_DISCLAIMER,
 } from "@/lib/content/case-studies";
 import { MANIFESTO, MISSION } from "@/lib/content/company";
+import { FAQ } from "@/lib/content/faq";
 import { LAYERS } from "@/lib/content/layers";
 import { ENGAGEMENT_PATH, STAGES } from "@/lib/content/stages";
 import {
@@ -108,6 +109,14 @@ function build(): string {
   }
   lines.push("");
 
+  lines.push("## Common questions");
+  lines.push("");
+  for (const item of FAQ) {
+    lines.push(`### ${item.question}`);
+    lines.push(item.answer);
+    lines.push("");
+  }
+
   lines.push("## Pages");
   lines.push("");
   lines.push(`- [Home](${SITE_URL}/): positioning, the production gap, proof.`);
@@ -117,6 +126,9 @@ function build(): string {
     lines.push(`  - [${study.title}](${SITE_URL}/insights/${study.slug})`);
   }
   lines.push(`- [Company](${SITE_URL}/company): who we are, manifesto, contact.`);
+  lines.push(
+    `- [AI fact sheet](${SITE_URL}/llm-info): the whole of the above as one page — definition, key facts, founders, services, engagement path, commitments, and FAQ.`,
+  );
   lines.push("");
 
   return lines.join("\n");

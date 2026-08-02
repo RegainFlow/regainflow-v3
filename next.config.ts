@@ -1,46 +1,38 @@
 import type { NextConfig } from "next";
 
 /**
- * PostHog ingestion is proxied through this origin so it is first-party.
+ * PostHog ingest, reverse-proxied through this origin.
  *
- * The audience is aerospace, industrial, and federal — ad blockers and
- * corporate network filters are the norm, and a direct `posthog.com` request is
- * blocked often enough to bias everything measured through it. The path is
- * `/relay` rather than the `/ingest` used in most tutorials for exactly that
- * reason: `/ingest` is itself on blocklists now.
+ * Content blockers filter requests to posthog.com by hostname, and the traffic
+ * this site most wants to measure — people arriving from an AI assistant to
+ * evaluate a technical vendor — is exactly the traffic most likely to be running
+ * one. Serving ingest from our own origin is PostHog's documented way around
+ * that.
  *
- * Order matters. Next evaluates rewrites top-down, so the two asset rules have
- * to precede the catch-all or they never match.
+ * Region follows `NEXT_PUBLIC_POSTHOG_HOST`, so an EU project needs no code
+ * change. Read at build time, which is when rewrites are resolved.
  */
+const POSTHOG_HOST =
+  process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com";
+const POSTHOG_ASSETS = POSTHOG_HOST.includes("eu")
+  ? "https://eu-assets.i.posthog.com"
+  : "https://us-assets.i.posthog.com";
+
 const nextConfig: NextConfig = {
   async rewrites() {
     return [
+      // Static assets come from a different host than the ingest API, so this
+      // has to be matched first — the catch-all below would otherwise swallow
+      // it and the SDK bundle would 404.
       {
-        source: "/relay/static/:path*",
-        destination: "https://us-assets.i.posthog.com/static/:path*",
+        source: "/ingest/static/:path*",
+        destination: `${POSTHOG_ASSETS}/static/:path*`,
       },
-      {
-        source: "/relay/array/:path*",
-        destination: "https://us-assets.i.posthog.com/array/:path*",
-      },
-      {
-        source: "/relay/:path*",
-        destination: "https://us.i.posthog.com/:path*",
-      },
+      { source: "/ingest/:path*", destination: `${POSTHOG_HOST}/:path*` },
     ];
   },
-
-  /**
-   * Required by the proxy above, and a deliberate global change rather than a
-   * side effect: PostHog's API paths end in a slash (`/e/`, `/flags/`), and
-   * without this Next redirects them before the rewrite applies, which breaks
-   * capture entirely.
-   *
-   * The trade is that Next no longer auto-redirects `/services/` to
-   * `/services`. Nothing on the site links that way — `lib/site.ts`,
-   * `app/sitemap.ts`, and every `<Link>` use the canonical no-slash form — so
-   * this only affects a hand-typed or badly-copied inbound URL.
-   */
+  // PostHog's API is sensitive to a trailing slash being appended on redirect;
+  // without this some ingest calls are answered with a 308 rather than landing.
   skipTrailingSlashRedirect: true,
 };
 

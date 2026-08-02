@@ -1,5 +1,6 @@
 allowBuilds:
-  # Arrives with posthog-js. Its postinstall only prints a funding notice.
+  # Reached via posthog-js. Its postinstall only prints a funding notice, so
+  # there is nothing to gain by running it and one less install script to trust.
   core-js: false
   sharp: false
   unrs-resolver: false

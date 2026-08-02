@@ -1,8 +1,16 @@
 import type { Metadata } from "next";
 
 import { CASE_STUDIES, type CaseStudy } from "@/lib/content/case-studies";
+import { TEAM } from "@/lib/content/company";
+import { FAQ } from "@/lib/content/faq";
 import { STAGES } from "@/lib/content/stages";
-import { BOOKING_HREF, CONTACT_EMAIL, SITE_NAME, SITE_URL } from "@/lib/site";
+import {
+  BOOKING_HREF,
+  CONTACT_EMAIL,
+  PROFILES,
+  SITE_NAME,
+  SITE_URL,
+} from "@/lib/site";
 
 /**
  * Every structured-data payload here is authored in this repository — no user
@@ -15,6 +23,18 @@ export function serializeJsonLd(data: unknown): string {
 }
 
 /**
+ * Every card this site generates is a 1200×630 PNG. Stated rather than inferred
+ * because the file convention's own tags are not emitted for a page that
+ * declares `openGraph` — see `pageMetadata`.
+ *
+ * One tag the convention adds that cannot be reproduced here is its content
+ * hash. Without it a redeploy that changes the card leaves scrapers serving the
+ * cached one until their TTL expires or the URL is resubmitted; the card's copy
+ * is stable enough that this is the better trade against having no dimensions.
+ */
+const OG_CARD = { width: 1200, height: 630, type: "image/png" };
+
+/**
  * Per-route metadata.
  *
  * A page that declares `openGraph` replaces the layout's object outright rather
@@ -22,17 +42,41 @@ export function serializeJsonLd(data: unknown): string {
  * only a title silently loses the card image, site name, and locale, and keeps
  * the home page's Twitter description. Building all three here keeps every
  * route complete and consistent.
+ *
+ * That replacement is also why `images` has to be stated rather than left to
+ * Next's `opengraph-image.tsx` convention. The convention only fills in an
+ * `openGraph` object the page has not declared: with `images` omitted, the home
+ * page (whose card sits in its own segment) kept the full tag set while every
+ * page using this helper emitted no `og:image` at all. Verified in the built
+ * HTML both ways — it fails silently, which is the dangerous kind.
+ *
+ * Stated as an object, not the bare `"/opengraph-image"` string this used to
+ * pass: a string emits `og:image` alone and drops `og:image:width`, `:height`,
+ * and `:alt`, which is what several scrapers use to decide whether to render a
+ * large card at all.
  */
 export function pageMetadata({
   title,
   description,
   path,
+  image,
 }: {
   title: string;
   description: string;
   path: string;
+  /**
+   * For routes that generate their own card. Defaults to the site card — pass
+   * this only where an `opengraph-image` file exists for that segment, or the
+   * tags will point at an image that is never generated.
+   */
+  image?: { url: string; alt: string };
 }): Metadata {
   const fullTitle = `${title} | ${SITE_NAME}`;
+  const card = {
+    url: image?.url ?? "/opengraph-image",
+    alt: image?.alt ?? `${SITE_NAME} — AI transformation partner`,
+    ...OG_CARD,
+  };
 
   return {
     title,
@@ -45,15 +89,32 @@ export function pageMetadata({
       url: `${SITE_URL}${path}`,
       type: "website",
       locale: "en_US",
-      images: ["/opengraph-image"],
+      images: [card],
     },
     twitter: {
       card: "summary_large_image",
       title: fullTitle,
       description,
-      images: ["/opengraph-image"],
+      images: [card],
     },
   };
+}
+
+/**
+ * A stable `@id` for a person, derived from their name.
+ *
+ * Nodes are linked by `@id` rather than nested so each person is stated once and
+ * referenced everywhere else — the organization's `founder`, the page graph, and
+ * any future author byline all resolve to the same entity instead of describing
+ * three lookalikes.
+ */
+function personId(name: string): string {
+  const slug = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  return `${SITE_URL}/#person-${slug}`;
 }
 
 export function organizationJsonLd() {
@@ -80,7 +141,22 @@ export function organizationJsonLd() {
     },
     // `address` already carries the location as a typed Place; a second
     // free-text `location` would not validate.
-    sameAs: [BOOKING_HREF],
+    //
+    // `sameAs` is the entity anchor — the set of URLs that let a crawler confirm
+    // this node and the profiles it already knows about are one organization.
+    // `PROFILES` is empty until the real URLs land; spreading it keeps the
+    // booking link as the floor rather than emitting an empty array.
+    sameAs: [BOOKING_HREF, ...PROFILES],
+    // Name as well as `@id`, not a bare reference. This node ships on every
+    // route but the full `Person` nodes only exist on `/llm-info`, so a
+    // reference alone would dangle on four pages out of five. Carrying the name
+    // makes each one valid standalone, and the shared `@id` still merges it with
+    // the complete node wherever both are seen.
+    founder: TEAM.map((member) => ({
+      "@type": "Person",
+      "@id": personId(member.name),
+      name: member.name,
+    })),
     hasOfferCatalog: {
       "@type": "OfferCatalog",
       name: "AI transformation services",
@@ -184,6 +260,55 @@ export function caseStudyJsonLd(study: CaseStudy) {
     isPartOf: { "@id": `${SITE_URL}/#website` },
     author: { "@id": `${SITE_URL}/#organization` },
     publisher: { "@id": `${SITE_URL}/#organization` },
+  };
+}
+
+/**
+ * The founders, as first-class entities.
+ *
+ * An organization whose people resolve to real, cross-referenceable identities
+ * is treated as more trustworthy than one asserting expertise in prose alone,
+ * and these two are the substance of what the company sells. `sameAs` is emitted
+ * only where a profile URL actually exists — see `TeamMember.profile`.
+ */
+export function peopleJsonLd() {
+  return TEAM.map((member) => ({
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "@id": personId(member.name),
+    name: member.name,
+    jobTitle: member.role,
+    description: member.bio,
+    image: `${SITE_URL}${member.image}`,
+    url: `${SITE_URL}/company#about`,
+    worksFor: { "@id": `${SITE_URL}/#organization` },
+    ...(member.profile ? { sameAs: [member.profile] } : {}),
+  }));
+}
+
+/**
+ * `FAQPage`, built from the same array the page renders visibly.
+ *
+ * Both must come from `FAQ` — structured data that answers a question the page
+ * does not visibly answer is a rich-result violation, not a shortcut, and the
+ * one-source rule is what makes that impossible to get wrong later.
+ */
+export function faqJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": `${SITE_URL}/llm-info/#faq`,
+    inLanguage: "en-US",
+    isPartOf: { "@id": `${SITE_URL}/#website` },
+    about: { "@id": `${SITE_URL}/#organization` },
+    mainEntity: FAQ.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
   };
 }
 

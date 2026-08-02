@@ -19,6 +19,12 @@ export interface TeamMember {
   bio: string;
   /** Replace the placeholder at this path with a real photograph. */
   image: string;
+  /**
+   * Public profile URL, emitted as `sameAs` on the `Person` node. Left unset
+   * until the real URL is known: an unverifiable profile link weakens the
+   * entity claim it is supposed to strengthen.
+   */
+  profile?: string;
 }
 
 export const TEAM: TeamMember[] = [

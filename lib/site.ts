@@ -15,6 +15,23 @@ export const CONTACT_HREF = `mailto:${CONTACT_EMAIL}?subject=AI%20transformation
 
 export const PRIMARY_CTA = "Contact Us";
 
+/**
+ * Verified profiles for this organization, in `sameAs` order.
+ *
+ * This is the entity anchor: it is how an answer engine confirms that the site,
+ * the LinkedIn page, and the name in its index are all one organization rather
+ * than three. Cheap to add and disproportionately load-bearing, which is why it
+ * gets a named constant instead of an inline array.
+ *
+ * Deliberately empty pending the real URLs — a guessed profile URL that 404s is
+ * worse than an absent one, because it asserts an identity we cannot back.
+ * `sameAs` below still carries the booking link, so the node stays valid.
+ */
+export const PROFILES: string[] = [
+  // "https://www.linkedin.com/company/regainflow",
+  // "https://www.crunchbase.com/organization/regainflow",
+];
+
 export const LOCATION = "Orlando, Florida";
 
 export const POSITIONING = "AI transformation partner";

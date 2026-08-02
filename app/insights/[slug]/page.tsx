@@ -42,6 +42,12 @@ export async function generateMetadata({
     title: study.title,
     description: study.summary,
     path: `/insights/${study.slug}`,
+    // This segment generates its own card in `opengraph-image.tsx`; naming it
+    // here is what stops the default site card from being used instead.
+    image: {
+      url: `/insights/${study.slug}/opengraph-image`,
+      alt: study.title,
+    },
   });
 }
 

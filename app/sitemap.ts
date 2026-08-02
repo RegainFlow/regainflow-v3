@@ -8,6 +8,10 @@ const PRIORITY: Record<string, number> = {
   "/services": 0.8,
   "/insights": 0.8,
   "/company": 0.6,
+  // Below the marketing routes on purpose — it is a reference sheet, not a
+  // destination — but it has to be listed, because the only link to it is in
+  // the footer and an unlisted page is one a crawler has to be lucky to reach.
+  "/llm-info": 0.5,
 };
 
 export default function sitemap(): MetadataRoute.Sitemap {
