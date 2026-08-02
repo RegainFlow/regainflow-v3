@@ -1,3 +1,5 @@
 allowBuilds:
+  # Arrives with posthog-js. Its postinstall only prints a funding notice.
+  core-js: false
   sharp: false
   unrs-resolver: false

@@ -4,6 +4,7 @@ import Image from "next/image";
 import PageHeader from "@/components/PageHeader";
 import PlayOnView from "@/components/stage-models/PlayOnView";
 import StageModel from "@/components/stage-models/StageModel";
+import { RF_EVENTS } from "@/lib/analytics/events";
 import { MANIFESTO, MISSION, MISSION_DETAIL, TEAM, VISION } from "@/lib/content/company";
 import { breadcrumbJsonLd, pageMetadata, serializeJsonLd } from "@/lib/seo";
 import {
@@ -128,10 +129,23 @@ export default function CompanyPage() {
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <a href={BOOKING_HREF} className="rf-cta-primary">
+              {/* Both carry the same location on purpose: it is one decision
+                  point, and the event name is what separates them, so book-vs-
+                  email stays a direct comparison. */}
+              <a
+                href={BOOKING_HREF}
+                className="rf-cta-primary"
+                data-rf-event={RF_EVENTS.bookingClicked}
+                data-rf-location="company_contact"
+              >
                 {PRIMARY_CTA}
               </a>
-              <a href={CONTACT_HREF} className="rf-cta-secondary">
+              <a
+                href={CONTACT_HREF}
+                className="rf-cta-secondary"
+                data-rf-event={RF_EVENTS.contactClicked}
+                data-rf-location="company_contact"
+              >
                 Email us instead
               </a>
             </div>
@@ -142,7 +156,12 @@ export default function CompanyPage() {
               Email
             </dt>
             <dd className="rf-body mt-2 break-words">
-              <a href={CONTACT_HREF} className="rf-text-link">
+              <a
+                href={CONTACT_HREF}
+                className="rf-text-link"
+                data-rf-event={RF_EVENTS.contactClicked}
+                data-rf-location="company_details"
+              >
                 {CONTACT_EMAIL}
               </a>
             </dd>

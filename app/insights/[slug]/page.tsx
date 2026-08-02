@@ -148,7 +148,7 @@ export default async function CaseStudyPage({
               {siblings.slice(0, 3).map((other, i) => (
                 <li key={other.slug} className="h-full">
                   <DitherReveal className="h-full" delay={i * 90}>
-                    <CaseStudyCard study={other} />
+                    <CaseStudyCard study={other} surface="related" />
                   </DitherReveal>
                 </li>
               ))}

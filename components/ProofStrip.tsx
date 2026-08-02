@@ -60,7 +60,7 @@ export default function ProofStrip() {
           {FEATURED.map((study, i) => (
             <li key={study.slug} className="h-full">
               <DitherReveal className="h-full" delay={i * 90}>
-                <CaseStudyCard study={study} />
+                <CaseStudyCard study={study} surface="home_proof" />
               </DitherReveal>
             </li>
           ))}
