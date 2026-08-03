@@ -1,15 +1,38 @@
 import Link from "next/link";
 
-import type { CaseStudy } from "@/lib/content/case-studies";
+import { RF_EVENTS, type RfSurface } from "@/lib/analytics/events";
+import { GROUP_KEYS, type CaseStudy } from "@/lib/content/case-studies";
 
 /**
  * The whole card is the link — the same shape the home proof strip already
  * used. Everything technical (capabilities, stack) is held back for the study
  * page; what a card has to survive is being read by someone who never opens it.
+ *
+ * `surface` has no default. This card renders in four places and the property
+ * exists to tell them apart — a homepage `ProofStrip` click and a click inside
+ * the `/insights` disclosure are different signals about the same study. A
+ * default would let a fifth call site report as one of the existing four and
+ * quietly flatten that; requiring it makes the type checker ask.
  */
-export default function CaseStudyCard({ study }: { study: CaseStudy }) {
+export default function CaseStudyCard({
+  study,
+  surface,
+}: {
+  study: CaseStudy;
+  surface: RfSurface;
+}) {
   return (
-    <Link href={`/insights/${study.slug}`} className="rf-card">
+    <Link
+      href={`/insights/${study.slug}`}
+      className="rf-card"
+      data-rf-event={RF_EVENTS.caseStudyOpened}
+      data-rf-slug={study.slug}
+      // The stable key, not `study.group` — see `GROUP_KEYS`. With traffic this
+      // low the category rollup is the readable number; per-slug counts will
+      // sit at one or two for a long time.
+      data-rf-group={GROUP_KEYS[study.group]}
+      data-rf-surface={surface}
+    >
       <p className="rf-utility text-rf-flow-soft">{study.industry}</p>
 
       <h3 className="rf-h3 mt-3">{study.title}</h3>

@@ -1,6 +1,7 @@
 import AsciiField from "@/components/brand/AsciiField";
 import AsciiMonogram from "@/components/brand/AsciiMonogram";
 import IndustryMarquee from "@/components/IndustryMarquee";
+import { RF_EVENTS } from "@/lib/analytics/events";
 import { BOOKING_HREF, POSITIONING, PRIMARY_CTA } from "@/lib/site";
 
 export default function Hero() {
@@ -29,10 +30,20 @@ export default function Hero() {
           </p>
 
           <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <a href={BOOKING_HREF} className="rf-cta-primary">
+            <a
+              href={BOOKING_HREF}
+              className="rf-cta-primary"
+              data-rf-event={RF_EVENTS.bookingClicked}
+              data-rf-location="hero"
+            >
               {PRIMARY_CTA}
             </a>
-            <a href="#approach" className="rf-cta-secondary">
+            <a
+              href="#approach"
+              className="rf-cta-secondary"
+              data-rf-event={RF_EVENTS.secondaryClicked}
+              data-rf-location="hero_how_we_work"
+            >
               How we work
             </a>
           </div>

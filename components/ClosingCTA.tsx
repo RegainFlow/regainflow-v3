@@ -1,3 +1,4 @@
+import { RF_EVENTS } from "@/lib/analytics/events";
 import { BOOKING_HREF, PRIMARY_CTA } from "@/lib/site";
 
 export default function ClosingCTA() {
@@ -15,7 +16,16 @@ export default function ClosingCTA() {
           </p>
 
           <div className="mt-8">
-            <a href={BOOKING_HREF} className="rf-cta-primary">
+            {/* One location across `/`, `/insights`, and `/insights/[slug]`.
+                PostHog attaches `$pathname` to every event, so the three are
+                already separable without giving this component a prop it
+                otherwise has no use for. */}
+            <a
+              href={BOOKING_HREF}
+              className="rf-cta-primary"
+              data-rf-event={RF_EVENTS.bookingClicked}
+              data-rf-location="closing_cta"
+            >
               {PRIMARY_CTA}
             </a>
           </div>

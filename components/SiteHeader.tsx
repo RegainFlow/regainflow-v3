@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import SiteNav from "@/components/SiteNav";
+import { RF_EVENTS } from "@/lib/analytics/events";
 import { BOOKING_HREF, PRIMARY_CTA } from "@/lib/site";
 
 export default function SiteHeader() {
@@ -15,7 +16,12 @@ export default function SiteHeader() {
 
         <SiteNav
           cta={
-            <a href={BOOKING_HREF} className="rf-cta-primary rf-cta-compact">
+            <a
+              href={BOOKING_HREF}
+              className="rf-cta-primary rf-cta-compact"
+              data-rf-event={RF_EVENTS.bookingClicked}
+              data-rf-location="header"
+            >
               {PRIMARY_CTA}
             </a>
           }

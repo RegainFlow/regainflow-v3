@@ -4,6 +4,7 @@ import CaseStudyCard from "@/components/CaseStudyCard";
 import ClosingCTA from "@/components/ClosingCTA";
 import DitherReveal from "@/components/DitherReveal";
 import PageHeader from "@/components/PageHeader";
+import { RF_EVENTS } from "@/lib/analytics/events";
 import {
   CASE_STUDIES,
   EXPERIENCE_DISCLAIMER,
@@ -77,7 +78,7 @@ export default function InsightsPage() {
                 {/* Staggered inside a row, so the row arrives rather than the
                     whole grid snapping in at once. */}
                 <DitherReveal className="h-full" delay={(i % 3) * 90}>
-                  <CaseStudyCard study={study} />
+                  <CaseStudyCard study={study} surface="featured" />
                 </DitherReveal>
               </li>
             ))}
@@ -87,7 +88,15 @@ export default function InsightsPage() {
               so they are readable and crawlable with JavaScript off. A state
               toggle would be the first thing on this site that hides content
               behind a trigger that might never fire. */}
-          <details id="all-work" className="rf-disclosure mt-12">
+          {/* `data-rf-toggle`, not `data-rf-event`: this is tracked on the
+              `toggle` event so open and close are distinguishable, and reusing
+              the click attribute would make the delegated click listener match
+              the `<details>` too and double-count every open. */}
+          <details
+            id="all-work"
+            className="rf-disclosure mt-12"
+            data-rf-toggle={RF_EVENTS.allWorkOpened}
+          >
             <summary className="rf-disclosure-summary">
               <span className="rf-disclosure-marker" aria-hidden="true" />
               See all twelve, by category
@@ -106,7 +115,7 @@ export default function InsightsPage() {
                       {studies.map((study) => (
                         <li key={study.slug} className="h-full">
                           <DitherReveal className="h-full">
-                            <CaseStudyCard study={study} />
+                            <CaseStudyCard study={study} surface="all_work" />
                           </DitherReveal>
                         </li>
                       ))}

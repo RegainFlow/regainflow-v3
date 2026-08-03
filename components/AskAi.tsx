@@ -1,4 +1,5 @@
 import { AI_GLYPHS, type AiGlyph } from "@/components/brand/ai-glyphs";
+import { RF_EVENTS } from "@/lib/analytics/events";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 /**
@@ -93,6 +94,8 @@ export default function AskAi() {
                 href={`${target.base}${encoded}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                data-rf-event={RF_EVENTS.askAiClicked}
+                data-rf-assistant={target.label}
                 className="rf-ai-link"
               >
                 <svg

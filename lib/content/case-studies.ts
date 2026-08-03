@@ -29,6 +29,23 @@ export const GROUPS: CaseStudyGroup[] = [
   "Analytics & Digital Engineering",
 ];
 
+/**
+ * Stable identifiers for the three groups, for anything outside the page that
+ * has to survive a copy edit — currently the `group` property on
+ * `case_study_opened`.
+ *
+ * The display strings above are headings and will be reworded eventually.
+ * Sending one as an analytics value would silently split every historical
+ * breakdown at the moment it changed, and the split would look like a drop in
+ * interest rather than a rename. These keys are not displayed anywhere, so they
+ * never need to change.
+ */
+export const GROUP_KEYS: Record<CaseStudyGroup, string> = {
+  "Enterprise AI & Knowledge Systems": "enterprise-ai",
+  "Platform Modernization & Interoperability": "platform-modernization",
+  "Analytics & Digital Engineering": "analytics-engineering",
+};
+
 export interface CaseStudy {
   slug: string;
   title: string;

@@ -1,8 +1,10 @@
 "use client";
 
+import posthog from "posthog-js";
 import { useState } from "react";
 
 import AsciiField from "@/components/brand/AsciiField";
+import { RF_EVENTS } from "@/lib/analytics/events";
 import {
   ASSESSMENT_CTA,
   ASSESSMENT_PROOF,
@@ -95,7 +97,19 @@ export default function FreeAssessment() {
                   // Sets rather than toggles — see the note in `LayerSystem`:
                   // on touch, focus lands before click, so a toggle undid the
                   // tap that caused it.
-                  onClick={() => setActive(step.index)}
+                  //
+                  // The site's only imperative capture, and the only handler of
+                  // the three here that carries one. `onMouseEnter` and
+                  // `onFocus` also set `active`, but they fire on incidental
+                  // pointer travel and on tabbing straight through the list, so
+                  // tracking them would bury the deliberate reads in noise.
+                  onClick={() => {
+                    setActive(step.index);
+                    posthog.capture(RF_EVENTS.assessmentStepOpened, {
+                      step: step.index,
+                      name: step.name,
+                    });
+                  }}
                 >
                   <span className="rf-assess-head">
                     <span className="rf-index">{step.index}</span>
@@ -113,7 +127,12 @@ export default function FreeAssessment() {
         </div>
 
         <div className="mt-12 flex flex-wrap items-center gap-x-6 gap-y-4">
-          <a href={BOOKING_HREF} className="rf-cta-primary">
+          <a
+            href={BOOKING_HREF}
+            className="rf-cta-primary"
+            data-rf-event={RF_EVENTS.bookingClicked}
+            data-rf-location="assessment"
+          >
             {ASSESSMENT_CTA}
           </a>
           <p className="rf-utility">No cost &middot; No obligation</p>

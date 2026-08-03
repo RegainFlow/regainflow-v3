@@ -196,6 +196,54 @@ Three properties are worth re-checking after any model change, because a screens
 will not catch them: every route terminal lands on a solid face, no terminal lands on
 a *dimmed* (rejected) solid, and no vertex hangs outside the drawing's own ground.
 
+### Analytics
+
+PostHog, and it adds **no client component and no change to `app/layout.tsx`**.
+
+`instrumentation-client.ts` at the root is the entire client surface: Next runs it
+once before hydration, so it initialises PostHog and registers **one delegated
+click listener** on the document. An element carrying `data-rf-event` fires that
+event when clicked, and its other `data-rf-*` attributes become properties —
+`data-rf-location` arrives as `location`. Instrumenting a CTA is therefore
+*adding an attribute*, which is why every anchor on the site is still inside the
+server component that renders it. `lib/analytics/events.ts` holds the names and
+the property vocabularies, and deliberately **imports nothing**: server
+components read `RF_EVENTS`, so a `posthog-js` import there would be evaluated
+on the server once per importer.
+
+Three details are load-bearing and will not show up as an obvious failure:
+
+- **`toggle` does not bubble.** The `/insights` disclosure listener is registered
+  on the capture phase or it never fires. It also uses `data-rf-toggle` rather
+  than `data-rf-event`, so the click listener does not match the `<details>` too
+  and double-count every open.
+- **Outbound CTAs capture with `sendBeacon` *and* `send_instantly`.** `transport`
+  alone only picks the network API; without `send_instantly` the event is still
+  in the batching queue when the document unloads. The `preventDefault` +
+  `setTimeout` alternative breaks modified clicks and keyboard activation.
+- **Do not add the `usePathname` + `useSearchParams` pageview component** that
+  most PostHog/Next tutorials still show. `defaults` already puts pageviews in
+  `'history_change'` mode, and `useSearchParams` would opt the route into
+  dynamic rendering. Every route here is static and `next build` should keep
+  saying so.
+
+`CaseStudyCard` takes a required `surface` — `home_proof`, `featured`,
+`all_work`, or `related`. It renders in four places and the property exists to
+separate browsing from digging; a default would let a fifth call site report as
+one of the four and flatten it.
+
+Ingestion is proxied through `/relay` (`next.config.ts`) so it is first-party —
+this audience runs ad blockers and sits behind corporate filters. That is what
+`skipTrailingSlashRedirect` is for: PostHog's API paths end in a slash and Next
+would otherwise redirect them before the rewrite applies. Its side effect is
+that `/services/` now serves 200 rather than redirecting to `/services`; both
+forms emit the same canonical link, so the two consolidate.
+
+Session replay is off via an explicit `disable_session_recording` — the bundled
+defaults snapshot moved recording behaviour and there is no consent banner.
+`NEXT_PUBLIC_POSTHOG_KEY` (see `.env.example`) is the only variable; unset makes
+analytics a no-op rather than an error.
+
 ### Navigation
 
 Group labels are real links to `/services`, `/insights`, and `/company`; the dropdown

@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
 
-import Analytics from "@/components/Analytics";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import { organizationJsonLd, serializeJsonLd, websiteJsonLd } from "@/lib/seo";
@@ -107,10 +106,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <main id="main">{children}</main>
 
         <SiteFooter />
-
-        {/* Renders nothing. Kept a leaf so the client boundary stops here and
-            the rest of the tree stays server-rendered. */}
-        <Analytics />
 
         {/* Static, RegainFlow-authored structured data. `serializeJsonLd`
             escapes `<` so no copy change can close the tag early. The site node
