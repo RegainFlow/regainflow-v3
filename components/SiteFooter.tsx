@@ -43,20 +43,25 @@ export default function SiteFooter() {
           ))}
         </div>
 
-        <AskAi />
+        {/* One closing block under a single rule — the assistant links and the
+            legal line read as the same shelf of the footer rather than two
+            stacked bands. */}
+        <div className="mt-14 border-t border-rf-hairline pt-6">
+          <AskAi />
 
-        <div className="mt-14 flex flex-wrap items-center justify-between gap-4 border-t border-rf-hairline pt-6">
-          <p className="rf-utility">&copy; {year} RegainFlow</p>
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-            {/* Linked here rather than in the nav: it is written for machines,
-                and a visitor who wants it is already looking for the fine
-                print. It still needs a crawlable link to be found. */}
-            <Link href="/llm-info" className="rf-nav-link">
-              AI fact sheet
-            </Link>
-            <Link href="/company#contact" className="rf-nav-link">
-              Contact us &rarr;
-            </Link>
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
+            <p className="rf-utility">&copy; {year} RegainFlow</p>
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+              {/* Linked here rather than in the nav: it is written for machines,
+                  and a visitor who wants it is already looking for the fine
+                  print. It still needs a crawlable link to be found. */}
+              <Link href="/llm-info" className="rf-nav-link">
+                AI fact sheet
+              </Link>
+              <Link href="/company#contact" className="rf-nav-link">
+                Contact us &rarr;
+              </Link>
+            </div>
           </div>
         </div>
       </div>

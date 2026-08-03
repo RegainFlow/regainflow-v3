@@ -30,6 +30,15 @@ export const RF_EVENTS = {
   /** The `/insights` disclosure — the clearest "digging" signal on the site. */
   allWorkOpened: "all_work_opened",
   assessmentStepOpened: "assessment_step_opened",
+  /**
+   * A footer assistant link. Carries `assistant` — which of them was picked.
+   *
+   * The one number that says whether this feature earns its place: it is a
+   * convenience for people who were going to ask an AI about us anyway, and
+   * that premise is either true in the data or it is not. Kept out of the `cta_`
+   * family deliberately, since it converts nothing.
+   */
+  askAiClicked: "ask_ai_clicked",
 } as const;
 
 export type RfEvent = (typeof RF_EVENTS)[keyof typeof RF_EVENTS];
