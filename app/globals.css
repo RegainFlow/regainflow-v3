@@ -401,9 +401,32 @@
     color: var(--color-rf-warm);
   }
 
-  .rf-nav-link[data-current]::after {
-    width: 100%;
-    background: var(--color-rf-flow-soft);
+  /* The assistant marks in the footer. Deliberately not `rf-nav-link`: that
+     grows an underline from the left edge, which is an affordance for a word
+     and reads as a stray rule under a 20px glyph.
+
+     The padding is the tap target. The icons sit on a 20px box, well under the
+     44px a finger needs, and growing the element is what keeps neighbouring
+     targets from overlapping — the same reasoning as the footer's nav links.
+     Negative margin keeps that padding from pushing the row out of alignment
+     with the utility label above it. */
+  .rf-ai-link {
+    display: inline-flex;
+    align-items: center;
+    margin: -0.6rem;
+    padding: 0.6rem;
+    color: var(--color-rf-slate);
+    transition: color 0.2s ease;
+  }
+
+  .rf-ai-link:focus-visible {
+    color: var(--color-rf-warm);
+  }
+
+  @media (hover: hover) {
+    .rf-ai-link:hover {
+      color: var(--color-rf-warm);
+    }
   }
 
   .rf-text-link {
