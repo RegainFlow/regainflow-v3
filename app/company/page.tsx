@@ -44,43 +44,87 @@ export default function CompanyPage() {
             </p>
           </div>
 
-          {/* Stacked while the column is narrow; from `lg` the portrait moves
-              beside the copy. Stacked at that width left most of a ~600px grid
-              cell empty to the right of a 240px portrait and a 42ch bio. */}
-          <ul className="mt-12 grid gap-8 sm:grid-cols-2 lg:gap-12">
+          {/* One founder per row rather than the two-up it used to be. A 42ch
+              bio fitted beside a portrait in a half-width cell; a three-
+              paragraph account does not, and squeezing it there produced a
+              column of about thirty characters. Full width buys the measure. */}
+          <div className="mt-14 border-t border-rf-hairline pt-10">
+            <p className="rf-eyebrow">Founders</p>
+            <h2 className="rf-h2 mt-5 max-w-[26ch]">
+              Two operators, both still in the code.
+            </h2>
+            <p className="rf-body mt-5 max-w-[54ch]">
+              There is no bench behind us. The people described here are the
+              people who show up.
+            </p>
+          </div>
+
+          <ul className="mt-12 flex flex-col gap-14 lg:gap-16">
             {TEAM.map((member) => (
-              <li key={member.name} className="lg:flex lg:items-start lg:gap-6">
+              <li key={member.name} className="rf-grid gap-y-6">
                 {/* Drop real photographs at the same paths and the layout does
                     not move — the frame declares its own ratio. */}
-                {/* Grows with the card rather than taking one fixed width: at
-                    `lg` the cell is only ~447px, so a portrait sized for the
-                    1280px layout would squeeze the bio to under 30 characters. */}
-                <div className="rf-portrait lg:w-48 lg:flex-none xl:w-56">
+                {/* `self-start` is load-bearing: grid items stretch to the row
+                    height by default, so beside a tall bio the frame grew to
+                    match while the image kept its 4/5 ratio — leaving a column
+                    of empty Navy under the photograph. */}
+                <div className="rf-portrait col-span-full self-start lg:col-span-3">
                   <Image
                     src={member.image}
                     alt={`${member.name}, ${member.role} of RegainFlow`}
                     width={480}
                     height={600}
-                    // The widest the frame ever gets is the 16rem stacked cap,
-                    // so ask for that rather than a share of the viewport —
-                    // `40vw` was requesting ~576px to fill a 240px slot.
+                    // The widest the frame ever gets is the 16rem cap, so ask
+                    // for that rather than a share of the viewport — `40vw` was
+                    // requesting ~576px to fill a 240px slot.
                     sizes="256px"
                     // `next/image` will not send an SVG through the optimizer
                     // unless `dangerouslyAllowSVG` is set, and it fails rather
                     // than falling back — which is why the pending placeholder
-                    // rendered as alt text. Serving these 657 bytes straight
-                    // from `/public` costs nothing and keeps the optimizer
-                    // closed to SVG everywhere else, which is the safe default.
+                    // rendered as alt text. Serving those bytes straight from
+                    // `/public` costs nothing and keeps the optimizer closed to
+                    // SVG everywhere else, which is the safe default.
                     unoptimized={member.image.endsWith(".svg")}
                   />
                 </div>
 
-                {/* One flex item, not three — otherwise the name, role, and bio
-                    each become their own column beside the portrait. */}
-                <div className="mt-5 lg:mt-0 lg:min-w-0">
+                <div className="col-span-full lg:col-span-8 lg:col-start-5">
                   <h3 className="rf-h3">{member.name}</h3>
                   <p className="rf-utility mt-2">{member.role}</p>
-                  <p className="rf-body mt-3 max-w-[42ch]">{member.bio}</p>
+
+                  {member.credentials ? (
+                    <p className="rf-mech mt-4">
+                      {member.credentials.map((credential) => (
+                        <span key={credential}>{credential}</span>
+                      ))}
+                    </p>
+                  ) : null}
+
+                  <p className="rf-body mt-5 max-w-[58ch]">{member.bio}</p>
+
+                  {/* Absent for a founder whose long form has not been written
+                      yet, which is why the field is optional — a short entry
+                      beside a long one still reads as deliberate. */}
+                  {member.detail?.map((paragraph) => (
+                    <p key={paragraph} className="rf-body mt-4 max-w-[58ch]">
+                      {paragraph}
+                    </p>
+                  ))}
+
+                  {/* The same URL `peopleJsonLd()` emits as `sameAs`. A crawler
+                      already had it; this is the version a person can click. */}
+                  {member.profile ? (
+                    <p className="mt-6">
+                      <a
+                        href={member.profile}
+                        className="rf-nav-link"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        LinkedIn &rarr;
+                      </a>
+                    </p>
+                  ) : null}
                 </div>
               </li>
             ))}

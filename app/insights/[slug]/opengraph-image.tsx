@@ -11,7 +11,7 @@ export const contentType = "image/png";
 type Params = { slug: string };
 
 /**
- * Without this the twelve cards would be generated on demand rather than at
+ * Without this the nine cards would be generated on demand rather than at
  * build time, which for a static export means they would not be generated at
  * all.
  */
@@ -22,7 +22,7 @@ export function generateStaticParams(): Params[] {
 /**
  * A card per study, so a shared link says which piece of work it points at.
  *
- * Until now all twelve unfurled as the generic site card — twelve links that
+ * Until now every study unfurled as the generic site card — a set of links that
  * looked like one link. The study's own title is the whole point, so it takes
  * the headline slot and the industry runs where the stage list normally sits.
  */

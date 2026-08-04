@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 /**
  * PostHog ingestion is proxied through this origin so it is first-party.
  *
- * The audience is aerospace, industrial, and federal — ad blockers and
+ * The audience is law enforcement, aerospace, and federal — ad blockers and
  * corporate network filters are the norm, and a direct `posthog.com` request is
  * blocked often enough to bias everything measured through it. The path is
  * `/relay` rather than the `/ingest` used in most tutorials for exactly that

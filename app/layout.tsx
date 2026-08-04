@@ -25,7 +25,7 @@ const ibmPlexMono = IBM_Plex_Mono({
 
 const TITLE = "RegainFlow | AI Transformation Partner";
 const DESCRIPTION =
-  "RegainFlow is an AI transformation partner for aerospace, industrial, and federal organizations. We find the AI work worth doing, engineer the production system around it, and leave your team able to run it.";
+  "RegainFlow is an AI transformation partner for law enforcement, aerospace manufacturing, and federal organizations. We find the AI work worth doing, engineer the production system around it, and leave your team able to run it.";
 
 /**
  * `viewportFit` is deliberately left at its default rather than set to

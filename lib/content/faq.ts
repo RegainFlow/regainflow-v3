@@ -26,7 +26,7 @@ export const FAQ: FaqItem[] = [
   {
     question: "Who does RegainFlow work with?",
     answer:
-      "Aerospace and industrial engineering organizations, and federal contractors carrying AI, data, and modernization scope. The common thread is environments that do not hand you clean data, a clear brief, or spare time — complex enterprise settings where the obstacle is rarely the model itself.",
+      "Law enforcement agencies and aerospace manufacturers, and the defense and federal organizations carrying AI, data, and modernization scope. The common thread is high-consequence environments that do not hand you clean data, a clear brief, or spare time — settings where the work is scrutinized after the fact and the obstacle is rarely the model itself.",
   },
   {
     question: "How does an engagement start?",

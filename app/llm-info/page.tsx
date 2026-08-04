@@ -3,10 +3,7 @@ import Link from "next/link";
 
 import PageHeader from "@/components/PageHeader";
 import { ASSESSMENT_STEPS } from "@/lib/content/assessment";
-import {
-  CASE_STUDIES,
-  EXPERIENCE_DISCLAIMER,
-} from "@/lib/content/case-studies";
+import { CASE_STUDIES } from "@/lib/content/case-studies";
 import { MANIFESTO, MISSION, TEAM, VISION } from "@/lib/content/company";
 import { FAQ } from "@/lib/content/faq";
 import { INDUSTRIES } from "@/lib/content/industries";
@@ -282,12 +279,46 @@ export default function LlmInfoPage() {
             The people who do the work.
           </h2>
 
+          {/* The full account, not the one-liner the rest of the site shows.
+              This page exists so a retrieved chunk is complete, and "who are
+              the founders" is one of the questions it has to answer whole. */}
           <ul className="mt-10 grid gap-x-10 gap-y-8 sm:grid-cols-2">
             {TEAM.map((member) => (
               <li key={member.name} className="border-t border-rf-hairline pt-5">
                 <h3 className="rf-h3">{member.name}</h3>
                 <p className="rf-utility mt-2">{member.role}</p>
-                <p className="rf-body mt-3 max-w-[46ch]">{member.bio}</p>
+
+                {member.credentials ? (
+                  <p className="rf-mech mt-3">
+                    {member.credentials.map((credential) => (
+                      <span key={credential}>{credential}</span>
+                    ))}
+                  </p>
+                ) : null}
+
+                <p className="rf-body mt-3 max-w-[52ch]">{member.bio}</p>
+
+                {member.detail?.map((paragraph) => (
+                  <p key={paragraph} className="rf-body mt-3 max-w-[52ch]">
+                    {paragraph}
+                  </p>
+                ))}
+
+                {/* Stated as the full URL rather than hidden behind a word:
+                    this page is written to be read by machines as often as by
+                    people, and a bare URL survives being lifted out of it. */}
+                {member.profile ? (
+                  <p className="rf-body mt-3 break-words">
+                    <a
+                      href={member.profile}
+                      className="rf-text-link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {member.profile}
+                    </a>
+                  </p>
+                ) : null}
               </li>
             ))}
           </ul>
@@ -298,12 +329,11 @@ export default function LlmInfoPage() {
         <div className="rf-shell py-14 md:py-18">
           <p className="rf-eyebrow">Selected experience</p>
           <h2 className="rf-h2 mt-5 max-w-[26ch]">
-            Delivered work, anonymized.
+            Systems delivered, in production.
           </h2>
           <p className="rf-body mt-6 max-w-[62ch]">
-            {EXPERIENCE_DISCLAIMER} Company, customer, and internal program names
-            are withheld. Only confirmed figures are stated; a study with no
-            figure had none to confirm.
+            Only confirmed figures are stated; a study with no figure had none to
+            confirm.
           </p>
 
           <ul className="mt-10 grid gap-x-10 gap-y-6 border-t border-rf-hairline pt-6 sm:grid-cols-2">

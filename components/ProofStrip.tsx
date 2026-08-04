@@ -5,14 +5,15 @@ import CaseStudyCard from "@/components/CaseStudyCard";
 import DitherReveal from "@/components/DitherReveal";
 import {
   CASE_STUDIES,
-  EXPERIENCE_DISCLAIMER,
   HEADLINE_FIGURES,
   HOME_SLUGS,
 } from "@/lib/content/case-studies";
 
-/** Two, not the six `/insights` leads with — this is a teaser, not the list. */
-const FEATURED = CASE_STUDIES.filter((study) =>
-  HOME_SLUGS.includes(study.slug),
+/** Two, not the three `/insights` leads with — this is a teaser, not the list. */
+/* Mapped over the slug list rather than filtered out of `CASE_STUDIES`, so the
+   order here is the one `HOME_SLUGS` declares. */
+const FEATURED = HOME_SLUGS.flatMap(
+  (slug) => CASE_STUDIES.find((study) => study.slug === slug) ?? [],
 );
 
 /** Proof on the home page without duplicating `/insights`: totals, two
@@ -47,16 +48,9 @@ export default function ProofStrip() {
           </dl>
         </div>
 
-        {/* The figures above are RegainFlow's own; the two studies below are
-            founder work elsewhere. Without this line between them, "18+ client
-            transformations delivered" reads as a caption for the cards. */}
-        <p className="rf-body mt-12 max-w-[62ch] border-t border-rf-hairline pt-6">
-          {EXPERIENCE_DISCLAIMER}
-        </p>
-
         {/* The same card `/insights` renders, rather than a second inline
             version that has to be kept in sync by hand. */}
-        <ul className="mt-8 grid gap-4 sm:grid-cols-2">
+        <ul className="mt-12 grid gap-4 border-t border-rf-hairline pt-10 sm:grid-cols-2">
           {FEATURED.map((study, i) => (
             <li key={study.slug} className="h-full">
               <DitherReveal className="h-full" delay={i * 90}>

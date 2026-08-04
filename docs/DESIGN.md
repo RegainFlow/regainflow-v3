@@ -27,7 +27,7 @@ are **not defined**, and are listed as gaps at the end rather than invented here
 | **Name** | RegainFlow |
 | **Category** | AI transformation partner |
 | **Tagline** | AI transformation, from ambition to operation. |
-| **Audience** | Aerospace and industrial engineering organizations; federal contractors carrying AI, data, and modernization scope. |
+| **Audience** | Law enforcement agencies and aerospace manufacturers; the defense and federal organizations carrying AI, data, and modernization scope. |
 | **Mission** | RegainFlow helps organizations move at the speed of their ambition. |
 
 Source of truth: `lib/site.ts` and `lib/content/company.ts`. These are constants, not prose —
@@ -54,10 +54,12 @@ sentence could appear on any consultancy's site, it is not written yet.
 control." Specificity is the proof of experience; abstraction reads as distance from the work.
 
 **4. No number unless it was confirmed.** This is policy, not style. `metric` appears on
-exactly two of twelve case studies because exactly two figures were verifiable — a study with
+exactly two of nine case studies because exactly two figures were verifiable — a study with
 no number carries none rather than a soft one. `PROFILES` in `lib/site.ts` sits empty for the
-same reason: a guessed profile URL asserts an identity we cannot back. Where we cannot measure
-the return, we say so rather than imply one.
+same reason: a guessed profile URL asserts an identity we cannot back. The same test governs
+prose: Leo's bio carries his service record because he stated it, and carries no degree or
+certification because the only source for those was a login-walled page. Where we cannot
+measure the return, we say so rather than imply one.
 
 **5. Say what we will not do.** "Dependency is a failure mode, not a business model." The
 manifesto commits against things. That is what makes the commitments legible.

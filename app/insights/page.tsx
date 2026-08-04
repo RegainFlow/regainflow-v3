@@ -7,7 +7,6 @@ import PageHeader from "@/components/PageHeader";
 import { RF_EVENTS } from "@/lib/analytics/events";
 import {
   CASE_STUDIES,
-  EXPERIENCE_DISCLAIMER,
   FEATURED_SLUGS,
   GROUPS,
   HEADLINE_FIGURES,
@@ -23,12 +22,19 @@ import {
 export const metadata: Metadata = pageMetadata({
   title: "Insights",
   description:
-    "Selected enterprise AI and platform experience: retrieval, knowledge, interoperability, and secure platform systems delivered by the founders inside aerospace, defense, government, and regulated enterprise environments.",
+    "Selected enterprise AI and platform experience: retrieval, knowledge, interoperability, and secure platform systems delivered inside government, aerospace, defense, and regulated enterprise environments.",
   path: "/insights",
 });
 
-const FEATURED = CASE_STUDIES.filter((study) =>
-  FEATURED_SLUGS.includes(study.slug),
+/**
+ * Mapped over `FEATURED_SLUGS`, not filtered out of `CASE_STUDIES` — the
+ * filter kept whatever order the studies happened to sit in, so the slug list
+ * chose the three and the array silently chose which one led. With three cards
+ * the first is the one that gets read, so the constant has to mean what it
+ * says.
+ */
+const FEATURED = FEATURED_SLUGS.flatMap(
+  (slug) => CASE_STUDIES.find((study) => study.slug === slug) ?? [],
 );
 
 const REMAINING_SLUGS = CASE_STUDIES.filter(
@@ -41,7 +47,7 @@ export default function InsightsPage() {
       <PageHeader
         eyebrow="Insights"
         title="What we have built, and what we learned building it."
-        lead="Twelve systems taken into production inside aerospace, defense, government, and regulated enterprise environments — described by what they had to solve rather than by who paid for them."
+        lead="Nine systems taken into production inside government, aerospace, defense, and regulated enterprise environments — described by what they had to solve rather than by who paid for them."
       />
 
       <section id="case-studies" className="rf-section">
@@ -55,22 +61,18 @@ export default function InsightsPage() {
             ))}
           </dl>
 
-          {/* These totals are RegainFlow's own. The studies below are a
-              different claim, and the two must not be read as one. */}
-          <p className="rf-body mt-6 max-w-[54ch] border-b border-rf-hairline pb-10">
-            Totals across all RegainFlow engagements. The experience below is a
-            separate account: the enterprise systems our founders built before
-            and alongside this firm.
-          </p>
+          {/* The rule belongs to the wrapper, not the heading. On the `<h2>` it
+              inherited the 24ch measure and drew a short tick above the words
+              rather than a divider between the totals and the work below. */}
+          <div className="mt-12 border-t border-rf-hairline pt-12">
+            <h2 className="rf-h2 max-w-[24ch]">
+              Selected Enterprise AI &amp; Platform Experience
+            </h2>
 
-          <h2 className="rf-h2 mt-12 max-w-[24ch]">
-            Selected Enterprise AI &amp; Platform Experience
-          </h2>
-
-          <p className="rf-body mt-5 max-w-[58ch]">
-            {EXPERIENCE_DISCLAIMER} Names, customers, and internal program names
-            are withheld; the only figures shown are the ones we can confirm.
-          </p>
+            <p className="rf-body mt-5 max-w-[58ch]">
+              The only figures shown are the ones we can confirm.
+            </p>
+          </div>
 
           <ul className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {FEATURED.map((study, i) => (
@@ -84,22 +86,37 @@ export default function InsightsPage() {
             ))}
           </ul>
 
-          {/* Native `<details>`: the remaining six stay in the server output,
-              so they are readable and crawlable with JavaScript off. A state
-              toggle would be the first thing on this site that hides content
-              behind a trigger that might never fire. */}
+          {/* Native `<details>`: the remaining studies stay in the server
+              output, so they are readable and crawlable with JavaScript off. A
+              state toggle would be the first thing on this site that hides
+              content behind a trigger that might never fire. */}
           {/* `data-rf-toggle`, not `data-rf-event`: this is tracked on the
               `toggle` event so open and close are distinguishable, and reusing
               the click attribute would make the delegated click listener match
               the `<details>` too and double-count every open. */}
           <details
             id="all-work"
-            className="rf-disclosure mt-12"
+            className="rf-disclosure mt-14"
             data-rf-toggle={RF_EVENTS.allWorkOpened}
           >
-            <summary className="rf-disclosure-summary">
+            {/* A bounded control rather than a caption. Both labels ship and CSS
+                picks between them on `[open]`, so the summary still says the
+                right thing with JavaScript off. */}
+            <summary className="rf-disclosure-summary rf-disclosure-cta">
               <span className="rf-disclosure-marker" aria-hidden="true" />
-              See all twelve, by category
+              <span className="rf-disclosure-label">
+                <span className="rf-on-closed">
+                  See all {CASE_STUDIES.length} case studies, by category
+                </span>
+                <span className="rf-on-open">Show fewer</span>
+              </span>
+              {/* Counted from the array that actually feeds the list below,
+                  never from a subtraction — a `FEATURED_SLUGS` entry that
+                  stopped matching a study would make arithmetic lie here while
+                  the list rendered correctly. */}
+              <span className="rf-disclosure-count">
+                +{REMAINING_SLUGS.length}
+              </span>
             </summary>
 
             <div className="rf-disclosure-body">

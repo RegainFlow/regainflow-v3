@@ -131,7 +131,7 @@ export function organizationJsonLd() {
     logo: `${SITE_URL}/icon.png`,
     image: `${SITE_URL}/opengraph-image`,
     description:
-      "AI transformation partner for aerospace, industrial, and federal organizations — AI portfolio direction, production engineering, and managed AI operations.",
+      "AI transformation partner for law enforcement, aerospace manufacturing, and federal organizations — AI portfolio direction, production engineering, and managed AI operations.",
     areaServed: "US",
     address: {
       "@type": "PostalAddress",
@@ -236,11 +236,11 @@ export function breadcrumbJsonLd(
  * and nothing else, so the page's actual subject was invisible to anything
  * reading structured data.
  *
- * `CreativeWork` rather than `Article`: these are anonymized accounts of
- * delivered work, not dated editorial, and `Article` without a real
- * `datePublished` invites a rich-result warning for a field we cannot honestly
- * fill. `about` carries the group and `abstract` the executive line, both
- * already authored in `lib/content/case-studies.ts`.
+ * `CreativeWork` rather than `Article`: these are accounts of delivered work,
+ * not dated editorial, and `Article` without a real `datePublished` invites a
+ * rich-result warning for a field we cannot honestly fill. `about` carries the
+ * group and `abstract` the executive line, both already authored in
+ * `lib/content/case-studies.ts`.
  */
 export function caseStudyJsonLd(study: CaseStudy) {
   return {

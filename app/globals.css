@@ -734,6 +734,15 @@
     border-top: 1px solid var(--color-rf-hairline);
   }
 
+  /* The bounded variant draws its own box, so the wrapper's rule would land as
+     a second hairline directly above it. Scoped with `:has()` rather than
+     deleted so a plain disclosure elsewhere still gets its separator; if the
+     selector is ever unsupported the cost is one extra rule, not a broken
+     control. */
+  .rf-disclosure:has(.rf-disclosure-cta) {
+    border-top: none;
+  }
+
   .rf-disclosure-summary {
     display: flex;
     align-items: center;
@@ -803,6 +812,73 @@
   .rf-disclosure[open] .rf-disclosure-marker::after {
     opacity: 0;
     transform: translate(-50%, -50%) rotate(90deg);
+  }
+
+  /* Modifier: the summary as a bounded control rather than a caption.
+     Unstyled, the row read as a label someone had left above the fold — the
+     one control on the site that had to be guessed at. This gives it the same
+     Navy surface and hairline border every other raised thing carries, the
+     3rem height both CTAs use, and a count on the right so the payoff is
+     stated before the click. Square, per the surfaces rule: only the two CTAs
+     and the skip link take a radius. */
+  .rf-disclosure-cta {
+    justify-content: flex-start;
+    gap: 1rem;
+    min-height: 3rem;
+    border: 1px solid var(--color-rf-hairline);
+    padding-inline: 1.35rem;
+    background: var(--color-rf-navy);
+    transition:
+      color 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .rf-disclosure-label {
+    margin-right: auto;
+  }
+
+  /* Flow Soft, not Flow: this is small text and Flow is 4.16:1 on Navy. */
+  .rf-disclosure-count {
+    flex: none;
+    color: var(--color-rf-flow-soft);
+  }
+
+  .rf-disclosure-cta:focus-visible {
+    border-color: var(--color-rf-slate);
+  }
+
+  @media (hover: hover) {
+    .rf-disclosure-cta:hover {
+      border-color: var(--color-rf-slate);
+    }
+  }
+
+  /* `-webkit-tap-highlight-color` is cleared globally, so every control owes an
+     explicit pressed state or a tap reads as nothing happening. */
+  .rf-disclosure-cta:active {
+    color: var(--color-rf-warm);
+    border-color: var(--color-rf-slate);
+  }
+
+  /* Both labels ship; CSS picks. Same device as `.rf-on-pointer` /
+     `.rf-on-touch` above, and for the same reason — it stays correct with
+     JavaScript off. */
+  .rf-on-open {
+    display: none;
+  }
+
+  .rf-disclosure[open] .rf-on-closed {
+    display: none;
+  }
+
+  .rf-disclosure[open] .rf-on-open {
+    display: inline;
+  }
+
+  /* The count is the number of studies still folded away. Once they are on
+     screen it is answering a question nobody is asking. */
+  .rf-disclosure[open] .rf-disclosure-count {
+    display: none;
   }
 
   /* --- Converging-routes glyph (ClosingCTA) ------------------------------ */

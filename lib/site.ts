@@ -43,7 +43,7 @@ export const TAGLINE = "AI transformation, from ambition to operation.";
  * page has to pass is "can you tell who we're targeting".
  */
 export const AUDIENCE =
-  "Built for aerospace and industrial engineering organizations, and for federal contractors carrying AI, data, and modernization scope.";
+  "Built for law enforcement agencies and aerospace manufacturers, and for the defense and federal organizations carrying AI, data, and modernization scope.";
 
 export interface NavLink {
   label: string;
@@ -109,13 +109,6 @@ export const NAV: NavGroup[] = [
         label: "Case studies",
         href: "/insights#case-studies",
         hint: "Selected enterprise AI and platform work",
-      },
-      {
-        // Targets the disclosure itself, which a fragment cannot open — so the
-        // hint promises the control, not the contents.
-        label: "All engagements",
-        href: "/insights#all-work",
-        hint: "Open the full list, by category",
       },
     ],
   },

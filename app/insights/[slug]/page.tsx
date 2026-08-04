@@ -6,11 +6,7 @@ import CaseStudyCard from "@/components/CaseStudyCard";
 import ClosingCTA from "@/components/ClosingCTA";
 import DitherReveal from "@/components/DitherReveal";
 import PageHeader from "@/components/PageHeader";
-import {
-  CASE_STUDIES,
-  EXPERIENCE_DISCLAIMER,
-  studiesInGroup,
-} from "@/lib/content/case-studies";
+import { CASE_STUDIES, studiesInGroup } from "@/lib/content/case-studies";
 import {
   breadcrumbJsonLd,
   caseStudyJsonLd,
@@ -86,22 +82,20 @@ export default async function CaseStudyPage({
 
       <section className="rf-section">
         <div className="rf-shell py-12 md:py-16">
-          <div className="rf-grid gap-y-8">
-            {/* Reached straight from search, this page has to carry the same
-                qualification the listing does. */}
-            <p className="rf-utility col-span-full max-w-[62ch] lg:col-span-7">
-              {EXPERIENCE_DISCLAIMER}
-            </p>
+          {/* Only two of the nine carry a confirmed figure. Rendered as its own
+              block rather than a grid cell: the disclaimer that used to sit
+              beside it is gone, so a study without a metric would otherwise
+              open with an empty grid row. */}
+          {study.metric ? (
+            <div className="max-w-[24ch]">
+              <p className="rf-utility">Confirmed result</p>
+              <p className="rf-stat mt-3">{study.metric}</p>
+            </div>
+          ) : null}
 
-            {study.metric ? (
-              <div className="col-span-full border-t border-rf-hairline pt-4 lg:col-span-4 lg:col-start-9 lg:border-t-0 lg:pt-0">
-                <p className="rf-utility">Confirmed result</p>
-                <p className="rf-stat mt-3">{study.metric}</p>
-              </div>
-            ) : null}
-          </div>
-
-          <div className="mt-12 border-t border-rf-hairline">
+          <div
+            className={`border-t border-rf-hairline ${study.metric ? "mt-12" : ""}`}
+          >
             {sections.map((section) => (
               <div
                 key={section.label}

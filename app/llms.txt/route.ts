@@ -2,11 +2,8 @@ import {
   ASSESSMENT_PROOF,
   ASSESSMENT_STEPS,
 } from "@/lib/content/assessment";
-import {
-  CASE_STUDIES,
-  EXPERIENCE_DISCLAIMER,
-} from "@/lib/content/case-studies";
-import { MANIFESTO, MISSION } from "@/lib/content/company";
+import { CASE_STUDIES } from "@/lib/content/case-studies";
+import { MANIFESTO, MISSION, TEAM } from "@/lib/content/company";
 import { FAQ } from "@/lib/content/faq";
 import { LAYERS } from "@/lib/content/layers";
 import { ENGAGEMENT_PATH, STAGES } from "@/lib/content/stages";
@@ -38,6 +35,26 @@ function build(): string {
   lines.push("");
   lines.push(`Based in ${LOCATION}. Contact: ${BOOKING_HREF} or ${CONTACT_EMAIL}.`);
   lines.push("");
+
+  // Ahead of the services, because the firm is two named people and an
+  // assistant summarizing it should reach them before the offer. This file
+  // previously omitted the founders entirely.
+  lines.push("## Founders");
+  lines.push("");
+  for (const member of TEAM) {
+    lines.push(`### ${member.name} — ${member.role}`);
+    if (member.credentials) {
+      lines.push(member.credentials.join(" · "));
+    }
+    lines.push(member.bio);
+    for (const paragraph of member.detail ?? []) {
+      lines.push(paragraph);
+    }
+    if (member.profile) {
+      lines.push(`Profile: ${member.profile}`);
+    }
+    lines.push("");
+  }
 
   lines.push("## Services");
   lines.push("");
@@ -80,9 +97,8 @@ function build(): string {
 
   lines.push("## Selected enterprise AI and platform experience");
   lines.push("");
-  lines.push(EXPERIENCE_DISCLAIMER);
   lines.push(
-    "Company, customer, and internal program names are withheld. Only confirmed figures are stated; a study with no figure had none to confirm.",
+    "Only confirmed figures are stated; a study with no figure had none to confirm.",
   );
   lines.push("");
   for (const study of CASE_STUDIES) {
@@ -125,7 +141,7 @@ function build(): string {
   for (const study of CASE_STUDIES) {
     lines.push(`  - [${study.title}](${SITE_URL}/insights/${study.slug})`);
   }
-  lines.push(`- [Company](${SITE_URL}/company): who we are, manifesto, contact.`);
+  lines.push(`- [Company](${SITE_URL}/company): the founders, manifesto, contact.`);
   lines.push(
     `- [AI fact sheet](${SITE_URL}/llm-info): the whole of the above as one page — definition, key facts, founders, services, engagement path, commitments, and FAQ.`,
   );

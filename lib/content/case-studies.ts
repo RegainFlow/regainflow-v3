@@ -1,17 +1,20 @@
 /**
  * Selected enterprise AI and platform experience.
  *
- * Three rules govern every entry here, and they are the reason the copy reads
- * the way it does:
+ * Two rules govern every entry here, and they are the reason the copy reads the
+ * way it does:
  *
  * 1. Nothing is named. No company, customer, internal platform, program, or
  *    project name appears — only the industry or environment the work ran in.
- * 2. These are anonymized examples of enterprise work completed by the
- *    founders. They are not all direct RegainFlow client engagements, and
- *    `EXPERIENCE_DISCLAIMER` says so anywhere a study is shown.
- * 3. `metric` is present only where a figure was confirmed. Two of the twelve
- *    have one. The other ten carry no number rather than a soft one, because a
+ * 2. `metric` is present only where a figure was confirmed. Two of the nine
+ *    have one. The other seven carry no number rather than a soft one, because a
  *    plausible invented figure is worse than no figure at all.
+ *
+ * Nine studies, not the twelve this list once held. Three were removed because
+ * they restated work already described here — two workforce-platform entries
+ * covering one program, and a document-intelligence entry subsumed by the two
+ * more specific ones that remain. A list that says the same thing three ways
+ * reads as padding, not as range.
  *
  * Cards carry the executive summary; `challenge`, `solution`, `capabilities`,
  * and `technologies` are detail-page only.
@@ -64,15 +67,6 @@ export interface CaseStudy {
   technologies?: string;
 }
 
-/**
- * Shown beside every case study, on the listing and on each detail page — a
- * study reached directly from search has to carry the same qualification the
- * listing does. Worded without "below" for exactly that reason: on a study page
- * there is nothing below it.
- */
-export const EXPERIENCE_DISCLAIMER =
-  "Anonymized examples of enterprise work completed by the founders. Not every project was a direct RegainFlow client engagement.";
-
 export const CASE_STUDIES: CaseStudy[] = [
   {
     slug: "workforce-data-validation-platform",
@@ -96,28 +90,6 @@ export const CASE_STUDIES: CaseStudy[] = [
     ],
     impact:
       "Reduced manual validation effort, improved auditability, and generated an estimated $8 million in annual operational savings.",
-  },
-  {
-    slug: "document-intelligence-platform",
-    title: "AI-Powered Document Intelligence Platform",
-    industry: "Aerospace & Engineering",
-    summary:
-      "Large collections of complex enterprise documents became searchable, summarized, and usable by people who are not document specialists.",
-    group: "Enterprise AI & Knowledge Systems",
-    challenge:
-      "Employees needed a faster way to process, summarize, search, and understand large collections of complex enterprise documents distributed across multiple repositories.",
-    solution:
-      "Developed an AI-powered knowledge-processing platform that combined document ingestion, text extraction, language models, visual document understanding, summarization, metadata enrichment, and enterprise search.",
-    capabilities: [
-      "Multi-format document ingestion",
-      "Automated document summarization",
-      "Visual-language model processing",
-      "Metadata extraction and enrichment",
-      "Searchable enterprise knowledge",
-      "Integration with existing enterprise applications",
-    ],
-    impact:
-      "Made complex technical information more accessible to nontechnical users and established the foundation for more advanced enterprise AI and retrieval capabilities.",
   },
   {
     slug: "agentic-knowledge-assistant",
@@ -166,28 +138,6 @@ export const CASE_STUDIES: CaseStudy[] = [
     ],
     impact:
       "Improved the relevance of enterprise search results and enabled users to discover information that was difficult to locate through traditional keyword matching.",
-  },
-  {
-    slug: "workforce-systems-interoperability",
-    title: "Workforce Systems Interoperability Platform",
-    industry: "Aerospace & Defense",
-    summary:
-      "Workforce, payroll, and human-capital systems stopped being wired together one pair at a time and started sharing one set of contracts.",
-    group: "Platform Modernization & Interoperability",
-    challenge:
-      "Workforce, payroll, and human-capital systems operated through fragmented interfaces, inconsistent data structures, and manually coordinated workflows.",
-    solution:
-      "Designed an interoperability layer that connected workforce applications through standardized APIs, shared data contracts, validation services, automated ingestion, and reusable integration components.",
-    capabilities: [
-      "Standardized enterprise APIs",
-      "Shared workforce data contracts",
-      "Cross-system data validation",
-      "Automated data synchronization",
-      "Reusable integration services",
-      "Centralized error handling and observability",
-    ],
-    impact:
-      "Reduced integration complexity, improved data consistency, and made it easier to introduce new workforce applications without creating additional point-to-point connections.",
   },
   {
     slug: "secure-internal-paas",
@@ -257,28 +207,6 @@ export const CASE_STUDIES: CaseStudy[] = [
     ],
     impact:
       "Reduced workflow fragmentation and made specialized engineering processes easier to operate, maintain, and scale.",
-  },
-  {
-    slug: "enterprise-workflow-acceleration",
-    title: "Enterprise Workflow Acceleration Platform",
-    industry: "Large-Scale Enterprise Operations",
-    summary:
-      "A process that made employees hop between disconnected systems and retype the same information became one automated workflow.",
-    group: "Platform Modernization & Interoperability",
-    challenge:
-      "A complex operational workflow required employees to move between disconnected systems, manually coordinate process steps, and repeatedly enter or transform information.",
-    solution:
-      "Built a modern workflow platform that combined automation, application services, reusable APIs, data processing, and a simplified user experience.",
-    capabilities: [
-      "End-to-end workflow automation",
-      "Modern user interfaces",
-      "API-driven system integration",
-      "Automated data transformation",
-      "Process-status visibility",
-      "Reusable enterprise services",
-    ],
-    impact:
-      "Reduced manual handoffs, simplified complex workflows, and created a more maintainable foundation for future process automation.",
   },
   {
     slug: "market-competitive-intelligence",
@@ -362,14 +290,22 @@ export const HEADLINE_FIGURES = [
   { value: "18+", label: "Client transformations delivered" },
 ];
 
-/** The six shown up front on `/insights`. The rest sit in the disclosure. */
+/**
+ * The three shown up front on `/insights`. The rest sit in the disclosure.
+ *
+ * One from each `CaseStudyGroup`, and that constraint is the point rather than
+ * a tidy coincidence. These three are the first thing a visitor reads, so they
+ * have to demonstrate range — governed retrieval, platform modernization,
+ * applied ML — not three variations of document search. `industry` leads every
+ * card, so the row also reads as three different environments.
+ *
+ * Keep it at three, and keep one per group. Adding a fourth from a group that
+ * is already represented is how this becomes the six-card wall it replaced.
+ */
 export const FEATURED_SLUGS = [
-  "workforce-data-validation-platform",
-  "agentic-knowledge-assistant",
-  "enterprise-search-modernization",
-  "secure-internal-paas",
   "secure-government-document-intelligence",
-  "manufacturing-knowledge-intelligence",
+  "workforce-data-validation-platform",
+  "operational-anomaly-detection",
 ];
 
 /**
