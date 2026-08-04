@@ -35,6 +35,7 @@ npm run typecheck
 
 | Path                       | Purpose                                                                          |
 | -------------------------- | -------------------------------------------------------------------------------- |
+| `docs/DESIGN.md`           | The design system — brand, palette, type, the `.rf-*` contract                   |
 | `app/layout.tsx`           | Fonts, metadata, header, `main#main`, footer, organization JSON-LD               |
 | `app/globals.css`          | Palette tokens, type scale, the wave, navigation, cards, model styles, keyframes |
 | `lib/ascii/`               | The ASCII engine — `dither`, `field`, `monogram`                                 |
