@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import AskAi from "@/components/AskAi";
+import NavItemLink from "@/components/NavItemLink";
 import { LOCATION, NAV, TAGLINE } from "@/lib/site";
 
 export default function SiteFooter() {
@@ -33,9 +34,9 @@ export default function SiteFooter() {
               <ul className="mt-3 flex flex-col gap-1.5">
                 {group.items.map((item) => (
                   <li key={item.href}>
-                    <Link href={item.href} className="rf-nav-link">
+                    <NavItemLink item={item} className="rf-nav-link">
                       {item.label}
-                    </Link>
+                    </NavItemLink>
                   </li>
                 ))}
               </ul>

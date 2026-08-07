@@ -1,3 +1,5 @@
+import { RF_EVENTS, type RfEvent } from "@/lib/analytics/events";
+
 export const SITE_NAME = "RegainFlow";
 
 export const SITE_URL = "https://www.regainflow.com";
@@ -6,6 +8,17 @@ export const CONTACT_EMAIL = "contact@regainflow.com";
 
 /** Primary destination for every conversion on the site. */
 export const BOOKING_HREF = "https://cal.com/regainflow/schedule";
+
+/**
+ * The capability statement, hosted on Supabase storage. The document a federal,
+ * defense, or law-enforcement buyer asks for by name, so it gets a real route
+ * out of the nav rather than living only in an email attachment.
+ *
+ * The year is in the filename, which makes replacing it a one-line change here
+ * and leaves the superseded edition reachable for anyone holding the old link.
+ */
+export const CAPABILITY_STATEMENT_HREF =
+  "https://wixdxikcuwgcdwhkmtsr.supabase.co/storage/v1/object/public/capability_sheet/RegainFlow_Capability_Statement_2026.pdf";
 
 /**
  * Secondary contact path. Kept as a pre-structured draft so an email arrives
@@ -54,6 +67,16 @@ export interface NavLink {
   index?: string;
   /** Renders below a rule, as a secondary route out of the panel. */
   secondary?: boolean;
+  /**
+   * Leaves the site. Renders as a plain anchor in a new tab rather than a
+   * `next/link`, on every surface `NAV` feeds — see `components/NavItemLink`.
+   */
+  external?: boolean;
+  /**
+   * `data-rf-event` for an item worth counting on its own. Most navigation is
+   * not; an item that is gets a name here rather than an inline string.
+   */
+  event?: RfEvent;
 }
 
 export interface NavGroup {
@@ -123,6 +146,14 @@ export const NAV: NavGroup[] = [
         hint: "What we will and will not do",
       },
       { label: "Contact", href: "/company#contact", hint: "Start the conversation" },
+      {
+        label: "Capability statement ↗",
+        href: CAPABILITY_STATEMENT_HREF,
+        hint: "The one-page overview, as a PDF",
+        secondary: true,
+        external: true,
+        event: RF_EVENTS.capabilityStatementOpened,
+      },
     ],
   },
 ];

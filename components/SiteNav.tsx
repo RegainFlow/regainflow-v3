@@ -14,6 +14,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
+import NavItemLink from "@/components/NavItemLink";
 import { NAV, type NavGroup } from "@/lib/site";
 
 /** Never fires — `useClient` below only needs the server/client split, not
@@ -103,7 +104,7 @@ function DesktopGroup({
             // Items arrive in reading order rather than all at once.
             style={{ "--rf-stagger": `${i * 40}ms` } as CSSProperties}
           >
-            <Link href={item.href} className="rf-menu-item" onClick={onClose}>
+            <NavItemLink item={item} className="rf-menu-item" onClick={onClose}>
               <span className="rf-menu-item-head">
                 {item.index ? (
                   <span className="rf-menu-index">{item.index}</span>
@@ -111,7 +112,7 @@ function DesktopGroup({
                 <span className="rf-menu-label">{item.label}</span>
               </span>
               <span className="rf-menu-hint">{item.hint}</span>
-            </Link>
+            </NavItemLink>
           </li>
         ))}
       </ul>
@@ -312,8 +313,8 @@ export default function SiteNav({ cta }: { cta: ReactNode }) {
                     <ul className="mt-3 flex flex-col">
                       {group.items.map((item) => (
                         <li key={item.href}>
-                          <Link
-                            href={item.href}
+                          <NavItemLink
+                            item={item}
                             className="rf-menu-item"
                             onClick={dismissMobile}
                           >
@@ -326,7 +327,7 @@ export default function SiteNav({ cta }: { cta: ReactNode }) {
                               <span className="rf-menu-label">{item.label}</span>
                             </span>
                             <span className="rf-menu-hint">{item.hint}</span>
-                          </Link>
+                          </NavItemLink>
                         </li>
                       ))}
                     </ul>

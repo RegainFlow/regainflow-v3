@@ -39,6 +39,13 @@ export const RF_EVENTS = {
    * family deliberately, since it converts nothing.
    */
   askAiClicked: "ask_ai_clicked",
+  /**
+   * The capability statement PDF. Deliberately outside the `cta_` family — it
+   * converts nothing on its own, but for a federal or law-enforcement buyer,
+   * pulling the capability statement is one of the strongest intent signals
+   * the site can observe.
+   */
+  capabilityStatementOpened: "capability_statement_opened",
 } as const;
 
 export type RfEvent = (typeof RF_EVENTS)[keyof typeof RF_EVENTS];
