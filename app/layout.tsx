@@ -93,6 +93,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html
       lang="en"
       className={`${spaceGrotesk.variable} ${ibmPlexMono.variable}`}
+      // Declares the `scroll-behavior: smooth` that `globals.css` sets, so Next
+      // can suppress it during route transitions. Without this a navigation
+      // animates the scroll back to the top instead of arriving there, which
+      // reads as lag on every link — the smooth scroll is wanted for in-page
+      // anchors only.
+      data-scroll-behavior="smooth"
     >
       <body>
         <a href="#main" className="rf-skip-link">

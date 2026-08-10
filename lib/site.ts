@@ -18,15 +18,44 @@ export const BOOKING_HREF = "https://cal.com/regainflow/schedule";
  * and leaves the superseded edition reachable for anyone holding the old link.
  */
 export const CAPABILITY_STATEMENT_HREF =
-  "https://wixdxikcuwgcdwhkmtsr.supabase.co/storage/v1/object/public/capability_sheet/RegainFlow_Capability_Statement_2026.pdf";
+  "https://qsnaxtjoyqycpbmmghff.supabase.co/storage/v1/object/public/site/RegainFlow_Capability_Statement_2026.pdf";
+
+/** The canonical contact route. Every contact CTA on the site points here. */
+export const CONTACT_PATH = "/contact";
 
 /**
- * Secondary contact path. Kept as a pre-structured draft so an email arrives
- * with the three things we need in order to reply usefully.
+ * The `mailto:`, kept as a pre-structured draft so an email arrives with the
+ * three things we need in order to reply usefully.
+ *
+ * **No longer a call to action.** It was the primary contact route until
+ * `/contact` shipped, and it lost that job for two reasons: it opens a client
+ * this audience frequently does not have configured, and it leaves no record
+ * anywhere we can query. It now appears only where the address is being stated
+ * as a fact and happens to be clickable — `/contact`, `/company#contact`, and
+ * `/llm-info`. Do not route a button here.
  */
 export const CONTACT_HREF = `mailto:${CONTACT_EMAIL}?subject=AI%20transformation%20inquiry&body=Organization%3A%0AWhat%20are%20you%20trying%20to%20move%20into%20production%3F%0ATimeline%3A`;
 
-export const PRIMARY_CTA = "Contact Us";
+/**
+ * The two CTAs, each named for where it goes.
+ *
+ * They replaced a single `PRIMARY_CTA = "Contact Us"` that was wired to
+ * `BOOKING_HREF` on every surface — so every button reading "Contact Us" opened
+ * cal.com, and the form at `CONTACT_PATH` was reachable only from the nav
+ * dropdown and the footer. Two labels pointing at two destinations is the whole
+ * fix; the ambiguous constant is deliberately deleted rather than aliased, so a
+ * new call site cannot reach for it.
+ *
+ * Booking stays the primary conversion. `CONTACT_CTA` is the secondary route,
+ * for the visitor who is not ready to put something in a calendar.
+ */
+export const BOOK_CTA = "Book Us";
+export const CONTACT_CTA = "Contact Us";
+
+export interface Profile {
+  label: string;
+  href: string;
+}
 
 /**
  * Verified profiles for this organization, in `sameAs` order.
@@ -36,13 +65,18 @@ export const PRIMARY_CTA = "Contact Us";
  * than three. Cheap to add and disproportionately load-bearing, which is why it
  * gets a named constant instead of an inline array.
  *
- * Deliberately empty pending the real URLs — a guessed profile URL that 404s is
- * worse than an absent one, because it asserts an identity we cannot back.
- * `sameAs` below still carries the booking link, so the node stays valid.
+ * Labelled rather than a bare URL list, because these are rendered in the footer
+ * as well as emitted as `sameAs` — and the one thing worse than an unverified
+ * profile URL is two copies of a verified one that can drift apart. `lib/seo.ts`
+ * maps to the hrefs; nothing else may hold this list.
+ *
+ * Every entry has to be a profile we control and that resolves. A guessed URL
+ * that 404s is worse than an absent one, because it asserts an identity we
+ * cannot back.
  */
-export const PROFILES: string[] = [
-  // "https://www.linkedin.com/company/regainflow",
-  // "https://www.crunchbase.com/organization/regainflow",
+export const PROFILES: Profile[] = [
+  { label: "LinkedIn", href: "https://www.linkedin.com/company/regain-flow" },
+  { label: "GitHub", href: "https://github.com/RegainFlow" },
 ];
 
 export const LOCATION = "Orlando, Florida";
@@ -133,19 +167,35 @@ export const NAV: NavGroup[] = [
         href: "/insights#case-studies",
         hint: "Selected enterprise AI and platform work",
       },
+      {
+        label: "Reports",
+        href: "/insights/reports",
+        hint: "Written research, with an audio version",
+      },
     ],
   },
   {
     label: "Company",
     href: "/company",
     items: [
-      { label: "About", href: "/company#about", hint: "Who you would be working with" },
+      {
+        label: "About",
+        href: "/company#about",
+        hint: "Who you would be working with",
+      },
       {
         label: "Manifesto",
         href: "/company#manifesto",
         hint: "What we will and will not do",
       },
-      { label: "Contact", href: "/company#contact", hint: "Start the conversation" },
+      // Its own route rather than the `/company#contact` anchor it used to be.
+      // The form is the destination now, and an anchor into the middle of
+      // another page is a weak thing to point every contact CTA at.
+      {
+        label: "Contact",
+        href: CONTACT_PATH,
+        hint: "Tell us what you are building",
+      },
       {
         label: "Capability statement ↗",
         href: CAPABILITY_STATEMENT_HREF,
@@ -158,4 +208,11 @@ export const NAV: NavGroup[] = [
   },
 ];
 
-export const ROUTES = ["/", "/services", "/insights", "/company"] as const;
+export const ROUTES = [
+  "/",
+  "/services",
+  "/insights",
+  "/insights/reports",
+  "/company",
+  CONTACT_PATH,
+] as const;

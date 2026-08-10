@@ -1,18 +1,27 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 
 import PageHeader from "@/components/PageHeader";
 import PlayOnView from "@/components/stage-models/PlayOnView";
 import StageModel from "@/components/stage-models/StageModel";
 import { RF_EVENTS } from "@/lib/analytics/events";
-import { MANIFESTO, MISSION, MISSION_DETAIL, TEAM, VISION } from "@/lib/content/company";
+import {
+  MANIFESTO,
+  MISSION,
+  MISSION_DETAIL,
+  TEAM,
+  VISION,
+} from "@/lib/content/company";
 import { breadcrumbJsonLd, pageMetadata, serializeJsonLd } from "@/lib/seo";
 import {
+  BOOK_CTA,
   BOOKING_HREF,
+  CONTACT_CTA,
   CONTACT_EMAIL,
   CONTACT_HREF,
+  CONTACT_PATH,
   LOCATION,
-  PRIMARY_CTA,
 } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
@@ -111,18 +120,35 @@ export default function CompanyPage() {
                     </p>
                   ))}
 
-                  {/* The same URL `peopleJsonLd()` emits as `sameAs`. A crawler
-                      already had it; this is the version a person can click. */}
-                  {member.profile ? (
-                    <p className="mt-6">
-                      <a
-                        href={member.profile}
-                        className="rf-nav-link"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        LinkedIn &rarr;
-                      </a>
+                  {/* The profile is the same URL `peopleJsonLd()` emits as
+                      `sameAs` — a crawler already had it; this is the version a
+                      person can click. The resume sits beside it because this
+                      block is the answer to "who am I dealing with", and both
+                      links answer it at different depths. */}
+                  {member.profile || member.resume ? (
+                    <p className="mt-6 flex flex-wrap gap-x-8">
+                      {member.profile ? (
+                        <a
+                          href={member.profile}
+                          className="rf-nav-link"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          LinkedIn &#8599;
+                        </a>
+                      ) : null}
+                      {member.resume ? (
+                        <a
+                          href={member.resume}
+                          className="rf-nav-link"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          data-rf-event={RF_EVENTS.resumeOpened}
+                          data-rf-person={member.name}
+                        >
+                          Resume &#8599;
+                        </a>
+                      ) : null}
                     </p>
                   ) : null}
                 </div>
@@ -182,16 +208,18 @@ export default function CompanyPage() {
                 data-rf-event={RF_EVENTS.bookingClicked}
                 data-rf-location="company_contact"
               >
-                {PRIMARY_CTA}
+                {BOOK_CTA}
               </a>
-              <a
-                href={CONTACT_HREF}
+              {/* Points at the form, not the mailto it used to open. The
+                  address itself is still below, as a fact. */}
+              <Link
+                href={CONTACT_PATH}
                 className="rf-cta-secondary"
                 data-rf-event={RF_EVENTS.contactClicked}
                 data-rf-location="company_contact"
               >
-                Email us instead
-              </a>
+                {CONTACT_CTA}
+              </Link>
             </div>
           </div>
 

@@ -13,6 +13,31 @@ import type { NextConfig } from "next";
  * to precede the catch-all or they never match.
  */
 const nextConfig: NextConfig = {
+  /**
+   * Report covers live in Supabase storage, not in `/public`.
+   *
+   * The cover used to be a committed PNG specifically so this block was not
+   * needed. That trade stopped being available when reports moved into a table:
+   * a row created in a browser cannot reference a file in the repository, so the
+   * URL has to be absolute and `next/image` has to be told the host is allowed.
+   *
+   * Hardcoded rather than read from `SUPABASE_URL`, matching how
+   * `CAPABILITY_STATEMENT_HREF` is already written in `lib/site.ts`. This is a
+   * public asset host, not a secret, and `next.config.ts` is evaluated before
+   * env loading in enough contexts that deriving it invites a confusing build
+   * failure. Scoped to the public object path — a signed or private URL should
+   * never be rendered through `<Image>` anyway.
+   */
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "qsnaxtjoyqycpbmmghff.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
+    ],
+  },
+
   async rewrites() {
     return [
       {

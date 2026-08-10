@@ -6,11 +6,14 @@ import { CASE_STUDIES } from "@/lib/content/case-studies";
 import { MANIFESTO, MISSION, TEAM } from "@/lib/content/company";
 import { FAQ } from "@/lib/content/faq";
 import { LAYERS } from "@/lib/content/layers";
+import { reportDate, type Report } from "@/lib/content/reports";
+import { getReports } from "@/lib/reports.server";
 import { ENGAGEMENT_PATH, STAGES } from "@/lib/content/stages";
 import {
   AUDIENCE,
   BOOKING_HREF,
   CONTACT_EMAIL,
+  CONTACT_PATH,
   LOCATION,
   POSITIONING,
   SITE_NAME,
@@ -21,10 +24,14 @@ import {
  * `llms.txt` — the llmstxt.org convention. Generated from the same content
  * modules the pages render, so an assistant quoting this file cannot be
  * quoting something the site no longer says.
+ *
+ * Dynamic rather than static since the reports moved into Supabase: a file
+ * frozen at build time would describe the reports that existed at the last
+ * deploy, which is the same staleness the table was adopted to remove.
  */
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
-function build(): string {
+function build(reports: Report[]): string {
   const lines: string[] = [];
 
   lines.push(`# ${SITE_NAME}`);
@@ -33,7 +40,9 @@ function build(): string {
   lines.push("");
   lines.push(AUDIENCE);
   lines.push("");
-  lines.push(`Based in ${LOCATION}. Contact: ${BOOKING_HREF} or ${CONTACT_EMAIL}.`);
+  lines.push(
+    `Based in ${LOCATION}. Contact: ${SITE_URL}${CONTACT_PATH}, ${BOOKING_HREF}, or ${CONTACT_EMAIL}.`,
+  );
   lines.push("");
 
   // Ahead of the services, because the firm is two named people and an
@@ -52,6 +61,9 @@ function build(): string {
     }
     if (member.profile) {
       lines.push(`Profile: ${member.profile}`);
+    }
+    if (member.resume) {
+      lines.push(`Resume: ${member.resume}`);
     }
     lines.push("");
   }
@@ -118,6 +130,32 @@ function build(): string {
     lines.push("");
   }
 
+  // Only where something is published. An empty heading tells an assistant we
+  // have a reports programme and nothing in it, which is worse than silence.
+  if (reports.length > 0) {
+    lines.push("## Reports");
+    lines.push(`[${SITE_URL}/insights/reports]`);
+    lines.push("");
+    lines.push(
+      "Each report is free to read. The page carries the findings; the PDF is behind an email, and most have an audio version.",
+    );
+    lines.push("");
+    for (const report of reports) {
+      lines.push(`### ${report.title}`);
+      lines.push(`[${SITE_URL}/insights/reports/${report.slug}]`);
+      lines.push(`Published: ${reportDate(report.published)}.`);
+      lines.push(report.summary);
+      // A bullet each, not a semicolon-joined run. Findings are whole sentences
+      // that already end in a period, so joining them produced `..` at the end
+      // and buried five distinct claims in one unreadable line.
+      lines.push("Findings:");
+      for (const finding of report.findings) {
+        lines.push(`- ${finding}`);
+      }
+      lines.push("");
+    }
+  }
+
   lines.push("## What RegainFlow believes");
   lines.push("");
   for (const item of MANIFESTO) {
@@ -141,7 +179,18 @@ function build(): string {
   for (const study of CASE_STUDIES) {
     lines.push(`  - [${study.title}](${SITE_URL}/insights/${study.slug})`);
   }
+  lines.push(
+    `- [Reports](${SITE_URL}/insights/reports): written research, each with an audio overview.`,
+  );
+  for (const report of reports) {
+    lines.push(
+      `  - [${report.title}](${SITE_URL}/insights/reports/${report.slug})`,
+    );
+  }
   lines.push(`- [Company](${SITE_URL}/company): the founders, manifesto, contact.`);
+  lines.push(
+    `- [Contact](${SITE_URL}${CONTACT_PATH}): the contact form, the booking link, and the email address.`,
+  );
   lines.push(
     `- [AI fact sheet](${SITE_URL}/llm-info): the whole of the above as one page — definition, key facts, founders, services, engagement path, commitments, and FAQ.`,
   );
@@ -150,8 +199,14 @@ function build(): string {
   return lines.join("\n");
 }
 
-export function GET() {
-  return new Response(build(), {
+export async function GET() {
+  // `throwOnError`, for the same reason `app/sitemap.ts` uses it. The `[]`
+  // default would drop the Reports section and every report link from the Pages
+  // list, leaving a document that reads as authoritative and states we publish
+  // no research. Erroring is the truthful failure.
+  const reports = await getReports({ throwOnError: true });
+
+  return new Response(build(reports), {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
       "Cache-Control": "public, max-age=0, must-revalidate",

@@ -252,6 +252,11 @@
     font-weight: 500;
     line-height: 1.2;
     text-align: center;
+    /* Most CTAs are anchors and get this free. The submit button on `/contact`
+       does not — a `<button>` is `cursor: default` by browser default, and
+       Tailwind v4 no longer overrides it. The disabled rule below takes it back
+       while a submission is in flight. */
+    cursor: pointer;
   }
 
   .rf-cta-primary {
@@ -463,6 +468,436 @@
     font-size: 0.875rem;
     font-weight: 500;
     border-radius: 2px;
+  }
+
+  /* --- Forms -------------------------------------------------------------- */
+
+  /* An input is a control, so it takes the control radius — 2px, the same as
+     the two CTAs — and their 3rem height, so a submit button sitting under a
+     field belongs to the same row of the system. Surfaces stay square. */
+
+  .rf-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  /* The mono utility register. A field label indexes and names rather than
+     speaks, which is exactly what that register marks. */
+  .rf-label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-rf-slate);
+  }
+
+  .rf-label[data-optional]::after {
+    content: " (optional)";
+    letter-spacing: 0.08em;
+    opacity: 0.65;
+  }
+
+  .rf-input,
+  .rf-textarea {
+    width: 100%;
+    padding: 0.8rem 0.9rem;
+    border: 1px solid var(--color-rf-hairline);
+    border-radius: 2px;
+    background: var(--color-rf-navy);
+    color: var(--color-rf-warm);
+    font-family: inherit;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .rf-input {
+    min-height: 3rem;
+  }
+
+  .rf-textarea {
+    min-height: 9rem;
+    resize: vertical;
+  }
+
+  .rf-input::placeholder,
+  .rf-textarea::placeholder {
+    color: var(--color-rf-line);
+  }
+
+  /* `:focus`, not `:focus-visible`. A text field is the one control where a
+     pointer user needs the focused state too — `:focus-visible` does not fire
+     on click for an input, so the global ring alone would leave a field that
+     has the caret looking identical to one that does not. */
+  .rf-input:focus,
+  .rf-textarea:focus {
+    outline: none;
+    border-color: var(--color-rf-flow-soft);
+    box-shadow: inset 0 0 0 1px var(--color-rf-flow-soft);
+  }
+
+  @media (hover: hover) {
+    .rf-input:hover,
+    .rf-textarea:hover {
+      border-color: var(--color-rf-slate);
+    }
+  }
+
+  /* Invalid state is an inset edge, the same device `.rf-stage-panel` uses for
+     active — nothing reflows, and Flow Blue is legal here because it is a
+     stroke and not text. The message below carries the meaning; the color is
+     never the only signal. */
+  .rf-input[aria-invalid="true"],
+  .rf-textarea[aria-invalid="true"] {
+    border-color: var(--color-rf-flow);
+    box-shadow: inset 3px 0 0 var(--color-rf-flow);
+  }
+
+  /* Introduced by the same route tick the disclosure and the CTA stub use —
+     one vocabulary, and an error is a response line like any other. Warm, not
+     the accent: this is text, and Flow Blue is below AA at this size. */
+  .rf-field-error {
+    display: flex;
+    gap: 0.65rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--color-rf-warm);
+  }
+
+  .rf-field-error .rf-route-tick {
+    margin-top: 0.62em;
+  }
+
+  /* The character count under the message field. Mono utility register and
+     right-aligned, so it reads as a meter rather than as a second label — and
+     `tabular-nums` because the number changes on every keystroke and a
+     proportional font makes the whole line jitter. */
+  .rf-field-count {
+    align-self: flex-end;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-rf-line);
+    transition: color 0.2s ease;
+  }
+
+  /* Approaching the cap. Warm rather than the accent, for the reason stated on
+     `.rf-field-error`: Flow Blue is below AA at this size. The number is the
+     signal; this only draws the eye to it. */
+  .rf-field-count[data-near] {
+    color: var(--color-rf-warm);
+  }
+
+  .rf-form-note {
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: var(--color-rf-slate);
+  }
+
+  /* Off-screen rather than `display: none` or `hidden`: a bot reading the DOM
+     skips anything obviously hidden, and this only works if it looks reachable.
+     `tabindex="-1"` and `autocomplete="off"` on the input keep it away from
+     keyboard users and password managers, which is the half that matters. */
+  .rf-honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  /* Submit while the action is in flight. The label stays put and the surface
+     recedes, so the button does not change width mid-sentence. */
+  .rf-cta-primary[aria-disabled="true"],
+  .rf-cta-primary:disabled {
+    background: var(--color-rf-slate);
+    cursor: default;
+  }
+
+  /* --- Reports ------------------------------------------------------------ */
+
+  /* The cover is the artifact, and a report page is asking for an email — so
+     the document has to look like a document. A hairline frame on Navy, the
+     same treatment `.rf-portrait` gives a photograph, for the same reason:
+     these are the two places on the site where an image is the subject rather
+     than decoration. */
+  /* The ratio lives here rather than on the image, because the covers are remote
+     now and arrive with no intrinsic dimensions — `<Image fill>` is absolutely
+     positioned and needs a parent that already has a size. A declared ratio also
+     means a cover exported at letter and one exported at A4 sit in the same box
+     and a grid row stays level. */
+  .rf-report-cover {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 17 / 22;
+    border: 1px solid var(--color-rf-hairline);
+    background: var(--color-rf-navy);
+  }
+
+  /* `contain`, not `cover` — a cropped cover cuts the title off it. */
+  .rf-report-cover img {
+    object-fit: contain;
+  }
+
+  .rf-report-cover-lead {
+    max-width: 24rem;
+  }
+
+  /* The gate and the audio block are both bounded modules on the page rather
+     than sections of it — a border is what says "this is the thing you came
+     for" without an elevation shadow the system does not have. */
+  .rf-gate,
+  .rf-audio {
+    padding: clamp(1.35rem, 3vw, 2rem);
+    border: 1px solid var(--color-rf-hairline);
+    background: var(--color-rf-navy);
+  }
+
+  .rf-gate {
+    box-shadow: inset 3px 0 0 var(--color-rf-flow);
+  }
+
+  /* --- Audio player ------------------------------------------------------
+
+     Drawn rather than left to the platform, and the one place on the site where
+     that call is made. The native widget is the only element on a report page
+     not rendered by this design system, and at the size it occupies that reads
+     as an embed rather than as part of the page.
+
+     What the rebuild had to keep is in `components/ReportAudioPlayer` — the
+     range input, the media session, the real `<audio>`. What is here is only
+     paint. */
+
+  .rf-audio-body {
+    display: grid;
+    gap: clamp(1rem, 3vw, 1.75rem);
+    margin-top: 1.5rem;
+    align-items: center;
+    grid-template-columns: 1fr;
+  }
+
+  /* The mark is decoration and the first thing to go when space is short. */
+  @media (min-width: 40rem) {
+    .rf-audio-body {
+      grid-template-columns: 7.5rem 1fr;
+    }
+  }
+
+  .rf-audio-mark {
+    display: none;
+    border: 1px solid var(--color-rf-hairline);
+    background: var(--color-rf-void);
+    padding: 0.75rem;
+  }
+
+  @media (min-width: 40rem) {
+    .rf-audio-mark {
+      display: block;
+    }
+  }
+
+  /* Stacks the two layers of the monogram the way `.rf-ascii` does for the hero,
+     but standalone: this tile sizes to the mark rather than filling a section,
+     so it sets its own container and lets the ratio come from the grid. */
+  .rf-ascii-mark {
+    container-type: inline-size;
+    position: relative;
+  }
+
+  .rf-ascii-mark pre {
+    font-family: var(--font-mono);
+    /* Same derivation as `.rf-ascii pre`: 0.6 is the monospace advance width, so
+       cells come out square, which the monogram's geometry assumes. */
+    font-size: calc(100cqw / (var(--rf-cols, 36) * 0.6));
+    line-height: 0.6;
+    white-space: pre;
+    user-select: none;
+  }
+
+  /* Depth stays in flow and gives the tile its height; the face overlays it. */
+  .rf-ascii-mark pre + pre {
+    position: absolute;
+    inset: 0;
+  }
+
+  .rf-audio-main {
+    min-width: 0;
+  }
+
+  .rf-audio-scrub {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+
+  /* The track is drawn on the input itself rather than on a wrapper, so the
+     thumb and the fill cannot drift apart at a sub-pixel width. `--rf-progress`
+     is set inline by the component; everything else about the appearance,
+     including both colours, stays here. */
+  .rf-audio-range {
+    flex: 1;
+    min-width: 0;
+    height: 1.5rem;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .rf-audio-range:disabled {
+    cursor: default;
+    opacity: 0.5;
+  }
+
+  .rf-audio-range::-webkit-slider-runnable-track {
+    height: 2px;
+    background: linear-gradient(
+      to right,
+      var(--color-rf-flow) 0 var(--rf-progress, 0%),
+      var(--color-rf-hairline) var(--rf-progress, 0%) 100%
+    );
+  }
+
+  .rf-audio-range::-moz-range-track {
+    height: 2px;
+    background: linear-gradient(
+      to right,
+      var(--color-rf-flow) 0 var(--rf-progress, 0%),
+      var(--color-rf-hairline) var(--rf-progress, 0%) 100%
+    );
+  }
+
+  /* Square, like every other handle and indicator in the system. The negative
+     margin is what centres a 10px thumb on a 2px track in WebKit, which does not
+     do it for you. */
+  .rf-audio-range::-webkit-slider-thumb {
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    margin-top: -4px;
+    border-radius: 2px;
+    background: var(--color-rf-warm);
+  }
+
+  .rf-audio-range::-moz-range-thumb {
+    width: 10px;
+    height: 10px;
+    border: 0;
+    border-radius: 2px;
+    background: var(--color-rf-warm);
+  }
+
+  .rf-audio-range:focus-visible {
+    outline: 2px solid var(--color-rf-flow-soft);
+    outline-offset: 4px;
+  }
+
+  .rf-audio-rate {
+    flex: none;
+    min-width: 3.25rem;
+    padding: 0.4rem 0.5rem;
+    border: 1px solid var(--color-rf-hairline);
+    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-rf-slate);
+    cursor: pointer;
+    transition:
+      color 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .rf-audio-rate:hover {
+    color: var(--color-rf-warm);
+    border-color: var(--color-rf-line);
+  }
+
+  .rf-audio-times {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.6rem;
+    /* Without this the whole row twitches every time a digit changes. */
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rf-audio-transport {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(1rem, 4vw, 2rem);
+    margin-top: 1.75rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-rf-hairline);
+  }
+
+  /* 44px floor on every control, which is the reason these carry explicit sizes
+     rather than padding around a glyph. */
+  .rf-audio-play,
+  .rf-audio-skip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .rf-audio-play {
+    width: 56px;
+    height: 56px;
+    background: var(--color-rf-flow);
+    color: #ffffff;
+  }
+
+  .rf-audio-play:hover {
+    background: var(--color-rf-flow-soft);
+  }
+
+  .rf-audio-play svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .rf-audio-skip {
+    border: 1px solid var(--color-rf-hairline);
+    padding: 0 0.7rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    color: var(--color-rf-slate);
+  }
+
+  .rf-audio-skip:hover {
+    color: var(--color-rf-warm);
+    border-color: var(--color-rf-line);
+  }
+
+  .rf-audio-play:focus-visible,
+  .rf-audio-skip:focus-visible {
+    outline: 2px solid var(--color-rf-flow-soft);
+    outline-offset: 3px;
+  }
+
+  /* The `<noscript>` fallback. Native controls, because that path has no
+     JavaScript to draw anything else with. */
+  .rf-audio-native {
+    display: block;
+    width: 100%;
+    max-width: 40rem;
+    margin-top: 1.5rem;
   }
 
   /* --- Navigation ------------------------------------------------------- */

@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import SiteNav from "@/components/SiteNav";
 import { RF_EVENTS } from "@/lib/analytics/events";
-import { BOOKING_HREF, PRIMARY_CTA } from "@/lib/site";
+import { BOOK_CTA, BOOKING_HREF } from "@/lib/site";
 
 export default function SiteHeader() {
   return (
@@ -22,7 +22,7 @@ export default function SiteHeader() {
               data-rf-event={RF_EVENTS.bookingClicked}
               data-rf-location="header"
             >
-              {PRIMARY_CTA}
+              {BOOK_CTA}
             </a>
           }
         />

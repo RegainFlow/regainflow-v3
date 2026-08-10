@@ -2,7 +2,7 @@ import AsciiField from "@/components/brand/AsciiField";
 import AsciiMonogram from "@/components/brand/AsciiMonogram";
 import IndustryMarquee from "@/components/IndustryMarquee";
 import { RF_EVENTS } from "@/lib/analytics/events";
-import { BOOKING_HREF, POSITIONING, PRIMARY_CTA } from "@/lib/site";
+import { BOOK_CTA, BOOKING_HREF, POSITIONING } from "@/lib/site";
 
 export default function Hero() {
   return (
@@ -36,7 +36,7 @@ export default function Hero() {
               data-rf-event={RF_EVENTS.bookingClicked}
               data-rf-location="hero"
             >
-              {PRIMARY_CTA}
+              {BOOK_CTA}
             </a>
             <a
               href="#approach"

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { CASE_STUDIES, type CaseStudy } from "@/lib/content/case-studies";
 import { TEAM } from "@/lib/content/company";
 import { FAQ } from "@/lib/content/faq";
+import type { Report } from "@/lib/content/reports";
 import { STAGES } from "@/lib/content/stages";
 import {
   BOOKING_HREF,
@@ -144,9 +145,9 @@ export function organizationJsonLd() {
     //
     // `sameAs` is the entity anchor — the set of URLs that let a crawler confirm
     // this node and the profiles it already knows about are one organization.
-    // `PROFILES` is empty until the real URLs land; spreading it keeps the
-    // booking link as the floor rather than emitting an empty array.
-    sameAs: [BOOKING_HREF, ...PROFILES],
+    // Derived from `PROFILES` rather than restated, so the footer and this node
+    // cannot come to disagree about where the company is.
+    sameAs: [BOOKING_HREF, ...PROFILES.map((profile) => profile.href)],
     // Name as well as `@id`, not a bare reference. This node ships on every
     // route but the full `Person` nodes only exist on `/llm-info`, so a
     // reference alone would dangle on four pages out of five. Carrying the name
@@ -260,6 +261,58 @@ export function caseStudyJsonLd(study: CaseStudy) {
     isPartOf: { "@id": `${SITE_URL}/#website` },
     author: { "@id": `${SITE_URL}/#organization` },
     publisher: { "@id": `${SITE_URL}/#organization` },
+  };
+}
+
+/**
+ * A published report.
+ *
+ * `Report` rather than the `CreativeWork` the case studies use, and rather than
+ * `Article`: these genuinely are reports, they carry a real `datePublished`, and
+ * the type exists precisely for this. `abstract` and `about` come from the same
+ * fields the page renders visibly — structured data must never assert something
+ * the page does not say.
+ *
+ * The PDF is declared as an `encoding`, which is what tells a crawler the page
+ * and the document are the same work in two formats rather than two works.
+ */
+export function reportJsonLd(report: Report) {
+  const url = `${SITE_URL}/insights/reports/${report.slug}`;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Report",
+    "@id": `${url}/#report`,
+    name: report.title,
+    headline: report.title,
+    abstract: report.summary,
+    description: report.summary,
+    datePublished: report.published,
+    url,
+    inLanguage: "en-US",
+    // Already absolute — it points at Supabase storage, not at `/public`.
+    image: report.cover,
+    isPartOf: { "@id": `${SITE_URL}/#website` },
+    author: { "@id": `${SITE_URL}/#organization` },
+    publisher: { "@id": `${SITE_URL}/#organization` },
+    encoding: {
+      "@type": "MediaObject",
+      contentUrl: report.pdf,
+      encodingFormat: "application/pdf",
+      ...(report.pages ? { numberOfPages: report.pages } : {}),
+    },
+    // Declared only where one exists, for the same reason `sameAs` is: a node
+    // pointing at a file that was never uploaded is worse than a silent one.
+    ...(report.audio
+      ? {
+          audio: {
+            "@type": "AudioObject",
+            contentUrl: report.audio,
+            encodingFormat: "audio/mp4",
+            name: `${report.title} — audio overview`,
+          },
+        }
+      : {}),
   };
 }
 

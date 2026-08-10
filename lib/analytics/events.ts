@@ -22,8 +22,17 @@
 export const RF_EVENTS = {
   /** Any route to the booking page. The site's primary conversion. */
   bookingClicked: "cta_booking_clicked",
-  /** Either mailto route. */
+  /** A route to `/contact`, or one of the two remaining mailto links. */
   contactClicked: "cta_contact_clicked",
+  /**
+   * A contact form submission that was accepted and written. The other half of
+   * the conversion: `contactClicked` counts intent to reach us, this counts
+   * arrival, and the gap between them is the form's own drop-off.
+   *
+   * Fired from the client after the action returns, not from the action — see
+   * `lib/analytics/track.ts` for why that is a separate module.
+   */
+  contactSubmitted: "contact_form_submitted",
   /** Non-converting CTAs, kept separate so they cannot inflate the above. */
   secondaryClicked: "cta_secondary_clicked",
   caseStudyOpened: "case_study_opened",
@@ -46,6 +55,26 @@ export const RF_EVENTS = {
    * the site can observe.
    */
   capabilityStatementOpened: "capability_statement_opened",
+  /** A report card, from the listing or from a report page. */
+  reportOpened: "report_opened",
+  /**
+   * The email gate on a report, accepted. Carries `report`.
+   *
+   * This is the event `instrumentation-client.ts` was configured for:
+   * `person_profiles: "identified_only"` means an anonymous visitor creates no
+   * person record until `identify(email)` runs here, at which point everything
+   * they read beforehand is stitched onto them retroactively.
+   */
+  reportUnlocked: "report_unlocked",
+  /** The PDF itself, after the gate. Separate from the unlock — an unlock that
+   *  never becomes a download means the gate is the wrong ask. */
+  reportDownloaded: "report_downloaded",
+  /** First play of a report's audio overview. Fires once per page view. */
+  podcastPlayed: "report_podcast_played",
+  /** A founder resume. Carries `person`. Like the capability statement, it
+   *  converts nothing and is a strong intent signal, so it stays outside the
+   *  `cta_` family. */
+  resumeOpened: "resume_opened",
 } as const;
 
 export type RfEvent = (typeof RF_EVENTS)[keyof typeof RF_EVENTS];
@@ -68,9 +97,23 @@ export type RfLocation =
   | "hero"
   | "hero_how_we_work"
   | "closing_cta"
+  /**
+   * The form button beside it. Split out rather than folded into `closing_cta`
+   * because the pair is now a ranked choice — booking first, form second — and
+   * the number worth having is how often the second one wins.
+   */
+  | "closing_cta_contact"
   | "assessment"
   | "company_contact"
-  | "company_details";
+  | "company_details"
+  /** The closing shelf of the footer, on every route. */
+  | "footer"
+  /** `/contact` — the form's own page. */
+  | "contact_page"
+  /** The email gate on a report page. */
+  | "report_gate"
+  /** A report page, outside the gate. */
+  | "report";
 
 /**
  * Which surface a case study card was opened from.

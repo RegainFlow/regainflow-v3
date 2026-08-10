@@ -1,5 +1,7 @@
+import Link from "next/link";
+
 import { RF_EVENTS } from "@/lib/analytics/events";
-import { BOOKING_HREF, PRIMARY_CTA } from "@/lib/site";
+import { BOOK_CTA, BOOKING_HREF, CONTACT_CTA, CONTACT_PATH } from "@/lib/site";
 
 export default function ClosingCTA() {
   return (
@@ -15,7 +17,11 @@ export default function ClosingCTA() {
             whether RegainFlow is the right engineering partner.
           </p>
 
-          <div className="mt-8">
+          {/* Both routes, ranked. Booking is still the primary conversion; the
+              form is here for the visitor who wants to say something before
+              committing to a time — which, until now, this shelf offered no way
+              to do. */}
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             {/* One location across `/`, `/insights`, and `/insights/[slug]`.
                 PostHog attaches `$pathname` to every event, so the three are
                 already separable without giving this component a prop it
@@ -26,8 +32,19 @@ export default function ClosingCTA() {
               data-rf-event={RF_EVENTS.bookingClicked}
               data-rf-location="closing_cta"
             >
-              {PRIMARY_CTA}
+              {BOOK_CTA}
             </a>
+            {/* Its own location rather than sharing `closing_cta`: these two are
+                a ranked pair, and the whole question this shelf now answers is
+                how many people pick the form over the calendar. */}
+            <Link
+              href={CONTACT_PATH}
+              className="rf-cta-secondary"
+              data-rf-event={RF_EVENTS.contactClicked}
+              data-rf-location="closing_cta_contact"
+            >
+              {CONTACT_CTA}
+            </Link>
           </div>
         </div>
 

@@ -2,7 +2,8 @@ import Link from "next/link";
 
 import AskAi from "@/components/AskAi";
 import NavItemLink from "@/components/NavItemLink";
-import { LOCATION, NAV, TAGLINE } from "@/lib/site";
+import { RF_EVENTS } from "@/lib/analytics/events";
+import { CONTACT_PATH, LOCATION, NAV, PROFILES, TAGLINE } from "@/lib/site";
 
 export default function SiteFooter() {
   const year = new Date().getFullYear();
@@ -18,6 +19,27 @@ export default function SiteFooter() {
             <p className="rf-body mt-4 max-w-[34ch]">{TAGLINE}</p>
             <p className="rf-utility mt-8">Location</p>
             <p className="rf-body mt-3">{LOCATION}</p>
+
+            {/* The same URLs `organizationJsonLd()` emits as `sameAs`. A crawler
+                already had them; this is the version a person can click — and
+                rendering both from `PROFILES` is what stops the two from
+                drifting. Text rather than marks: the footer's register is text,
+                and `components/brand/ai-glyphs` is a closed set. */}
+            <p className="rf-utility mt-8">Follow</p>
+            <ul className="mt-3 flex flex-wrap gap-x-6 gap-y-1.5">
+              {PROFILES.map((profile) => (
+                <li key={profile.href}>
+                  <a
+                    href={profile.href}
+                    className="rf-nav-link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {profile.label} &#8599;
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
 
           {NAV.map((group) => (
@@ -59,7 +81,12 @@ export default function SiteFooter() {
               <Link href="/llm-info" className="rf-nav-link">
                 AI fact sheet
               </Link>
-              <Link href="/company#contact" className="rf-nav-link">
+              <Link
+                href={CONTACT_PATH}
+                className="rf-nav-link"
+                data-rf-event={RF_EVENTS.contactClicked}
+                data-rf-location="footer"
+              >
                 Contact us &rarr;
               </Link>
             </div>

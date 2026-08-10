@@ -28,7 +28,11 @@ npm run typecheck
 | `/services`                                                    | Full Discover / Implement / Scale, the four capability layers, engagement path, free assessment |
 | `/insights`                                                    | Selected enterprise AI and platform experience — six featured, all twelve in a disclosure       |
 | `/insights/[slug]`                                             | One case study in full: challenge, solution, capabilities, impact                               |
+| `/insights/reports`                                            | Published reports. Renders an empty state until the first is authored                           |
+| `/insights/reports/[slug]`                                     | One report: cover, findings, audio overview, and the email gate in front of the PDF             |
 | `/company`                                                     | Who we are, manifesto, contact                                                                  |
+| `/contact`                                                     | The contact form. The canonical contact route — every contact CTA points here                   |
+| `/contact/thanks`                                              | Post-submission confirmation. `noindex`, reachable only by submitting                           |
 | `/robots.txt`, `/sitemap.xml`, `/llms.txt`, `/opengraph-image` | Generated                                                                                       |
 
 ## Structure
@@ -40,8 +44,13 @@ npm run typecheck
 | `app/globals.css`          | Palette tokens, type scale, the wave, navigation, cards, model styles, keyframes |
 | `lib/ascii/`               | The ASCII engine — `dither`, `field`, `monogram`                                 |
 | `lib/site.ts`              | Domain, contact destinations, positioning copy, navigation tree                  |
-| `lib/content/`             | Stages, layers, case studies, company — the single source for every page         |
+| `lib/content/`             | Stages, layers, case studies, company, reports — the single source for every page |
 | `lib/seo.ts`               | JSON-LD builders and the `<` escape used before injection                        |
+| `lib/forms.ts`             | Field limits and validators. **No imports** — read by client and server both      |
+| `lib/forms.server.ts`      | IP hashing and the rate limiter. `server-only`                                    |
+| `lib/supabase.ts`          | The secret-key client. Server only, constructed lazily                            |
+| `lib/mail.ts`              | Resend notification for contact submissions. Best-effort by design                |
+| `supabase/migrations/`     | The two tables the forms write to, their grants, and their RLS posture            |
 | `components/brand/`        | `AsciiField` (animated), `AsciiMonogram` (still)                                 |
 | `components/SiteNav.tsx`   | Desktop dropdowns and the mobile menu (the only navigation client component)     |
 | `components/stage-models/` | The isometric primitives and the four stage models                               |
@@ -250,6 +259,126 @@ analytics a no-op rather than an error.
 Group labels are real links to `/services`, `/insights`, and `/company`; the dropdown
 is progressive enhancement only. Below `md` the same tree opens in a focus-trapped
 panel. Without JavaScript every route is still reachable.
+
+### Forms, and what is still static
+
+Two forms write to Supabase: the contact form on `/contact`, and the email gate in front
+of each report's PDF. Both go through Server Actions, and **neither makes a route
+dynamic** — a Server Action does not opt its page into dynamic rendering, and nothing on
+this site reads `cookies()` or `searchParams`.
+
+The routes that *are* dynamic (`ƒ` in `pnpm build`) are the ones that read the `reports`
+table: `/insights`, `/insights/reports`, `/insights/reports/[slug]` and its OG image,
+`/sitemap.xml`, and `/llms.txt`. That is the deliberate price of publishing a report by
+adding a row rather than by deploying. Everything else — `/`, `/services`, `/company`,
+`/contact`, `/llm-info`, and all nine case studies — must still show `○` or `●`, and a new
+`ƒ` among them means something opted a route into dynamic rendering by accident.
+
+**Both forms work with JavaScript disabled, and that is measured.** Replaying the native
+`multipart/form-data` POST that a scripting-off browser sends — the four `$ACTION_*` fields React
+serializes, plus the form data — against a running server on `/contact`:
+
+| Submission | Result |
+| ---------- | ------ |
+| Valid | Action runs through to the Supabase write |
+| Honeypot filled | `303 See Other → /contact/thanks`, no row written |
+| Message under `LIMITS.messageMin` | Page re-renders with the field error in the response HTML, no write |
+
+The third row is the one worth knowing, because the natural assumption is the opposite:
+`useActionState` is not what renders validation errors, it is what renders them without a round
+trip. Reproduce it by lifting `$ACTION_1:0`, `$ACTION_1:1` and `$ACTION_KEY` out of the rendered
+HTML and `curl -F` them back with an `Origin` header.
+
+The gate is what makes the static claim non-obvious. It remembers a reader in `localStorage`, read
+through `useSyncExternalStore` in `components/ReportGate.tsx` — not a cookie, which the
+server would have to read, and not `useState` plus a mount effect, which renders the
+locked state and then flashes past it. Server snapshot is always `null`, so hydration is
+honest: the server has no storage and must render locked.
+
+**The gate is a courtesy ask, not access control.** Reports live in a public Supabase
+bucket, the same as the capability statement, so the PDF URL is public whether or not
+anyone fills the form in. That is why `ReportGate` ships a `<noscript>` block with the
+direct link — a reader with scripting off gets the document rather than a dead page, and
+nothing is being protected by pretending otherwise.
+
+**Security posture.** There is no browser Supabase client, and no publishable key —
+`SUPABASE_SECRET_KEY` (`sb_secret_…`, Supabase's replacement for the legacy `service_role` key)
+is server-only, has no `NEXT_PUBLIC_` prefix, and carries `BYPASSRLS`. Which is why both tables
+in `supabase/migrations/` enable RLS with **no policies at all**, leaving every other key with no
+path in. Adding a policy is what would open them.
+
+The schema also states its `grant`s explicitly. Supabase is moving the platform default from
+auto-granting new `public` tables to the Data API roles to revoking them, so on a current project
+a table without an explicit grant returns "permission denied" through PostgREST — even to the
+secret key. `select, insert` only: nothing edits or removes a submission.
+
+**Spam and abuse.** An off-screen honeypot field (`isBot` in `lib/forms.ts`) returns
+success and writes nothing — telling a bot it failed just teaches it where the trap is.
+Beyond that, submissions are counted per hashed IP over a trailing ten minutes, in
+Postgres rather than in memory, because a serverless process is fresh often enough that an
+in-process counter is a rate limiter in name only. `RF_IP_SALT` is what makes the hash
+non-reversible; without it the limiter stands down rather than storing a bare address.
+
+**Mail is best-effort and must stay that way.** `lib/mail.ts` swallows its own failures, and
+`after()` keeps the send off the response path so a slow Resend never delays a submitter. The
+Supabase row is the durable record: a lead that arrived and was not emailed can be read out of
+the table, and a lead rejected because Resend was down is gone. The Resend account is held
+directly — no integration, no host-specific binding, one `fetch` to one endpoint.
+
+### Publishing a report
+
+Reports live in the `public.reports` table, not in the repository. Publishing one is adding a row
+in the Supabase UI and refreshing the page — no commit, no deploy. `lib/content/reports.ts` keeps
+only the `Report` type and `reportDate()`; `lib/reports.server.ts` does the reading.
+
+The cover is **generated from page 1 of the PDF**, never exported by hand:
+
+```bash
+pnpm report:cover <pdf-url-or-path> <slug> [--width 1000]
+```
+
+It writes `public/reports/<slug>-cover.png` and reports the page count. Re-run it whenever the PDF
+is replaced — the PDF is the source of truth, and a cover that disagrees with page 1 is a bug a
+reader finds before we do.
+
+Then, in the Supabase UI:
+
+1. Upload the PDF, the audio, and the cover PNG to the `reports` bucket under `<slug>/`.
+2. Insert a row: paste the three public URLs into `cover_url` / `pdf_url` / `audio_url`, write
+   `title`, `summary`, and `findings`, and leave `status` at its `draft` default.
+3. Flip `status` to `published`. It is live on the next refresh.
+
+`status` defaults to `draft` for a reason: the pages read this table on every request, so there is
+no build step standing between a half-typed row and a visitor.
+
+`pdf-to-img` stays a devDependency that never ships, and the generated PNG stays out of the
+deployed bundle — the site reads the uploaded copy. Covers are remote now, which is why
+`next.config.ts` carries an `images.remotePatterns` entry: a row created in a browser cannot
+reference a file in the repository. No `coverWidth` / `coverHeight` travel with it either;
+`.rf-report-cover` declares the aspect ratio and `<Image fill>` fills it, because nobody can
+measure a PNG by hand in a table editor.
+
+One gotcha worth keeping: pdfjs rejects a plain `Uint8Array` when handing data to its worker
+("Cannot transfer object of unsupported type"). The script converts to a Node `Buffer`.
+
+### Database migrations
+
+Schema lives in `supabase/migrations/`, applied with the Supabase CLI (a devDependency, so
+`pnpm supabase` works without a global install):
+
+```bash
+pnpm supabase migration new <name>   # scaffold a timestamped file
+pnpm supabase db reset               # rebuild the local stack from every migration
+pnpm supabase db push                # apply pending migrations to the linked project
+pnpm supabase migration list         # compare local and remote history
+```
+
+Migrations are written `if not exists` throughout. A migration normally runs once, so that is not
+for re-runs — it is so `db push` succeeds against a project where these tables were created by
+hand before migrations existed.
+
+`.env.example` documents every variable. With Supabase unset the pages still build and
+render — only submission fails, which is what keeps a checkout without credentials useful.
 
 ## Content status
 

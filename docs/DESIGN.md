@@ -55,8 +55,9 @@ control." Specificity is the proof of experience; abstraction reads as distance 
 
 **4. No number unless it was confirmed.** This is policy, not style. `metric` appears on
 exactly two of nine case studies because exactly two figures were verifiable — a study with
-no number carries none rather than a soft one. `PROFILES` in `lib/site.ts` sits empty for the
-same reason: a guessed profile URL asserts an identity we cannot back. The same test governs
+no number carries none rather than a soft one. `PROFILES` in `lib/site.ts` shipped empty for
+months and now carries exactly the two URLs that were confirmed, for the same reason: a
+guessed profile URL asserts an identity we cannot back. The same test governs
 prose: Leo's bio carries his service record because he stated it, and carries no degree or
 certification because the only source for those was a login-walled page. Where we cannot
 measure the return, we say so rather than imply one.
@@ -303,7 +304,8 @@ Use the [scale](#the-scale). Two rules beyond it:
 | `.rf-ai-link` | Icon-only assistant links in the footer. |
 | `.rf-skip-link` | Skip to content. Already in `app/layout.tsx`; do not add a second. |
 
-Both CTAs are `min-height: 3rem`, `border-radius: 2px`.
+Both CTAs are `min-height: 3rem`, `border-radius: 2px`. Form inputs are controls too and
+inherit both — see [Adding a form](#10-adding-a-form).
 
 **Controls are 2px; surfaces are square.** Only `.rf-cta-primary`, `.rf-cta-secondary`, and
 `.rf-skip-link` carry a radius, and it is 2px. Cards, iso frames, menu panels, and stage panels
@@ -343,6 +345,9 @@ Touch-only adjustments go in `@media (hover: none)`.
 | `.rf-stage-panel` | Process panels — the only strongly bordered modules on the page. |
 | `.rf-portrait` | Team photographs. `4/5` ratio, `object-position: center 25%`, capped at `16rem`. |
 | `.rf-disclosure` | Native `<details>`. Folds content; never hides it from the server output. Takes `.rf-disclosure-summary` on the `<summary>` and a `.rf-disclosure-marker` span inside it. |
+| `.rf-report-cover` | The frame around a report cover. Declares `aspect-ratio: 17/22` and `object-fit: contain`, so covers exported at different page sizes still leave a grid row level. `.rf-report-cover-lead` caps the hero copy at `24rem`. |
+| `.rf-gate` | The email ask on a report page. Bordered, Navy, with the Flow Blue inset edge — it is the one module on the page asking the reader for something. |
+| `.rf-audio` | The frame around the audio overview. The transport inside it is ours: `.rf-audio-mark` (the RF monogram tile), `.rf-audio-range` (the scrubber), `.rf-audio-rate`, `.rf-audio-play`, `.rf-audio-skip`. The one platform widget the system replaces rather than styles — at the size it occupies, a native player reads as an embed. `.rf-audio-native` is the `<noscript>` fallback, where the transport does go back to the platform. |
 
 **Active state is an inset shadow, never a wider border.** `box-shadow: inset 3px 0 0
 var(--color-rf-flow)` on `.rf-stage-panel` and `.rf-assess-step`; a `border-left` that is
@@ -474,6 +479,74 @@ custom property from that one declaration. Do not add raw hex values in componen
 literals in the CSS are `#ffffff` (CTA hover, selection) and the `rgb(… / …)` overlays derived
 from Warm and Void.
 
+**The palette has stayed at eight, and the forms are the reason that is worth stating.** A form
+is the obvious place to want a ninth — every system has a red. This one does not, and the error
+state is built from primitives that already existed instead: see below.
+
+## 10. Adding a form
+
+```tsx
+<div className="rf-field">
+  <label htmlFor="email" className="rf-label">Email</label>
+  <input id="email" name="email" type="email" required maxLength={LIMITS.email}
+         className="rf-input" aria-invalid={error ? true : undefined} />
+  {error ? (
+    <p id="email-error" className="rf-field-error">
+      <span className="rf-route-tick" aria-hidden="true" />
+      <span>{error}</span>
+    </p>
+  ) : null}
+</div>
+```
+
+| Class | Use |
+|---|---|
+| `.rf-field` | One field: label, control, error slot. `flex-col`, `0.5rem` gap. |
+| `.rf-label` | The label. Mono utility register — `data-optional` appends "(optional)". |
+| `.rf-input` / `.rf-textarea` | Navy fill, hairline border, 2px radius. Input is `min-height: 3rem`; textarea is `9rem` and vertical-resize only. |
+| `.rf-field-error` | The message. Warm text behind a `.rf-route-tick`. |
+| `.rf-form-note` | Slate, `0.8125rem`. The line beside a submit button. |
+| `.rf-honeypot` | Off-screen wrapper for the bot trap. Never `display: none` — see below. |
+
+**An input is a control, so it takes the control rules.** `border-radius: 2px` and
+`min-height: 3rem`, both matching the two CTAs, which is what lets a submit button sit under a
+field and read as the same row of the system. Surfaces stay square.
+
+**Labels are the mono register**, and that is not decoration: a field label indexes and names
+rather than speaks, which is exactly what [the mono register](#the-mono-register) marks.
+
+**`:focus`, not `:focus-visible`, on the field itself.** `:focus-visible` does not fire on click
+for a text input, so the global ring alone leaves a field that has the caret looking identical to
+one that does not. Both are declared; the hover half still sits inside `@media (hover: hover)`.
+
+**There is no error colour, and there must not be one.** The invalid state is
+`box-shadow: inset 3px 0 0 var(--color-rf-flow)` — the same inset-edge device
+[Adding a surface](#4-adding-a-surface) uses for active, so nothing reflows, and Flow Blue is
+legal there because it is a stroke rather than text. The message itself is **Warm**, introduced
+by the `.rf-route-tick` that [Adding a diagram](#5-adding-a-diagram) defines as the mark that
+opens a response line. An error is a response line. Meaning lives in the words, never in the
+colour, which is also what [the accessibility floors](#7-accessibility-floors) require.
+
+**Every limit is imported, never retyped.** `LIMITS` in `lib/forms.ts` is read by the client to
+render `maxLength` / `minLength` *and* by the Server Action to validate. Browsers run constraint
+validation with scripting off, so the attributes catch what they can before the POST; the server
+rules are what actually enforce.
+
+**The honeypot is positioned off-screen, not hidden.** `display: none` and `hidden` are the
+first things a bot skips. `tabIndex={-1}` and `autoComplete="off"` are what keep it away from
+keyboard users and password managers, and those are the half that actually matters.
+
+**Forms submit to Server Actions, and the no-JS path is not optional.** `<form action={fn}>`
+progressively enhances — with scripting off the browser performs a native POST. Measured on
+`/contact` by replaying that POST as `multipart/form-data`: the action runs, `redirect()` answers
+`303 See Other`, and a validation failure re-renders the page with the error in the response
+HTML. `useActionState` is not what renders errors — it is what renders them without a round trip.
+
+Apply the same test [Adding motion](#6-adding-motion) applies: if JS never runs, does this still
+work? Where the honest answer is no, say so in the markup rather than papering over it —
+`components/ReportGate.tsx` ships a `<noscript>` block with the direct download link, because its
+reveal genuinely does need scripting and the file behind it is public anyway.
+
 ---
 
 ## Not yet defined
@@ -481,9 +554,12 @@ from Warm and Void.
 The site has never needed these, so no convention exists. Anyone adding one is designing, not
 applying — extend the vocabulary above deliberately rather than importing a component library.
 
-Form inputs, labels, validation · tables · toasts and notifications · modals and dialogs ·
-loading and skeleton states · empty states · error states (404/500 render Next.js defaults) ·
-pagination · tabs · tooltips · light mode.
+Tables · toasts and notifications · modals and dialogs · skeleton states · pagination · tabs ·
+tooltips · light mode · route-level error states (404/500 render Next.js defaults).
+
+Form validation and pending states are defined — see [Adding a form](#10-adding-a-form). Empty
+states have one worked example and no rule: `/insights/reports` renders a headline, a sentence,
+and a route out when nothing is published, rather than an empty grid.
 
 ## Files
 
@@ -492,8 +568,11 @@ pagination · tabs · tooltips · light mode.
 | `app/globals.css` | `@theme` tokens, the type scale, every `.rf-*` class, keyframes |
 | `app/layout.tsx` | Font loading, `themeColor`, `colorScheme`, metadata |
 | `app/icon.png` | The mark — source of truth |
-| `lib/site.ts` | Positioning, tagline, audience, contact, nav tree |
-| `lib/content/` | All copy: stages, layers, case studies, company |
+| `lib/site.ts` | Positioning, tagline, audience, contact, profiles, nav tree |
+| `lib/content/` | All copy: stages, layers, case studies, company, reports |
+| `lib/forms.ts` | Field limits and validators. **No imports** — read by client and server both |
+| `lib/supabase.ts` | The secret-key client. Server only |
+| `supabase/migrations/` | The two tables the forms write to, their grants, and their RLS posture |
 | `lib/og.tsx` | The OG card **and a hand-mirrored copy of the palette** |
 | `lib/ascii/monogram.ts` | The mark's geometry, traced from the icon |
 | `components/stage-models/iso.tsx` | Isometric primitives |

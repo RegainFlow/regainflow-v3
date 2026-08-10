@@ -30,3 +30,9 @@ yarn-error.log*
 
 # claude code worktrees
 .claude/worktrees/
+
+# supabase cli scratch
+supabase/.temp/
+
+.vercel
+.env*
