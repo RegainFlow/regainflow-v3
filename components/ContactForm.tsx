@@ -170,7 +170,12 @@ export default function ContactForm({ source }: Props) {
             className="rf-field-count"
             data-near={message.length >= LIMITS.message * 0.9 || undefined}
           >
-            {message.length.toLocaleString()} / {LIMITS.message.toLocaleString()}
+            {/* Locale pinned to the `lang="en"` the document declares. Bare
+                `toLocaleString()` reads the *runtime* locale, so the server
+                would render "4,000" and a browser set to de-DE would hydrate
+                "4.000" — a mismatch React would have to repair. */}
+            {message.length.toLocaleString("en-US")} /{" "}
+            {LIMITS.message.toLocaleString("en-US")}
           </p>
         }
       />
