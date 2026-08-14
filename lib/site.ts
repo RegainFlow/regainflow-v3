@@ -7,7 +7,8 @@ export const SITE_URL = "https://www.regainflow.com";
 export const CONTACT_EMAIL = "contact@regainflow.com";
 
 /** Primary destination for every conversion on the site. */
-export const BOOKING_HREF = "https://cal.com/regainflow/schedule";
+export const FREE_ASSESSMENT_HREF =
+  "https://cal.com/regainflow/free-assessment";
 
 /**
  * The capability statement, hosted on Supabase storage. The document a federal,
@@ -40,7 +41,7 @@ export const CONTACT_HREF = `mailto:${CONTACT_EMAIL}?subject=AI%20transformation
  * The two CTAs, each named for where it goes.
  *
  * They replaced a single `PRIMARY_CTA = "Contact Us"` that was wired to
- * `BOOKING_HREF` on every surface — so every button reading "Contact Us" opened
+ * `FREE_ASSESSMENT_HREF` on every surface — so every button reading "Contact Us" opened
  * cal.com, and the form at `CONTACT_PATH` was reachable only from the nav
  * dropdown and the footer. Two labels pointing at two destinations is the whole
  * fix; the ambiguous constant is deliberately deleted rather than aliased, so a
@@ -49,7 +50,7 @@ export const CONTACT_HREF = `mailto:${CONTACT_EMAIL}?subject=AI%20transformation
  * Booking stays the primary conversion. `CONTACT_CTA` is the secondary route,
  * for the visitor who is not ready to put something in a calendar.
  */
-export const BOOK_CTA = "Book Us";
+export const FREE_ASSESSMENT_CTA = "Free Assessment";
 export const CONTACT_CTA = "Contact Us";
 
 export interface Profile {
@@ -88,9 +89,15 @@ export const TAGLINE = "AI transformation, from ambition to operation.";
 /**
  * Who the site is written for. Named in the hero because the first test the
  * page has to pass is "can you tell who we're targeting".
+ *
+ * State and local leads; aerospace and defense closes. That order is the
+ * positioning: the firm sells to counties and states now, and the defense
+ * record is what makes a two-person firm credible to them rather than the
+ * market being addressed. Reversing the sentence puts a county administrator in
+ * front of a defense contractor's website, which is the problem this replaced.
  */
 export const AUDIENCE =
-  "Built for law enforcement agencies and aerospace manufacturers, and for the defense and federal organizations carrying AI, data, and modernization scope.";
+  "Built for counties, cities, and state agencies — public safety, utilities and water, public works, and the administrative departments carrying modernization scope. The same engineers behind aerospace, defense, and federal systems.";
 
 export interface NavLink {
   label: string;
@@ -120,12 +127,22 @@ export interface NavGroup {
 }
 
 /**
- * Three routes, each with its own sections. The group label is a real link to
+ * Four routes, each with its own sections. The group label is a real link to
  * the landing route, so navigation works with the dropdown closed — or absent.
  *
- * Service hints mirror `STAGES[].promise` in `lib/content/stages.ts`; they are
- * repeated rather than imported so this module stays free of content imports,
- * and they are short enough that drift would be obvious.
+ * Service hints mirror `STAGES[].promise` in `lib/content/stages.ts`; industry
+ * items mirror `INDUSTRY_GROUPS[].hint`. Both are repeated rather than imported
+ * so this module stays free of content imports, and both are short enough that
+ * drift would be obvious.
+ *
+ * Industries sits second, ahead of Insights and Company, because it is the
+ * group a visitor self-selects into and everything after it is evidence.
+ *
+ * Its items are the four **groups**, not the thirteen sectors underneath them.
+ * The panel is single column by design (see `docs/DESIGN.md`), so thirteen
+ * items with hints would run past the fold; the sectors are named on
+ * `/industries` and on each group page, which is where someone searching for
+ * "corrections" finds the word.
  */
 export const NAV: NavGroup[] = [
   {
@@ -155,6 +172,44 @@ export const NAV: NavGroup[] = [
         href: "/services#assessment",
         hint: "Start with a no-cost read",
         secondary: true,
+      },
+    ],
+  },
+  {
+    label: "Industries",
+    href: "/industries",
+    items: [
+      {
+        label: "Public Safety",
+        href: "/industries/public-safety",
+        hint: "Law enforcement, fire & EMS, corrections, dispatch",
+      },
+      {
+        label: "Infrastructure & Utilities",
+        href: "/industries/infrastructure-utilities",
+        hint: "Power, water and wastewater, public works",
+      },
+      {
+        label: "Government & Administration",
+        href: "/industries/government-administration",
+        hint: "County and state agencies, records, risk",
+      },
+      {
+        label: "Defense & Advanced Manufacturing",
+        href: "/industries/defense-manufacturing",
+        hint: "Aerospace, defense, federal contractors",
+      },
+      // Straight to the booking page rather than to `/services#assessment`.
+      // Every item above this rule is a page that explains something; this one
+      // is the ask, and a reader who opened this panel already knows which
+      // sector they are in.
+      {
+        label: "Free assessment",
+        href: FREE_ASSESSMENT_HREF,
+        hint: "No cost, no obligation",
+        secondary: true,
+        external: true,
+        event: RF_EVENTS.bookingClicked,
       },
     ],
   },
@@ -208,9 +263,19 @@ export const NAV: NavGroup[] = [
   },
 ];
 
+/**
+ * The static top-level routes.
+ *
+ * Nothing reads this. `app/sitemap.ts` holds the list that actually ships,
+ * because it carries per-route priorities and the dynamic report URLs too.
+ * Kept in step rather than deleted so a stale copy cannot mislead anyone who
+ * finds it first — if it ever gains a consumer, that consumer should be
+ * `app/sitemap.ts` rather than a second source.
+ */
 export const ROUTES = [
   "/",
   "/services",
+  "/industries",
   "/insights",
   "/insights/reports",
   "/company",

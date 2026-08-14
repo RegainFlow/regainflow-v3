@@ -5,8 +5,8 @@ import PageHeader from "@/components/PageHeader";
 import { RF_EVENTS } from "@/lib/analytics/events";
 import { breadcrumbJsonLd, pageMetadata, serializeJsonLd } from "@/lib/seo";
 import {
-  BOOK_CTA,
-  BOOKING_HREF,
+  FREE_ASSESSMENT_CTA,
+  FREE_ASSESSMENT_HREF,
   CONTACT_EMAIL,
   CONTACT_HREF,
   LOCATION,
@@ -57,12 +57,12 @@ export default function ContactPage() {
 
             <div className="mt-7">
               <a
-                href={BOOKING_HREF}
+                href={FREE_ASSESSMENT_HREF}
                 className="rf-cta-secondary"
                 data-rf-event={RF_EVENTS.bookingClicked}
                 data-rf-location="contact_page"
               >
-                {BOOK_CTA}
+                {FREE_ASSESSMENT_CTA}
               </a>
             </div>
 

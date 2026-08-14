@@ -231,7 +231,11 @@
     }
   }
 
-  @media (min-width: 768px) {
+  /* `lg`, matching the header's own height step. It grew at `md` while the
+     header did, and both moved to `lg` when the burger took over navigation up
+     to 1024px — a larger wordmark inside a header that is still 4rem tall is
+     the one combination this was never sized for. */
+  @media (min-width: 1024px) {
     .rf-wordmark-3d {
       font-size: 1.1875rem;
     }
@@ -263,6 +267,21 @@
     background: var(--color-rf-warm);
     color: var(--color-rf-void);
     transition: background-color 0.2s ease;
+  }
+
+  /* The line under a CTA pair, for a term of the offer rather than a second
+     call to action. The mono utility register, so it reads as a footnote to the
+     button instead of competing with the lead above it — and deliberately not a
+     badge on the button itself, since the control set in `docs/DESIGN.md` §3 is
+     closed and a decorated primary would need a rule of its own everywhere. */
+  .rf-cta-note {
+    margin-top: 1.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 400;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-rf-slate);
   }
 
   /* A short route stub that extends on interaction. */
@@ -922,9 +941,44 @@
     color: var(--color-rf-warm);
   }
 
+  /* The label and the chevron are one control to a reader and two elements in
+     the DOM, and the split is deliberate — the label navigates, the button
+     discloses, and losing JavaScript loses only the second. `.rf-menu-head` is
+     what puts the seam back: whatever lights one half lights the other, so the
+     pair behaves as a single target including the gap between them.
+
+     Scoped to the head rather than to `.rf-menu`. That element also contains
+     the dropdown panel, and hovering an item inside the panel should not draw
+     an underline under the group label three rows above it. The open state is
+     handled separately below, which is the case where the whole group *should*
+     read as active. */
+  .rf-menu-head:has(.rf-menu-toggle[aria-expanded="true"]) .rf-nav-link,
+  .rf-menu-head:has(:focus-visible) .rf-nav-link {
+    color: var(--color-rf-warm);
+  }
+
+  .rf-menu-head:has(.rf-menu-toggle[aria-expanded="true"]) .rf-nav-link::after,
+  .rf-menu-head:has(:focus-visible) .rf-nav-link::after {
+    width: 100%;
+  }
+
+  /* `:has(:focus-visible)` rather than `:focus-within`. The latter fires on a
+     mouse click too, which would leave the underline stuck under whichever
+     group was clicked last until focus moved elsewhere. */
+
   @media (hover: hover) {
     .rf-menu:hover .rf-menu-toggle {
       color: var(--color-rf-warm);
+    }
+
+    /* The chevron half. Covers the frame before `aria-expanded` flips, so the
+       pair never lights one at a time. */
+    .rf-menu-head:hover .rf-nav-link {
+      color: var(--color-rf-warm);
+    }
+
+    .rf-menu-head:hover .rf-nav-link::after {
+      width: 100%;
     }
   }
 
@@ -2213,6 +2267,20 @@
     background: var(--color-rf-flow);
   }
 
+  /* Each sector links to its group page. Everything about the type comes from
+     the track — font, size, tracking, case — so this only takes the colour and
+     the transition. `.rf-nav-link` was tried and is wrong here: its own
+     `font-size` and `padding-block` pull the row out of the mono utility scale
+     and make the marquee taller than the label beside it. */
+  .rf-marquee-link {
+    color: inherit;
+    transition: color 0.2s ease;
+  }
+
+  .rf-marquee-link:focus-visible {
+    color: var(--color-rf-warm);
+  }
+
   /* Gated, and this one is not cosmetic: ungated, a single tap on the row put
      iOS into `:hover` and left the marquee paused for the rest of the visit. */
   .rf-marquee:focus-within .rf-marquee-track {
@@ -2222,6 +2290,10 @@
   @media (hover: hover) {
     .rf-marquee:hover .rf-marquee-track {
       animation-play-state: paused;
+    }
+
+    .rf-marquee-link:hover {
+      color: var(--color-rf-warm);
     }
   }
 

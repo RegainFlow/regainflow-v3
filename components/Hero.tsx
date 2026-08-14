@@ -2,7 +2,11 @@ import AsciiField from "@/components/brand/AsciiField";
 import AsciiMonogram from "@/components/brand/AsciiMonogram";
 import IndustryMarquee from "@/components/IndustryMarquee";
 import { RF_EVENTS } from "@/lib/analytics/events";
-import { BOOK_CTA, BOOKING_HREF, POSITIONING } from "@/lib/site";
+import {
+  FREE_ASSESSMENT_CTA,
+  FREE_ASSESSMENT_HREF,
+  POSITIONING,
+} from "@/lib/site";
 
 export default function Hero() {
   return (
@@ -20,23 +24,29 @@ export default function Hero() {
         <div className="max-w-[36rem]">
           <p className="rf-eyebrow">{POSITIONING}</p>
 
+          {/* "Agency", not "county". The audience is counties, cities, *and*
+              state agencies, and a state CIO does not see themselves in
+              "county" — this is the one line on the site that has to hold all
+              three. The sector-specific framing lives on the industry pages,
+              where the reader has already told us which one they are. */}
           <h1 className="rf-h1 mt-6">
-            Turn AI ambition into systems your business can run.
+            Your agency can move as fast as it decides to.
           </h1>
 
-          <p className="rf-lead mt-6 max-w-[46ch]">
-            We find the AI work worth doing, engineer the production system
-            around it, and leave your team able to run it.
+          <p className="rf-lead mt-6 max-w-[48ch]">
+            We install the AI systems your agency runs on: the intake, the
+            search, the monitoring, the records work. Built by the engineers who
+            built them for defense, and handed to your team to operate.
           </p>
 
           <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <a
-              href={BOOKING_HREF}
+              href={FREE_ASSESSMENT_HREF}
               className="rf-cta-primary"
               data-rf-event={RF_EVENTS.bookingClicked}
               data-rf-location="hero"
             >
-              {BOOK_CTA}
+              {FREE_ASSESSMENT_CTA}
             </a>
             <a
               href="#approach"
@@ -47,6 +57,14 @@ export default function Hero() {
               How we work
             </a>
           </div>
+
+          {/* The one thing on this site that is free, said under the button
+              that leads to it. The label already reads "Free Assessment"; what
+              a first-time reader does not know is that free means no call
+              sequence attached, which is the objection this answers. */}
+          <p className="rf-cta-note">
+            No cost, no obligation, no sales deck.
+          </p>
         </div>
       </div>
 

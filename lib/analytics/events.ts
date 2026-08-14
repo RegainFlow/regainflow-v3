@@ -104,6 +104,16 @@ export type RfLocation =
    */
   | "closing_cta_contact"
   | "assessment"
+  /**
+   * The `FreeAssessment` section on the home page, as distinct from the one
+   * closing `/services`. Both render the same component, so `$pathname` would
+   * separate them — but this one sits mid-page between proof and partnership
+   * rather than closing the route, and the question worth answering is whether
+   * a reader converts there or carries on to the closing CTA.
+   */
+  | "home_assessment"
+  /** The compact callout closing an industry group page. */
+  | "industry_assessment"
   | "company_contact"
   | "company_details"
   /** The closing shelf of the footer, on every route. */
@@ -124,4 +134,15 @@ export type RfLocation =
  * `home_proof` is the one that matters most: a homepage visitor going straight
  * into a study is a stronger signal than someone who reached `/insights` first.
  */
-export type RfSurface = "home_proof" | "featured" | "all_work" | "related";
+export type RfSurface =
+  | "home_proof"
+  | "featured"
+  | "all_work"
+  | "related"
+  /**
+   * The proof band on an industry group page. Its own value rather than
+   * `featured`, because a click here means a reader who already self-selected
+   * into a sector went looking for evidence — the strongest qualifying signal
+   * the site can observe short of a booking.
+   */
+  | "industry";

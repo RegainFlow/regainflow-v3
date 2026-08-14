@@ -12,21 +12,26 @@ Node.js **>= 20.9.0** (Next.js 16 refuses to start below this). Node 22 LTS reco
 ## Commands
 
 ```bash
-npm install
-npm run dev        # http://localhost:3000
-npm run build
-npm run start
-npm run lint
-npm run typecheck
+pnpm install
+pnpm dev           # http://localhost:3000
+pnpm build
+pnpm start
+pnpm lint
+pnpm typecheck
 ```
+
+pnpm, not npm. The `package-lock.json` in the tree is stale drift; `pnpm-lock.yaml` is the
+lockfile that ships.
 
 ## Routes
 
 | Route                                                          | Purpose                                                                                         |
 | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `/`                                                            | Positioning, the production gap, condensed services, proof, partnership model                   |
+| `/`                                                            | Positioning, the production gap, condensed services, proof, free assessment, partnership model  |
 | `/services`                                                    | Full Discover / Implement / Scale, the four capability layers, engagement path, free assessment |
-| `/insights`                                                    | Selected enterprise AI and platform experience — six featured, all twelve in a disclosure       |
+| `/industries`                                                  | The four industry groups and the thirteen sectors inside them                                   |
+| `/industries/[slug]`                                           | One group: sectors, where the work stalls, what we install, proof, and the assessment callout   |
+| `/insights`                                                    | Selected enterprise AI and platform experience — three featured, the rest in a disclosure       |
 | `/insights/[slug]`                                             | One case study in full: challenge, solution, capabilities, impact                               |
 | `/insights/reports`                                            | Published reports. Renders an empty state until the first is authored                           |
 | `/insights/reports/[slug]`                                     | One report: cover, findings, audio overview, and the email gate in front of the PDF             |
@@ -44,7 +49,7 @@ npm run typecheck
 | `app/globals.css`          | Palette tokens, type scale, the wave, navigation, cards, model styles, keyframes |
 | `lib/ascii/`               | The ASCII engine — `dither`, `field`, `monogram`                                 |
 | `lib/site.ts`              | Domain, contact destinations, positioning copy, navigation tree                  |
-| `lib/content/`             | Stages, layers, case studies, company, reports — the single source for every page |
+| `lib/content/`             | Stages, layers, industries, case studies, company, reports — the single source for every page |
 | `lib/seo.ts`               | JSON-LD builders and the `<` escape used before injection                        |
 | `lib/forms.ts`             | Field limits and validators. **No imports** — read by client and server both      |
 | `lib/forms.server.ts`      | IP hashing and the rate limiter. `server-only`                                    |
@@ -256,9 +261,21 @@ analytics a no-op rather than an error.
 
 ### Navigation
 
-Group labels are real links to `/services`, `/insights`, and `/company`; the dropdown
-is progressive enhancement only. Below `md` the same tree opens in a focus-trapped
+Group labels are real links to `/services`, `/industries`, `/insights`, and `/company`; the
+dropdown is progressive enhancement only. Below `lg` the same tree opens in a focus-trapped
 panel. Without JavaScript every route is still reachable.
+
+**The breakpoint is `lg`, not `md`, and the two places that state it must agree.** Four groups
+plus the Free Assessment button plus the wordmark do not fit at 768px. `SiteNav.tsx` carries
+`lg:` utilities on the nav, the burger, and the portalled panel — *and* a
+`matchMedia("(min-width: 1024px)")` that closes the mobile panel when a rotation crosses the
+breakpoint. That listener is what releases the scroll lock; if the query and the utilities ever
+disagree, a rotate can leave the page frozen with no visible way out.
+
+The Industries dropdown lists the four **groups**, not the thirteen sectors. The panel is a
+single column by design, so thirteen items with hints would run past the fold. The sectors are
+named on `/industries`, on each group page, and on `/llm-info#industries`, which is where a
+reader searching for "corrections" or "wastewater" finds the word.
 
 ### Forms, and what is still static
 
@@ -270,9 +287,10 @@ this site reads `cookies()` or `searchParams`.
 The routes that *are* dynamic (`ƒ` in `pnpm build`) are the ones that read the `reports`
 table: `/insights`, `/insights/reports`, `/insights/reports/[slug]` and its OG image,
 `/sitemap.xml`, and `/llms.txt`. That is the deliberate price of publishing a report by
-adding a row rather than by deploying. Everything else — `/`, `/services`, `/company`,
-`/contact`, `/llm-info`, and all nine case studies — must still show `○` or `●`, and a new
-`ƒ` among them means something opted a route into dynamic rendering by accident.
+adding a row rather than by deploying. Everything else — `/`, `/services`, `/industries` and
+its four group pages, `/company`, `/contact`, `/llm-info`, and all twelve case studies — must
+still show `○` or `●`, and a new `ƒ` among them means something opted a route into dynamic
+rendering by accident.
 
 **Both forms work with JavaScript disabled, and that is measured.** Replaying the native
 `multipart/form-data` POST that a scripting-off browser sends — the four `$ACTION_*` fields React
@@ -386,16 +404,31 @@ render — only submission fails, which is what keeps a checkout without credent
 
 The twelve entries in `lib/content/case-studies.ts` are **anonymized examples of
 enterprise work completed by the founders** — not all of them are direct RegainFlow
-client engagements, and `EXPERIENCE_DISCLAIMER` says so on the listing and on every
-study page. Three rules govern the file:
+client engagements. Three rules govern the file:
 
 1. Nothing is named — no company, customer, internal platform, program, or project
    name. Only the industry or environment.
-2. `metric` is optional and appears on exactly two of twelve, because exactly two
-   figures were confirmed. A study with no number carries none rather than a soft
-   one.
-3. Cards carry the executive summary; `challenge`, `solution`, `capabilities`, and
-   `technologies` appear only on the study page.
+2. **No figure unless it was published or confirmed.** Every number in `metrics` was
+   published on the previous RegainFlow site and cleared by that site's own
+   anonymization worksheets, which survive in `regainflow-website` git history under
+   `app/features/projects/data/prompts/` (deleted in `6d71afe` and `0077888`). Those
+   worksheets are the source of record for what may appear here. Three figures they
+   held back as identifying must stay off this site: `300+ tables / 100+ interfaces`,
+   the `90 → 3 day cycle time`, and `6K+ daily active users` (the previous site
+   published `5K+` in its place).
+3. Cards carry the executive summary and `metrics[0]`; `challenge`, `solution`,
+   `capabilities`, `atAGlance`, `outcomes`, and `technologies` appear only on the
+   study page.
+
+`atAGlance` is deliberately outside rule 2. It states what the engagement *was* —
+environment, volumes, stack, method — and never what it returned, so nothing in it is
+the kind of claim that rule governs. `outcomes` is the itemized form of `impact`; both
+ship because the paragraph is what an assistant quotes and the list is what a skimming
+reader actually reads.
+
+`EXPERIENCE_DISCLAIMER` is gone. It was removed before this revision — the comment at
+`app/insights/[slug]/page.tsx` records it — and earlier editions of this file described
+it as still present.
 
 The three headline figures in the same file are a **separate claim** — RegainFlow's
 own totals, restated from previously published work. `/insights` keeps text between
@@ -417,6 +450,20 @@ Deliberately absent:
 - A blog and a podcast. Both were placeholders and are now off the site and out of
   the navigation; they come back when there is something to publish.
 
-The industries in `lib/content/industries.ts` are the set the vertical research
-commits to. Banking, insurance, pharma, and healthcare are documented there as
-unvalidated and are deliberately not on the homepage.
+### Industries
+
+`lib/content/industries.ts` holds four groups and the thirteen sectors inside them. The
+site sells to counties and states now; aerospace and defense is the fourth group rather
+than the positioning, and that ordering is the whole point of the module.
+
+**`proof` is what keeps it honest.** Every group cites at least two studies from
+`lib/content/case-studies.ts`, and a group that cannot is one we are not ready to claim.
+That constraint is why banking, insurance, pharma, and healthcare are still absent, and
+why `operational-anomaly-detection` is labelled *Utilities & Grid Operations* — the
+previous site published that work as Grid Infrastructure Analytics, and its worksheet
+names utilities and water treatment as the intended domain.
+
+Four group pages rather than thirteen sector routes. Nine of thirteen sectors have no
+case study written specifically for them, so shipping a page each would mean nine pages
+leaning on transferable capability with nothing behind them. Individual sector routes can
+land later where one earns the traffic.

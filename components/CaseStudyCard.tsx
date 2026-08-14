@@ -39,12 +39,16 @@ export default function CaseStudyCard({
 
       <p className="rf-body mt-4">{study.summary}</p>
 
-      {/* Only two studies carry a confirmed figure. The route tick marks it as
-          a stated result rather than another line of description. */}
-      {study.metric ? (
+      {/* The lead figure only. A card is read at a glance, and a second number
+          beside the first turns one claim into a table nobody reads; the rest
+          are on the study page. The route tick marks it as a stated result
+          rather than another line of description. */}
+      {study.metrics?.[0] ? (
         <p className="rf-utility mt-5 flex gap-4 text-rf-flow-soft">
           <span className="rf-route-tick" aria-hidden="true" />
-          <span>{study.metric}</span>
+          <span>
+            {study.metrics[0].value} &middot; {study.metrics[0].label}
+          </span>
         </p>
       ) : null}
 

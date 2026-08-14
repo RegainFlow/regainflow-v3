@@ -1,19 +1,17 @@
-import {
-  ASSESSMENT_PROOF,
-  ASSESSMENT_STEPS,
-} from "@/lib/content/assessment";
+import { ASSESSMENT_PROOF, ASSESSMENT_STEPS } from "@/lib/content/assessment";
 import { CASE_STUDIES } from "@/lib/content/case-studies";
 import { MANIFESTO, MISSION, TEAM } from "@/lib/content/company";
 import { FAQ } from "@/lib/content/faq";
+import { INDUSTRY_GROUPS } from "@/lib/content/industries";
 import { LAYERS } from "@/lib/content/layers";
 import { reportDate, type Report } from "@/lib/content/reports";
-import { getReports } from "@/lib/reports.server";
 import { ENGAGEMENT_PATH, STAGES } from "@/lib/content/stages";
+import { getReports } from "@/lib/reports.server";
 import {
   AUDIENCE,
-  BOOKING_HREF,
   CONTACT_EMAIL,
   CONTACT_PATH,
+  FREE_ASSESSMENT_HREF,
   LOCATION,
   POSITIONING,
   SITE_NAME,
@@ -41,7 +39,7 @@ function build(reports: Report[]): string {
   lines.push(AUDIENCE);
   lines.push("");
   lines.push(
-    `Based in ${LOCATION}. Contact: ${SITE_URL}${CONTACT_PATH}, ${BOOKING_HREF}, or ${CONTACT_EMAIL}.`,
+    `Based in ${LOCATION}. Contact: ${SITE_URL}${CONTACT_PATH}, ${FREE_ASSESSMENT_HREF}, or ${CONTACT_EMAIL}.`
   );
   lines.push("");
 
@@ -79,11 +77,38 @@ function build(reports: Report[]): string {
     lines.push("");
   }
 
+  // Between the services and the layers, matching the order a reader meets them
+  // in the navigation. An assistant asked "does RegainFlow work with water
+  // utilities" has to reach an answer that names the sector, and the services
+  // section above is deliberately sector-neutral.
+  lines.push("## Industries");
+  lines.push(`[${SITE_URL}/industries]`);
+  lines.push("");
+  for (const group of INDUSTRY_GROUPS) {
+    lines.push(`### ${group.name}`);
+    lines.push(`[${SITE_URL}/industries/${group.slug}]`);
+    lines.push(
+      `Sectors: ${group.industries.map((industry) => `${industry.name} (${industry.detail.replace(/\.$/, "")})`).join("; ")}.`
+    );
+    lines.push(group.lead);
+    lines.push("Where the work commonly stalls:");
+    for (const stall of group.stalls) {
+      lines.push(`- ${stall}`);
+    }
+    lines.push(
+      `What we build: ${group.installs.map((install) => `${install.layer} — ${install.detail}`).join(" ")}`
+    );
+    lines.push(
+      `Supporting case studies: ${group.proof.map((slug) => `${SITE_URL}/insights/${slug}`).join(", ")}.`
+    );
+    lines.push("");
+  }
+
   lines.push("## Capability layers");
   lines.push("");
   for (const layer of LAYERS) {
     lines.push(
-      `- **${layer.index} ${layer.name}** — ${layer.enables} (${layer.mechanisms.join(", ")})`,
+      `- **${layer.index} ${layer.name}** — ${layer.enables} (${layer.mechanisms.join(", ")})`
     );
   }
   lines.push("");
@@ -99,7 +124,7 @@ function build(reports: Report[]): string {
   lines.push(`[${SITE_URL}/services#assessment]`);
   lines.push("");
   lines.push(
-    `The first conversation costs nothing and carries no obligation. ${ASSESSMENT_PROOF.map((item) => `${item.label}: ${item.value}`).join(". ")}.`,
+    `The first conversation costs nothing and carries no obligation. ${ASSESSMENT_PROOF.map((item) => `${item.label}: ${item.value}`).join(". ")}.`
   );
   lines.push("");
   for (const step of ASSESSMENT_STEPS) {
@@ -110,13 +135,27 @@ function build(reports: Report[]): string {
   lines.push("## Selected enterprise AI and platform experience");
   lines.push("");
   lines.push(
-    "Only confirmed figures are stated; a study with no figure had none to confirm.",
+    "Every figure stated here was published or confirmed; nothing is estimated for presentation."
   );
   lines.push("");
   for (const study of CASE_STUDIES) {
     lines.push(`### ${study.title}`);
     lines.push(`[${SITE_URL}/insights/${study.slug}]`);
     lines.push(`Industry: ${study.industry}. Category: ${study.group}.`);
+    if (study.metrics?.length) {
+      lines.push(
+        `Results: ${study.metrics
+          .map((metric) => `${metric.value} ${metric.label.toLowerCase()}`)
+          .join("; ")}.`
+      );
+    }
+    if (study.atAGlance?.length) {
+      lines.push(
+        `At a glance: ${study.atAGlance
+          .map((item) => `${item.label} — ${item.value}`)
+          .join("; ")}.`
+      );
+    }
     lines.push(`Challenge: ${study.challenge}`);
     lines.push(`Solution: ${study.solution}`);
     lines.push(`Key capabilities: ${study.capabilities.join("; ")}.`);
@@ -124,8 +163,11 @@ function build(reports: Report[]): string {
       lines.push(`Technologies: ${study.technologies}`);
     }
     lines.push(`Impact: ${study.impact}`);
-    if (study.metric) {
-      lines.push(`Confirmed result: ${study.metric}.`);
+    if (study.outcomes?.length) {
+      lines.push("Outcomes:");
+      for (const outcome of study.outcomes) {
+        lines.push(`- ${outcome}`);
+      }
     }
     lines.push("");
   }
@@ -137,7 +179,7 @@ function build(reports: Report[]): string {
     lines.push(`[${SITE_URL}/insights/reports]`);
     lines.push("");
     lines.push(
-      "Each report is free to read. The page carries the findings; the PDF is behind an email, and most have an audio version.",
+      "Each report is free to read. The page carries the findings; the PDF is behind an email, and most have an audio version."
     );
     lines.push("");
     for (const report of reports) {
@@ -174,25 +216,39 @@ function build(reports: Report[]): string {
   lines.push("## Pages");
   lines.push("");
   lines.push(`- [Home](${SITE_URL}/): positioning, the production gap, proof.`);
-  lines.push(`- [Services](${SITE_URL}/services): Discover, Implement, Scale, capability layers, engagement path, free assessment.`);
-  lines.push(`- [Insights](${SITE_URL}/insights): selected enterprise AI and platform experience.`);
+  lines.push(
+    `- [Services](${SITE_URL}/services): Discover, Implement, Scale, capability layers, engagement path, free assessment.`
+  );
+  lines.push(
+    `- [Industries](${SITE_URL}/industries): the sectors we sell into, and the case studies behind each.`
+  );
+  for (const group of INDUSTRY_GROUPS) {
+    lines.push(
+      `  - [${group.name}](${SITE_URL}/industries/${group.slug}): ${group.hint}.`
+    );
+  }
+  lines.push(
+    `- [Insights](${SITE_URL}/insights): selected enterprise AI and platform experience.`
+  );
   for (const study of CASE_STUDIES) {
     lines.push(`  - [${study.title}](${SITE_URL}/insights/${study.slug})`);
   }
   lines.push(
-    `- [Reports](${SITE_URL}/insights/reports): written research, each with an audio overview.`,
+    `- [Reports](${SITE_URL}/insights/reports): written research, each with an audio overview.`
   );
   for (const report of reports) {
     lines.push(
-      `  - [${report.title}](${SITE_URL}/insights/reports/${report.slug})`,
+      `  - [${report.title}](${SITE_URL}/insights/reports/${report.slug})`
     );
   }
-  lines.push(`- [Company](${SITE_URL}/company): the founders, manifesto, contact.`);
   lines.push(
-    `- [Contact](${SITE_URL}${CONTACT_PATH}): the contact form, the booking link, and the email address.`,
+    `- [Company](${SITE_URL}/company): the founders, manifesto, contact.`
   );
   lines.push(
-    `- [AI fact sheet](${SITE_URL}/llm-info): the whole of the above as one page — definition, key facts, founders, services, engagement path, commitments, and FAQ.`,
+    `- [Contact](${SITE_URL}${CONTACT_PATH}): the contact form, the booking link, and the email address.`
+  );
+  lines.push(
+    `- [AI fact sheet](${SITE_URL}/llm-info): the whole of the above as one page — definition, key facts, founders, services, engagement path, commitments, and FAQ.`
   );
   lines.push("");
 

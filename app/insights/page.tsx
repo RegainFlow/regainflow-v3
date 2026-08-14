@@ -25,7 +25,7 @@ import {
 export const metadata: Metadata = pageMetadata({
   title: "Insights",
   description:
-    "Selected enterprise AI and platform experience: retrieval, knowledge, interoperability, and secure platform systems delivered inside government, aerospace, defense, and regulated enterprise environments.",
+    "Selected enterprise AI and platform experience: retrieval, knowledge, interoperability, telemetry monitoring, and secure platform systems delivered inside government, utilities, aerospace, defense, and regulated enterprise environments.",
   path: "/insights",
 });
 
@@ -65,7 +65,7 @@ export default async function InsightsPage() {
       <PageHeader
         eyebrow="Insights"
         title="What we have built, and what we learned building it."
-        lead="Nine systems taken into production inside government, aerospace, defense, and regulated enterprise environments — described by what they had to solve rather than by who paid for them."
+        lead="Systems taken into production inside government, utilities, aerospace, defense, and regulated enterprise environments — described by what they had to solve rather than by who paid for them."
       />
 
       <section id="case-studies" className="rf-section">
@@ -88,7 +88,8 @@ export default async function InsightsPage() {
             </h2>
 
             <p className="rf-body mt-5 max-w-[58ch]">
-              The only figures shown are the ones we can confirm.
+              Every figure below was published or confirmed. None of them are
+              estimates written to look good on a card.
             </p>
           </div>
 

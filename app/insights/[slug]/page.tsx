@@ -82,19 +82,45 @@ export default async function CaseStudyPage({
 
       <section className="rf-section">
         <div className="rf-shell py-12 md:py-16">
-          {/* Only two of the nine carry a confirmed figure. Rendered as its own
-              block rather than a grid cell: the disclaimer that used to sit
-              beside it is gone, so a study without a metric would otherwise
-              open with an empty grid row. */}
-          {study.metric ? (
-            <div className="max-w-[24ch]">
-              <p className="rf-utility">Confirmed result</p>
-              <p className="rf-stat mt-3">{study.metric}</p>
+          {/* Rendered as its own block rather than a grid cell: the disclaimer
+              that used to sit beside it is gone, so a study without figures
+              would otherwise open with an empty grid row. */}
+          {study.metrics?.length ? (
+            <dl className="flex flex-wrap gap-x-16 gap-y-8">
+              {study.metrics.map((metric) => (
+                <div key={metric.label} className="max-w-[22ch]">
+                  <dd className="rf-stat">{metric.value}</dd>
+                  <dt className="rf-utility mt-3">{metric.label}</dt>
+                </div>
+              ))}
+            </dl>
+          ) : null}
+
+          {/* Scope before narrative. A reader deciding whether this study is
+              relevant to them wants the environment and the volumes, and both
+              are facts about the engagement rather than claims about its
+              return — which is why this block is not governed by the figure
+              rule the metrics above are. */}
+          {study.atAGlance?.length ? (
+            <div
+              className={`rf-grid gap-y-4 ${study.metrics?.length ? "mt-12" : ""}`}
+            >
+              <h2 className="rf-h3 col-span-full lg:col-span-3">At a glance</h2>
+              <dl className="col-span-full grid gap-x-10 gap-y-6 sm:grid-cols-2 lg:col-span-8">
+                {study.atAGlance.map((item) => (
+                  <div key={item.label}>
+                    <dt className="rf-utility">{item.label}</dt>
+                    <dd className="rf-body mt-2 max-w-[38ch]">{item.value}</dd>
+                  </div>
+                ))}
+              </dl>
             </div>
           ) : null}
 
           <div
-            className={`border-t border-rf-hairline ${study.metric ? "mt-12" : ""}`}
+            className={`border-t border-rf-hairline ${
+              study.metrics?.length || study.atAGlance?.length ? "mt-12" : ""
+            }`}
           >
             {sections.map((section) => (
               <div
@@ -110,6 +136,23 @@ export default async function CaseStudyPage({
               </div>
             ))}
           </div>
+
+          {/* `impact` is the paragraph; this is the itemized version of it.
+              Both are kept because the paragraph is what an assistant quotes
+              and the list is what a skimming reader actually reads. */}
+          {study.outcomes?.length ? (
+            <div className="rf-grid mt-10 gap-y-4">
+              <h2 className="rf-h3 col-span-full lg:col-span-3">Outcomes</h2>
+              <ul className="col-span-full flex flex-col gap-4 lg:col-span-8">
+                {study.outcomes.map((outcome) => (
+                  <li key={outcome} className="rf-body flex gap-4">
+                    <span className="rf-route-tick" aria-hidden="true" />
+                    <span className="max-w-[64ch]">{outcome}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
 
           <div className="rf-grid mt-10 gap-y-4">
             <h2 className="rf-h3 col-span-full lg:col-span-3">

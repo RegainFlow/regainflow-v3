@@ -10,22 +10,23 @@ const FAILURE_STATES = [
     service: "Discover",
     href: "/services#discover",
     response:
-      "We find the AI work worth funding and stop the rest — measured against revenue, efficiency, risk, or competitive advantage.",
-    state: "Too many initiatives, no shared priority.",
+      "We find the work worth funding and say so plainly, measured against staff time, service levels, risk, or the deadline you are actually working to.",
+    state: "A modernization budget with a spend deadline and no plan behind it.",
   },
   {
     service: "Implement",
     href: "/services#implement",
     response:
       "We build and ship the real system — architecture, data, integration, evaluation, deployment, and the adoption work that gets it used.",
-    state: "A pilot that works in a demo and nowhere else.",
+    state: "A vendor pilot that impressed the room and nobody can extend.",
   },
   {
     service: "Scale",
     href: "/services#scale",
     response:
-      "We build the operating layer that lets it run — evaluation, observability, MLOps, security, cost control, and portability — then hand you the keys.",
-    state: "A deployed AI capability that can't survive real load, real cost, or real audit.",
+      "We build the operating layer that lets it run — evaluation, observability, access control, cost control, and portability — then hand you the keys.",
+    state:
+      "A system that cleared procurement and cannot produce the record an auditor asks for.",
   },
 ];
 
@@ -40,10 +41,10 @@ export default function ProductionGap() {
           </div>
 
           <p className="rf-body col-span-full max-w-[52ch] lg:col-span-5 lg:pt-3">
-            AI initiatives stall when business priorities, data, software,
-            security, and operations move on separate tracks. RegainFlow turns
-            those fragments into one accountable path from decision to
-            production.
+            AI programs stall when the mandate, the data, the systems, and the
+            people who own them move on separate tracks. RegainFlow turns those
+            fragments into one accountable path from decision to production, and
+            stays on it through the handoff.
           </p>
         </div>
 

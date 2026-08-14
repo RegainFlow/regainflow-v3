@@ -4,13 +4,13 @@ import posthog from "posthog-js";
 import { useState } from "react";
 
 import AsciiField from "@/components/brand/AsciiField";
-import { RF_EVENTS } from "@/lib/analytics/events";
+import { RF_EVENTS, type RfLocation } from "@/lib/analytics/events";
 import {
   ASSESSMENT_CTA,
   ASSESSMENT_PROOF,
   ASSESSMENT_STEPS,
 } from "@/lib/content/assessment";
-import { BOOKING_HREF } from "@/lib/site";
+import { FREE_ASSESSMENT_HREF } from "@/lib/site";
 
 /** Where each step's route leaves the column, in SVG units. */
 const NODE_Y = [40, 100, 160, 220];
@@ -23,8 +23,22 @@ const JUNCTION = 130;
  * Every step's copy is rendered at rest. Highlighting a step lights its route
  * into the junction and lifts the row; it never reveals text that was hidden,
  * because a visitor with JavaScript off has to be able to read all four.
+ *
+ * `hook` swaps the lead for a caller-supplied one. `/services` and the home
+ * page both take the default; the shorter `AssessmentCallout` is what industry
+ * pages use, since four steps and a traced diagram repeated at the foot of
+ * every sector page stop reading as substance.
+ *
+ * `location` is the analytics value for the booking anchor, because this now
+ * renders on two routes and a shared value would merge them.
  */
-export default function FreeAssessment() {
+export default function FreeAssessment({
+  hook,
+  location = "assessment",
+}: {
+  hook?: string;
+  location?: RfLocation;
+} = {}) {
   const [active, setActive] = useState<string | null>(null);
 
   return (
@@ -46,8 +60,8 @@ export default function FreeAssessment() {
           </div>
 
           <p className="rf-lead col-span-full max-w-[50ch] lg:col-span-5 lg:col-start-8 lg:pt-3">
-            The first conversation is free, and it stays free whether or not it
-            ends in work. You get our read either way.
+            {hook ??
+              "The first conversation is free, and it stays free whether or not it ends in work. You get our read either way."}
           </p>
         </div>
 
@@ -128,10 +142,10 @@ export default function FreeAssessment() {
 
         <div className="mt-12 flex flex-wrap items-center gap-x-6 gap-y-4">
           <a
-            href={BOOKING_HREF}
+            href={FREE_ASSESSMENT_HREF}
             className="rf-cta-primary"
             data-rf-event={RF_EVENTS.bookingClicked}
-            data-rf-location="assessment"
+            data-rf-location={location}
           >
             {ASSESSMENT_CTA}
           </a>
@@ -190,7 +204,11 @@ function AssessmentRoute({ active }: { active: string | null }) {
         );
       })}
 
-      <path className="rf-assess-route" data-active d={`M150 ${JUNCTION} H206`} />
+      <path
+        className="rf-assess-route"
+        data-active
+        d={`M150 ${JUNCTION} H206`}
+      />
 
       <rect
         x="147"
@@ -199,7 +217,10 @@ function AssessmentRoute({ active }: { active: string | null }) {
         height="6"
         fill="var(--color-rf-flow)"
       />
-      <path className="rf-head" d={`M220 ${JUNCTION} L206 ${JUNCTION - 7} L206 ${JUNCTION + 7} Z`} />
+      <path
+        className="rf-head"
+        d={`M220 ${JUNCTION} L206 ${JUNCTION - 7} L206 ${JUNCTION + 7} Z`}
+      />
 
       <rect
         x="222"
@@ -210,7 +231,12 @@ function AssessmentRoute({ active }: { active: string | null }) {
         stroke="var(--color-rf-flow)"
         strokeWidth="1.5"
       />
-      <text className="rf-annotation" x="304" y={JUNCTION + 5} textAnchor="middle">
+      <text
+        className="rf-annotation"
+        x="304"
+        y={JUNCTION + 5}
+        textAnchor="middle"
+      >
         A CLEAR READ
       </text>
     </svg>

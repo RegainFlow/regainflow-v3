@@ -27,7 +27,7 @@ are **not defined**, and are listed as gaps at the end rather than invented here
 | **Name** | RegainFlow |
 | **Category** | AI transformation partner |
 | **Tagline** | AI transformation, from ambition to operation. |
-| **Audience** | Law enforcement agencies and aerospace manufacturers; the defense and federal organizations carrying AI, data, and modernization scope. |
+| **Audience** | Counties, cities, and state agencies — public safety, utilities and water, public works, and the administrative departments carrying modernization scope. Aerospace, defense, and federal remain the credibility behind that, not the market being addressed. |
 | **Mission** | RegainFlow helps organizations move at the speed of their ambition. |
 
 Source of truth: `lib/site.ts` and `lib/content/company.ts`. These are constants, not prose —
@@ -53,14 +53,25 @@ sentence could appear on any consultancy's site, it is not written yet.
 **3. Name the unglamorous thing.** "Retrieval, data quality, evaluation, observability, cost
 control." Specificity is the proof of experience; abstraction reads as distance from the work.
 
-**4. No number unless it was confirmed.** This is policy, not style. `metric` appears on
-exactly two of nine case studies because exactly two figures were verifiable — a study with
-no number carries none rather than a soft one. `PROFILES` in `lib/site.ts` shipped empty for
-months and now carries exactly the two URLs that were confirmed, for the same reason: a
-guessed profile URL asserts an identity we cannot back. The same test governs
-prose: Leo's bio carries his service record because he stated it, and carries no degree or
-certification because the only source for those was a login-walled page. Where we cannot
-measure the return, we say so rather than imply one.
+**4. No number unless it was published or confirmed.** This is policy, not style.
+
+Every figure in `metrics` on a case study was published on the previous RegainFlow site and
+cleared by that site's own anonymization worksheets, which survive in `regainflow-website` git
+history under `app/features/projects/data/prompts/` (deleted in `6d71afe` and `0077888`). Those
+worksheets are the source of record. Three figures they held back as identifying must not appear
+here: `300+ tables / 100+ interfaces`, the `90 → 3 day cycle time`, and `6K+ daily active users`
+(the previous site published `5K+` in its place). A study with nothing cleared carries no number
+rather than a soft one, and a plausible invented figure is worse than an absent one.
+
+`PROFILES` in `lib/site.ts` shipped empty for months and now carries exactly the two URLs that
+were confirmed, for the same reason: a guessed profile URL asserts an identity we cannot back.
+The same test governs prose: Leo's bio carries his service record because he stated it, and
+carries no degree or certification because the only source for those was a login-walled page.
+Where we cannot measure the return, we say so rather than imply one.
+
+`atAGlance` is exempt, and the distinction matters. It states what the engagement *was* —
+environment, volumes, stack, method — never what it returned, so nothing in it is a claim the
+number rule governs.
 
 **5. Say what we will not do.** "Dependency is a failure mode, not a business model." The
 manifesto commits against things. That is what makes the commitments legible.

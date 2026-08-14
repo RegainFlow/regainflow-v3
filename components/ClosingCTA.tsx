@@ -1,7 +1,13 @@
 import Link from "next/link";
 
 import { RF_EVENTS } from "@/lib/analytics/events";
-import { BOOK_CTA, BOOKING_HREF, CONTACT_CTA, CONTACT_PATH } from "@/lib/site";
+import { ASSESSMENT_PROOF } from "@/lib/content/assessment";
+import {
+  FREE_ASSESSMENT_CTA,
+  FREE_ASSESSMENT_HREF,
+  CONTACT_CTA,
+  CONTACT_PATH,
+} from "@/lib/site";
 
 export default function ClosingCTA() {
   return (
@@ -27,12 +33,12 @@ export default function ClosingCTA() {
                 already separable without giving this component a prop it
                 otherwise has no use for. */}
             <a
-              href={BOOKING_HREF}
+              href={FREE_ASSESSMENT_HREF}
               className="rf-cta-primary"
               data-rf-event={RF_EVENTS.bookingClicked}
               data-rf-location="closing_cta"
             >
-              {BOOK_CTA}
+              {FREE_ASSESSMENT_CTA}
             </a>
             {/* Its own location rather than sharing `closing_cta`: these two are
                 a ranked pair, and the whole question this shelf now answers is
@@ -46,6 +52,19 @@ export default function ClosingCTA() {
               {CONTACT_CTA}
             </Link>
           </div>
+
+          {/* The terms of the primary, from the same constant `/services` and
+              every industry page read. This shelf closes four routes and was
+              the one place a reader could reach the booking link without ever
+              being told what it costs. */}
+          <dl className="mt-10 grid max-w-[34rem] gap-6 sm:grid-cols-3">
+            {ASSESSMENT_PROOF.map((proof) => (
+              <div key={proof.label}>
+                <dd className="rf-stat">{proof.value}</dd>
+                <dt className="rf-utility mt-2">{proof.label}</dt>
+              </div>
+            ))}
+          </dl>
         </div>
 
         <div className="col-span-full lg:col-span-4 lg:col-start-9 lg:pt-6">
@@ -89,7 +108,13 @@ export default function ClosingCTA() {
               style={{ animationDelay: "-1.5s" }}
             />
 
-            <rect x="227" y="97" width="6" height="6" fill="var(--color-rf-flow)" />
+            <rect
+              x="227"
+              y="97"
+              width="6"
+              height="6"
+              fill="var(--color-rf-flow)"
+            />
             <path className="rf-head" d="M270 100 L256 93 L256 107 Z" />
 
             <rect

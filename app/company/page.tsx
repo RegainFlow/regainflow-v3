@@ -15,8 +15,8 @@ import {
 } from "@/lib/content/company";
 import { breadcrumbJsonLd, pageMetadata, serializeJsonLd } from "@/lib/seo";
 import {
-  BOOK_CTA,
-  BOOKING_HREF,
+  FREE_ASSESSMENT_CTA,
+  FREE_ASSESSMENT_HREF,
   CONTACT_CTA,
   CONTACT_EMAIL,
   CONTACT_HREF,
@@ -203,12 +203,12 @@ export default function CompanyPage() {
                   point, and the event name is what separates them, so book-vs-
                   email stays a direct comparison. */}
               <a
-                href={BOOKING_HREF}
+                href={FREE_ASSESSMENT_HREF}
                 className="rf-cta-primary"
                 data-rf-event={RF_EVENTS.bookingClicked}
                 data-rf-location="company_contact"
               >
-                {BOOK_CTA}
+                {FREE_ASSESSMENT_CTA}
               </a>
               {/* Points at the form, not the mailto it used to open. The
                   address itself is still below, as a fact. */}

@@ -3,11 +3,12 @@ import type { Metadata } from "next";
 import { CASE_STUDIES, type CaseStudy } from "@/lib/content/case-studies";
 import { TEAM } from "@/lib/content/company";
 import { FAQ } from "@/lib/content/faq";
+import type { IndustryGroup } from "@/lib/content/industries";
 import type { Report } from "@/lib/content/reports";
 import { STAGES } from "@/lib/content/stages";
 import {
-  BOOKING_HREF,
   CONTACT_EMAIL,
+  FREE_ASSESSMENT_HREF,
   PROFILES,
   SITE_NAME,
   SITE_URL,
@@ -147,7 +148,7 @@ export function organizationJsonLd() {
     // this node and the profiles it already knows about are one organization.
     // Derived from `PROFILES` rather than restated, so the footer and this node
     // cannot come to disagree about where the company is.
-    sameAs: [BOOKING_HREF, ...PROFILES.map((profile) => profile.href)],
+    sameAs: [FREE_ASSESSMENT_HREF, ...PROFILES.map((profile) => profile.href)],
     // Name as well as `@id`, not a bare reference. This node ships on every
     // route but the full `Person` nodes only exist on `/llm-info`, so a
     // reference alone would dangle on four pages out of five. Carrying the name
@@ -201,7 +202,7 @@ export function websiteJsonLd() {
 export function breadcrumbJsonLd(
   name: string,
   path: string,
-  parent?: { name: string; path: string },
+  parent?: { name: string; path: string }
 ) {
   const trail = [
     { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
@@ -256,11 +257,48 @@ export function caseStudyJsonLd(study: CaseStudy) {
     // The environment the work ran in — the closest thing to a subject these
     // deliberately unnamed studies have.
     keywords: [study.group, study.industry],
+    // Every figure here was published or confirmed (see the header comment in
+    // `lib/content/case-studies.ts`), which is what makes it safe to restate as
+    // structured data. `mentions` rather than a `QuantitativeValue`: these are
+    // stated results in prose form, not measured properties of the work.
+    ...(study.metrics?.length
+      ? {
+          mentions: study.metrics.map((metric) => ({
+            "@type": "Thing",
+            name: `${metric.value} ${metric.label.toLowerCase()}`,
+          })),
+        }
+      : {}),
     url: `${SITE_URL}/insights/${study.slug}`,
     inLanguage: "en-US",
     isPartOf: { "@id": `${SITE_URL}/#website` },
     author: { "@id": `${SITE_URL}/#organization` },
     publisher: { "@id": `${SITE_URL}/#organization` },
+  };
+}
+
+/**
+ * An industry group page.
+ *
+ * `Service` rather than `WebPage`: the page describes something we sell into a
+ * named sector, and `serviceType` plus `areaServed` is what lets an answer
+ * engine connect "who does AI work for county utilities" to this organization.
+ * `areaServed` is the United States rather than a list of counties — naming
+ * jurisdictions we have not worked in would be the same class of unbacked claim
+ * as an invented figure.
+ */
+export function industryJsonLd(group: IndustryGroup) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": `${SITE_URL}/industries/${group.slug}/#service`,
+    name: `AI transformation for ${group.name}`,
+    description: group.lead,
+    serviceType: group.industries.map((industry) => industry.name),
+    url: `${SITE_URL}/industries/${group.slug}`,
+    areaServed: { "@type": "Country", name: "United States" },
+    provider: { "@id": `${SITE_URL}/#organization` },
+    isPartOf: { "@id": `${SITE_URL}/#website` },
   };
 }
 

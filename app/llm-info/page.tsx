@@ -6,7 +6,7 @@ import { ASSESSMENT_STEPS } from "@/lib/content/assessment";
 import { CASE_STUDIES } from "@/lib/content/case-studies";
 import { MANIFESTO, MISSION, TEAM, VISION } from "@/lib/content/company";
 import { FAQ } from "@/lib/content/faq";
-import { INDUSTRIES } from "@/lib/content/industries";
+import { INDUSTRY_GROUPS } from "@/lib/content/industries";
 import { LAYERS } from "@/lib/content/layers";
 import { ENGAGEMENT_PATH, STAGES } from "@/lib/content/stages";
 import {
@@ -18,7 +18,7 @@ import {
 } from "@/lib/seo";
 import {
   AUDIENCE,
-  BOOKING_HREF,
+  FREE_ASSESSMENT_HREF,
   CONTACT_EMAIL,
   CONTACT_HREF,
   LOCATION,
@@ -90,7 +90,10 @@ export default function LlmInfoPage() {
 
             <dl className="col-span-full lg:col-span-5 lg:col-start-8 lg:pt-10">
               {KEY_FACTS.map((fact) => (
-                <div key={fact.term} className="border-t border-rf-hairline py-3">
+                <div
+                  key={fact.term}
+                  className="border-t border-rf-hairline py-3"
+                >
                   <dt className="rf-utility">{fact.term}</dt>
                   <dd className="rf-body mt-1 break-words">{fact.detail}</dd>
                 </div>
@@ -111,21 +114,96 @@ export default function LlmInfoPage() {
 
           <div className="col-span-full lg:col-span-6 lg:col-start-7">
             <p className="rf-body max-w-[52ch]">{AUDIENCE}</p>
-            <ul className="mt-6 flex flex-wrap gap-x-3 gap-y-2">
-              {INDUSTRIES.map((industry) => (
-                <li
-                  key={industry}
-                  className="rf-utility border border-rf-hairline px-3 py-1.5"
-                >
-                  {industry}
-                </li>
-              ))}
-            </ul>
+
+            {/* Grouped rather than one flat chip wall. This page exists so a
+                retrieved chunk is complete, and "which sectors" is a question
+                whose honest answer includes which group each sector sits in —
+                a flat list of thirteen loses that and reads as a keyword pile. */}
+            {INDUSTRY_GROUPS.map((group) => (
+              <div key={group.slug} className="mt-6">
+                <p className="rf-utility">
+                  <Link
+                    href={`/industries/${group.slug}`}
+                    className="rf-nav-link"
+                  >
+                    {group.name}
+                  </Link>
+                </p>
+                <ul className="mt-2 flex flex-wrap gap-x-3 gap-y-2">
+                  {group.industries.map((industry) => (
+                    <li
+                      key={industry.name}
+                      className="rf-utility border border-rf-hairline px-3 py-1.5"
+                    >
+                      {industry.name}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <section id="services" className="rf-section">
+      {/* The sectors in full, not only as chips above. This page exists so a
+          retrieved chunk is complete, and "does RegainFlow work with water
+          utilities" is exactly the question the chip list can only half answer —
+          it names the sector without saying what the work there is. */}
+      <section id="industries" className="rf-section">
+        <div className="rf-shell py-14 md:py-18">
+          <p className="rf-eyebrow">Industries</p>
+          <h2 className="rf-h2 mt-5 max-w-[26ch]">
+            Four groups, and what the work is in each.
+          </h2>
+
+          <div className="mt-10 border-t border-rf-hairline">
+            {INDUSTRY_GROUPS.map((group) => (
+              <div
+                key={group.slug}
+                className="rf-grid gap-y-4 border-b border-rf-hairline py-8"
+              >
+                <div className="col-span-full lg:col-span-3">
+                  <h3 className="rf-h3">
+                    <Link
+                      href={`/industries/${group.slug}`}
+                      className="rf-nav-link"
+                    >
+                      {group.name}
+                    </Link>
+                  </h3>
+                  <p className="rf-utility mt-2">{group.hint}</p>
+                </div>
+
+                <div className="col-span-full lg:col-span-8">
+                  <p className="rf-body max-w-[68ch]">{group.lead}</p>
+
+                  <p className="rf-utility mt-6">Where the work stalls</p>
+                  <ul className="mt-2 flex flex-col gap-2">
+                    {group.stalls.map((stall) => (
+                      <li key={stall} className="rf-body flex gap-4">
+                        <span className="rf-route-tick" aria-hidden="true" />
+                        <span className="max-w-[62ch]">{stall}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <p className="rf-utility mt-6">What we install</p>
+                  <ul className="mt-2 flex flex-col gap-2">
+                    {group.installs.map((install) => (
+                      <li key={install.layer} className="rf-body flex gap-4">
+                        <span className="rf-index">{install.layer}</span>
+                        <span className="max-w-[62ch]">{install.detail}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="services" className="rf-section bg-rf-navy">
         <div className="rf-shell py-14 md:py-18">
           <p className="rf-eyebrow">Services</p>
           <h2 className="rf-h2 mt-5 max-w-[24ch]">
@@ -168,7 +246,7 @@ export default function LlmInfoPage() {
         </div>
       </section>
 
-      <section id="layers" className="rf-section bg-rf-navy">
+      <section id="layers" className="rf-section">
         <div className="rf-shell py-14 md:py-18">
           <p className="rf-eyebrow">Capability layers</p>
           <h2 className="rf-h2 mt-5 max-w-[26ch]">
@@ -177,7 +255,10 @@ export default function LlmInfoPage() {
 
           <ul className="mt-10 grid gap-x-10 gap-y-8 sm:grid-cols-2">
             {LAYERS.map((layer) => (
-              <li key={layer.index} className="border-t border-rf-hairline pt-5">
+              <li
+                key={layer.index}
+                className="border-t border-rf-hairline pt-5"
+              >
                 <div className="flex gap-4">
                   <span className="rf-index pt-0.5">{layer.index}</span>
                   <div>
@@ -194,7 +275,7 @@ export default function LlmInfoPage() {
         </div>
       </section>
 
-      <section id="engagement" className="rf-section">
+      <section id="engagement" className="rf-section bg-rf-navy">
         <div className="rf-shell py-14 md:py-18">
           <div className="rf-grid gap-y-10">
             <div className="col-span-full lg:col-span-5">
@@ -240,7 +321,7 @@ export default function LlmInfoPage() {
         </div>
       </section>
 
-      <section id="commitments" className="rf-section bg-rf-navy">
+      <section id="commitments" className="rf-section">
         <div className="rf-shell rf-grid gap-y-10 py-14 md:py-18">
           <div className="col-span-full lg:col-span-4">
             <p className="rf-eyebrow">What it will and will not do</p>
@@ -272,7 +353,7 @@ export default function LlmInfoPage() {
         </div>
       </section>
 
-      <section id="people" className="rf-section">
+      <section id="people" className="rf-section bg-rf-navy">
         <div className="rf-shell py-14 md:py-18">
           <p className="rf-eyebrow">Founders</p>
           <h2 className="rf-h2 mt-5 max-w-[24ch]">
@@ -284,7 +365,10 @@ export default function LlmInfoPage() {
               the founders" is one of the questions it has to answer whole. */}
           <ul className="mt-10 grid gap-x-10 gap-y-8 sm:grid-cols-2">
             {TEAM.map((member) => (
-              <li key={member.name} className="border-t border-rf-hairline pt-5">
+              <li
+                key={member.name}
+                className="border-t border-rf-hairline pt-5"
+              >
                 <h3 className="rf-h3">{member.name}</h3>
                 <p className="rf-utility mt-2">{member.role}</p>
 
@@ -325,22 +409,25 @@ export default function LlmInfoPage() {
         </div>
       </section>
 
-      <section id="experience" className="rf-section bg-rf-navy">
+      <section id="experience" className="rf-section">
         <div className="rf-shell py-14 md:py-18">
           <p className="rf-eyebrow">Selected experience</p>
           <h2 className="rf-h2 mt-5 max-w-[26ch]">
             Systems delivered, in production.
           </h2>
           <p className="rf-body mt-6 max-w-[62ch]">
-            Only confirmed figures are stated; a study with no figure had none to
-            confirm.
+            Every figure stated here was published or confirmed; nothing is
+            estimated for presentation.
           </p>
 
           <ul className="mt-10 grid gap-x-10 gap-y-6 border-t border-rf-hairline pt-6 sm:grid-cols-2">
             {CASE_STUDIES.map((study) => (
               <li key={study.slug}>
                 <h3 className="rf-h3">
-                  <Link href={`/insights/${study.slug}`} className="rf-nav-link">
+                  <Link
+                    href={`/insights/${study.slug}`}
+                    className="rf-nav-link"
+                  >
                     {study.title}
                   </Link>
                 </h3>
@@ -348,9 +435,15 @@ export default function LlmInfoPage() {
                   {study.industry} · {study.group}
                 </p>
                 <p className="rf-body mt-2 max-w-[46ch]">{study.summary}</p>
-                {study.metric ? (
+                {study.metrics?.length ? (
                   <p className="rf-body mt-2">
-                    <span className="rf-utility">Confirmed</span> {study.metric}
+                    <span className="rf-utility">Results</span>{" "}
+                    {study.metrics
+                      .map(
+                        (metric) =>
+                          `${metric.value} ${metric.label.toLowerCase()}`,
+                      )
+                      .join(", ")}
                   </p>
                 ) : null}
               </li>
@@ -359,7 +452,7 @@ export default function LlmInfoPage() {
         </div>
       </section>
 
-      <section id="faq" className="rf-section">
+      <section id="faq" className="rf-section bg-rf-navy">
         <div className="rf-shell py-14 md:py-18">
           <p className="rf-eyebrow">Common questions</p>
           <h2 className="rf-h2 mt-5 max-w-[24ch]">
@@ -385,7 +478,7 @@ export default function LlmInfoPage() {
         </div>
       </section>
 
-      <section id="contact" className="rf-section bg-rf-navy">
+      <section id="contact" className="rf-section">
         <div className="rf-shell rf-grid gap-y-8 py-14 md:py-18">
           <div className="col-span-full lg:col-span-6">
             <p className="rf-eyebrow">Contact</p>
@@ -399,8 +492,8 @@ export default function LlmInfoPage() {
             <div className="border-t border-rf-hairline py-3">
               <dt className="rf-utility">Book a conversation</dt>
               <dd className="rf-body mt-1 break-words">
-                <a href={BOOKING_HREF} className="rf-text-link">
-                  {BOOKING_HREF}
+                <a href={FREE_ASSESSMENT_HREF} className="rf-text-link">
+                  {FREE_ASSESSMENT_HREF}
                 </a>
               </dd>
             </div>
@@ -427,7 +520,9 @@ export default function LlmInfoPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: serializeJsonLd(breadcrumbJsonLd("AI fact sheet", "/llm-info")),
+          __html: serializeJsonLd(
+            breadcrumbJsonLd("AI fact sheet", "/llm-info")
+          ),
         }}
       />
       <script

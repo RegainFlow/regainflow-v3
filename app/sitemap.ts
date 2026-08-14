@@ -1,12 +1,18 @@
 import type { MetadataRoute } from "next";
 
 import { CASE_STUDIES } from "@/lib/content/case-studies";
+import { INDUSTRY_GROUPS } from "@/lib/content/industries";
 import { getReports } from "@/lib/reports.server";
 import { SITE_URL } from "@/lib/site";
 
 const PRIORITY: Record<string, number> = {
   "/": 1,
   "/services": 0.8,
+  // Level with `/services`. An inbound search from this audience is far more
+  // likely to name a sector than a service — "AI for county government" rather
+  // than "AI implementation" — so the industry hub is a landing route, not a
+  // secondary one. The four group pages are generated below.
+  "/industries": 0.8,
   "/insights": 0.8,
   // The reports index. Level with `/insights` because a gated report is what an
   // inbound search is most likely to be looking for by name.
@@ -43,6 +49,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }),
   );
 
+  // Generated rather than listed, so a new group cannot ship unindexed. Above
+  // the case studies: these are the pages written to be found by a sector
+  // search, and a study is what a reader opens once one of them convinced them.
+  const industries: MetadataRoute.Sitemap = INDUSTRY_GROUPS.map((group) => ({
+    url: `${SITE_URL}/industries/${group.slug}`,
+    lastModified,
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
   // Generated rather than listed, so a new study cannot ship unindexed.
   const studies: MetadataRoute.Sitemap = CASE_STUDIES.map((study) => ({
     url: `${SITE_URL}/insights/${study.slug}`,
@@ -63,5 +79,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...pages, ...reports, ...studies];
+  return [...pages, ...industries, ...reports, ...studies];
 }

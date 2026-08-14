@@ -69,7 +69,10 @@ function DesktopGroup({
         }
       }}
     >
-      <span className="flex items-center gap-1">
+      {/* `inline-flex`, so the box hugs the label and the chevron rather than
+          stretching to the column — the hover scope below is this element, and
+          a wider box would light the group from empty space beside it. */}
+      <span className="rf-menu-head inline-flex items-center gap-1">
         <Link
           href={group.href}
           className="rf-nav-link"
@@ -165,12 +168,14 @@ export default function SiteNav({ cta }: { cta: ReactNode }) {
   // only exists once we are on the client.
   const mounted = useClient();
 
-  // Rotating a phone to landscape can cross `md` — a 14 Pro Max is 932px wide
-  // that way. CSS hides the panel there, but the scroll lock below is keyed to
-  // state, so without this the page stays frozen with no visible way to unfreeze
-  // it. Closing on the breakpoint keeps the two in step.
+  // Rotating a phone to landscape can cross `lg` — an iPad in portrait is
+  // 768px and a 13" laptop is well past it. CSS hides the panel there, but the
+  // scroll lock below is keyed to state, so without this the page stays frozen
+  // with no visible way to unfreeze it. Closing on the breakpoint keeps the two
+  // in step, and this query must stay equal to the `lg:` utilities below —
+  // Tailwind's `lg` is 1024px.
   useEffect(() => {
-    const desktop = window.matchMedia("(min-width: 768px)");
+    const desktop = window.matchMedia("(min-width: 1024px)");
     const sync = () => {
       if (desktop.matches) setMobileOpen(false);
     };
@@ -231,8 +236,11 @@ export default function SiteNav({ cta }: { cta: ReactNode }) {
   }, [mobileOpen]);
 
   return (
-    <div className="ml-auto flex items-center gap-3 md:gap-8">
-      <nav aria-label="Primary" className="hidden items-center gap-7 md:flex">
+    // `lg`, not `md`. Four groups plus the Free Assessment button plus the
+    // wordmark do not fit at 768px; the burger carries navigation up to 1024
+    // instead. `matchMedia` above has to agree with these utilities.
+    <div className="ml-auto flex items-center gap-3 lg:gap-8">
+      <nav aria-label="Primary" className="hidden items-center gap-6 lg:flex">
         {NAV.map((group) => (
           <DesktopGroup
             key={group.href}
@@ -250,7 +258,7 @@ export default function SiteNav({ cta }: { cta: ReactNode }) {
       <button
         ref={triggerRef}
         type="button"
-        className="rf-burger md:hidden"
+        className="rf-burger lg:hidden"
         aria-expanded={mobileOpen}
         aria-controls="rf-mobile-nav"
         onClick={() => setMobileOpen((open) => !open)}
@@ -287,7 +295,7 @@ export default function SiteNav({ cta }: { cta: ReactNode }) {
             <div
               id="rf-mobile-nav"
               ref={panelRef}
-              className="rf-mobile-nav md:hidden"
+              className="rf-mobile-nav lg:hidden"
               data-open={mobileOpen}
               hidden={!mobileOpen}
             >
