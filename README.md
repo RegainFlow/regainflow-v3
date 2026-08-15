@@ -2,7 +2,7 @@
 
 Marketing site for RegainFlow, an AI engineering & transformation partner.
 
-Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · npm.
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · pnpm.
 No motion, canvas, WebGL, or 3D dependencies — every diagram is SVG and CSS.
 
 ## Requirements
@@ -28,11 +28,11 @@ lockfile that ships.
 | Route                                                          | Purpose                                                                                         |
 | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | `/`                                                            | Positioning, the production gap, condensed services, proof, free assessment, partnership model  |
-| `/services`                                                    | Full Discover / Implement / Scale, the four capability layers, engagement path, free assessment |
-| `/industries`                                                  | The four industry groups and the thirteen sectors inside them                                   |
+| `/services`                                                    | Full Discover / Implement / Scale, the engagement path, the four capability layers, free assessment |
+| `/industries`                                                  | Hub: four large cards into the group pages, then the selected engagements                       |
 | `/industries/[slug]`                                           | One group: sectors, where the work stalls, what we install, proof, and the assessment callout   |
-| `/insights`                                                    | Selected enterprise AI and platform experience — three featured, the rest in a disclosure       |
-| `/insights/[slug]`                                             | One case study in full: challenge, solution, capabilities, impact                               |
+| `/insights`                                                    | The three case studies, then the reports band                                                   |
+| `/insights/[slug]`                                             | One case study in full: context, constraints, our role, what we engineered, outcome, what next  |
 | `/insights/reports`                                            | Published reports. Renders an empty state until the first is authored                           |
 | `/insights/reports/[slug]`                                     | One report: cover, findings, audio overview, and the email gate in front of the PDF             |
 | `/company`                                                     | Who we are, manifesto, contact                                                                  |
@@ -228,10 +228,12 @@ on the server once per importer.
 
 Three details are load-bearing and will not show up as an obvious failure:
 
-- **`toggle` does not bubble.** The `/insights` disclosure listener is registered
-  on the capture phase or it never fires. It also uses `data-rf-toggle` rather
-  than `data-rf-event`, so the click listener does not match the `<details>` too
-  and double-count every open.
+- **`toggle` does not bubble.** The capture-phase listener for `data-rf-toggle`
+  is registered that way or it never fires, and the separate attribute is what
+  stops the click listener matching a `<details>` too and double-counting every
+  open. No element currently uses it — the `/insights` disclosure it was written
+  for is gone with the twelve case studies — but the handler stays, because the
+  next disclosure would otherwise silently record nothing.
 - **Outbound CTAs capture with `sendBeacon` *and* `send_instantly`.** `transport`
   alone only picks the network API; without `send_instantly` the event is still
   in the batching queue when the document unloads. The `preventDefault` +
@@ -243,9 +245,10 @@ Three details are load-bearing and will not show up as an obvious failure:
   saying so.
 
 `CaseStudyCard` takes a required `surface` — `home_proof`, `featured`,
-`all_work`, or `related`. It renders in four places and the property exists to
-separate browsing from digging; a default would let a fifth call site report as
-one of the four and flatten it.
+`industries_hub`, or `industry`. It renders in four places and the property
+exists to separate browsing from digging; a default would let a fifth call site
+report as one of the four and flatten it. `all_work` and `related` were removed
+with the surfaces that fed them.
 
 Ingestion is proxied through `/relay` (`next.config.ts`) so it is first-party —
 this audience runs ad blockers and sits behind corporate filters. That is what
@@ -288,7 +291,7 @@ The routes that *are* dynamic (`ƒ` in `pnpm build`) are the ones that read the 
 table: `/insights`, `/insights/reports`, `/insights/reports/[slug]` and its OG image,
 `/sitemap.xml`, and `/llms.txt`. That is the deliberate price of publishing a report by
 adding a row rather than by deploying. Everything else — `/`, `/services`, `/industries` and
-its four group pages, `/company`, `/contact`, `/llm-info`, and all twelve case studies — must
+its four group pages, `/company`, `/contact`, `/llm-info`, and all three case studies — must
 still show `○` or `●`, and a new `ƒ` among them means something opted a route into dynamic
 rendering by accident.
 
@@ -402,49 +405,56 @@ render — only submission fails, which is what keeps a checkout without credent
 
 ### Case studies
 
-The twelve entries in `lib/content/case-studies.ts` are **anonymized examples of
-enterprise work completed by the founders** — not all of them are direct RegainFlow
-client engagements. Three rules govern the file:
+The three entries in `lib/content/case-studies.ts` are **RegainFlow's own engagements**.
 
-1. Nothing is named — no company, customer, internal platform, program, or project
-   name. Only the industry or environment.
-2. **No figure unless it was published or confirmed.** Every number in `metrics` was
-   published on the previous RegainFlow site and cleared by that site's own
-   anonymization worksheets, which survive in `regainflow-website` git history under
-   `app/features/projects/data/prompts/` (deleted in `6d71afe` and `0077888`). Those
-   worksheets are the source of record for what may appear here. Three figures they
-   held back as identifying must stay off this site: `300+ tables / 100+ interfaces`,
-   the `90 → 3 day cycle time`, and `6K+ daily active users` (the previous site
-   published `5K+` in its place).
-3. Cards carry the executive summary and `metrics[0]`; `challenge`, `solution`,
-   `capabilities`, `atAGlance`, `outcomes`, and `technologies` appear only on the
-   study page.
+They replaced twelve studies describing work the founders did before RegainFlow existed.
+Presented on this site those read as RegainFlow delivery, which is not what they were, so
+they were removed rather than relabelled — the twelve retired URLs 308 to `/insights` from
+`next.config.ts`. That prior record now appears as one supporting credibility line in the
+founder bios, and nowhere else.
 
-`atAGlance` is deliberately outside rule 2. It states what the engagement *was* —
-environment, volumes, stack, method — and never what it returned, so nothing in it is
-the kind of claim that rule governs. `outcomes` is the itemized form of `impact`; both
-ship because the paragraph is what an assistant quotes and the list is what a skimming
-reader actually reads.
+Two rules govern the file:
 
-`EXPERIENCE_DISCLAIMER` is gone. It was removed before this revision — the comment at
-`app/insights/[slug]/page.tsx` records it — and earlier editions of this file described
-it as still present.
+1. **Nothing is named without written client approval.** No company, customer, internal
+   platform, program, or project name — only the industry or environment. When approval
+   arrives, adding the name is a copy edit rather than a restructure.
 
-The three headline figures in the same file are a **separate claim** — RegainFlow's
-own totals, restated from previously published work. `/insights` keeps text between
-the two so the adjacency cannot be read as one assertion.
+   This is a rule we keep, **not a caveat the UI states**. No page says the studies are
+   anonymized. Copy announcing the omission makes it conspicuous, invites the question of
+   who the client was, and reads as apology for work that stands on its own. It was on four
+   surfaces and came off all of them; do not reintroduce it.
+
+2. **No metric until we can defend it.** There are no figures on these studies at all, and
+   that is deliberate rather than an omission waiting to be filled. A number ships only once
+   we can state how it was measured and hold that up in a procurement conversation.
+
+Every study carries the same six narrative fields, rendered in declaration order: `context`,
+`constraints`, `role`, `engineered` (the one genuinely itemized field), `outcome`, `next`.
+Keep them parallel — a reader comparing two studies is comparing the same six answers. Cards
+carry `industry`, `summary`, and the first three `capabilityTags`; everything else is
+study-page only.
+
+With three studies, grouping is degenerate and gone: `CaseStudyGroup`, `GROUPS`, `GROUP_KEYS`,
+`studiesInGroup`, `FEATURED_SLUGS`, and `HOME_SLUGS` were all removed, along with the
+`/insights` disclosure, the "more in this category" band, and the `all_work` / `related`
+analytics surfaces they fed. All three studies render on `/`, `/insights`, and the
+`/industries` hub. Filter chips and pagination land when the library needs them, not before.
+
+> **The prose in these three entries was expanded from one-line briefs** and has not had a
+> factual pass from either founder. Before treating any sentence as fact, check it.
 
 Authored during design, pending RegainFlow's commercial and legal review before launch:
 
 - the four "what this layer enables" lines in `lib/content/layers.ts`
-- the three principle detail lines and the five manifesto entries in `lib/content/company.ts`
+- the three principle detail lines and the manifesto entries in `lib/content/company.ts`
 - the engagement path in `lib/content/stages.ts` and the free assessment in `lib/content/assessment.ts`
 
 Deliberately absent:
 
 - **DPHSL** — documented internally as built and implemented but never adopted, so it
   is not used as public supporting evidence.
-- Rate and retainer figures, named pilot success measures, and per-project promises.
+- A client logo wall. Logos need permission we do not have yet.
+- Rate and retainer figures, named success measures, and per-project promises.
   The engagement path describes the shape of the commitment and nothing more
   specific, because anything more would be committing before we have seen the work.
 - A blog and a podcast. Both were placeholders and are now off the site and out of
@@ -452,18 +462,46 @@ Deliberately absent:
 
 ### Industries
 
-`lib/content/industries.ts` holds four groups and the thirteen sectors inside them. The
-site sells to counties and states now; aerospace and defense is the fourth group rather
-than the positioning, and that ordering is the whole point of the module.
+`lib/content/industries.ts` holds four groups and the thirteen sectors inside them. Public
+safety leads and defense closes, and that ordering is the whole point of the module.
 
-**`proof` is what keeps it honest.** Every group cites at least two studies from
-`lib/content/case-studies.ts`, and a group that cannot is one we are not ready to claim.
-That constraint is why banking, insurance, pharma, and healthcare are still absent, and
-why `operational-anomaly-detection` is labelled *Utilities & Grid Operations* — the
-previous site published that work as Grid Infrastructure Analytics, and its worksheet
-names utilities and water treatment as the intended domain.
+Two groups were renamed with the repositioning, and the slugs moved with the names. Both old
+URLs 308 to the new page from `next.config.ts` — the reader asked for a specific sector and
+that sector still exists:
 
-Four group pages rather than thirteen sector routes. Nine of thirteen sectors have no
-case study written specifically for them, so shipping a page each would mean nine pages
-leaning on transferable capability with nothing behind them. Individual sector routes can
-land later where one earns the traffic.
+| Was | Is |
+| --- | --- |
+| `government-administration` — Government & Administration | `federal-state-local` — Federal, State & Local Government |
+| `defense-manufacturing` — Defense & Advanced Manufacturing | `defense-aerospace` — Defense & Aerospace |
+
+Technology & SaaS is deliberately **not** a fifth group. Commercial work stays visible
+through the case studies without diluting the government focus.
+
+**`proof` no longer carries a minimum.** It used to require at least two studies per group,
+on the reasoning that a group we cannot evidence is a group we are not ready to claim. That
+rule was written against the twelve prior-career studies; the three RegainFlow engagements
+that replaced them cover two of the four groups:
+
+| Group | `proof` |
+| --- | --- |
+| Public Safety | *(empty)* |
+| Infrastructure & Utilities | *(empty)* |
+| Federal, State & Local Government | `government-energy-rag-platform` |
+| Defense & Aerospace | `aerospace-rag-evaluation` |
+
+The four groups stay anyway, and that is a deliberate trade. They are the market the firm
+sells into, and the pages carry real weight without a proof band — where the work stalls, and
+what we install at each layer. `app/industries/[slug]/page.tsx` renders the band only when
+there is something in it. **As RegainFlow engagements accumulate, fill these in; do not pad
+them with work done somewhere else.** Banking, insurance, pharma, and healthcare are still
+absent for the same reason the empty bands are empty.
+
+`/industries` is a hub: four large clickable cards into the group pages, then a selected
+engagements band. It previously rendered all four groups in full, which made the hub longer
+than the pages it linked to and left the group names as small headings inside their own
+sections.
+
+Four group pages rather than thirteen sector routes. Most sectors have no case study written
+specifically for them, so shipping a page each would mean pages leaning on transferable
+capability with nothing behind them. Individual sector routes can land later where one earns
+the traffic.

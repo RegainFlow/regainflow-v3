@@ -27,7 +27,7 @@ are **not defined**, and are listed as gaps at the end rather than invented here
 | **Name** | RegainFlow |
 | **Category** | AI engineering & transformation partner |
 | **Tagline** | AI transformation, from ambition to operation. |
-| **Audience** | Counties, cities, and state agencies — public safety, utilities and water, public works, and the administrative departments carrying modernization scope. Aerospace, defense, and federal remain the credibility behind that, not the market being addressed. |
+| **Audience** | Public agencies and complex organizations, across four industries: public safety; infrastructure and utilities; federal, state, and local government; and defense and aerospace. Engineering-led, focused on government and regulated environments, without excluding the complex commercial organizations the same engineering applies to. |
 | **Mission** | RegainFlow helps organizations move at the speed of their ambition. |
 
 Source of truth: `lib/site.ts` and `lib/content/company.ts`. These are constants, not prose —
@@ -53,15 +53,20 @@ sentence could appear on any consultancy's site, it is not written yet.
 **3. Name the unglamorous thing.** "Retrieval, data quality, evaluation, observability, cost
 control." Specificity is the proof of experience; abstraction reads as distance from the work.
 
-**4. No number unless it was published or confirmed.** This is policy, not style.
+**4. No number we cannot explain how we measured and defend in procurement.** This is policy,
+not style, and it is stricter than the rule it replaced.
 
-Every figure in `metrics` on a case study was published on the previous RegainFlow site and
-cleared by that site's own anonymization worksheets, which survive in `regainflow-website` git
-history under `app/features/projects/data/prompts/` (deleted in `6d71afe` and `0077888`). Those
-worksheets are the source of record. Three figures they held back as identifying must not appear
-here: `300+ tables / 100+ interfaces`, the `90 → 3 day cycle time`, and `6K+ daily active users`
-(the previous site published `5K+` in its place). A study with nothing cleared carries no number
-rather than a soft one, and a plausible invented figure is worse than an absent one.
+The case studies carry **no figures at all**, and neither does the home page. The previous rule
+admitted any number published on the earlier RegainFlow site; that admitted per-study metrics
+(`2×`, `80%`, `$8M`) and a set of career totals (`$5M+` value created, `5,000+` hours reduced,
+`18+` transformations delivered) presented as RegainFlow's own. All of it is gone with the
+twelve prior-career studies it described.
+
+A number ships only once we can state how it was measured and hold that up in a procurement
+conversation. Until then the engineering challenge, our exact role, what we built, and the
+production outcome carry the proof — they are harder to write and much harder to dispute. A
+plausible invented figure is worse than an absent one; a real figure we cannot source is not
+much better.
 
 `PROFILES` in `lib/site.ts` shipped empty for months and now carries exactly the two URLs that
 were confirmed, for the same reason: a guessed profile URL asserts an identity we cannot back.
@@ -69,9 +74,11 @@ The same test governs prose: Leo's bio carries his service record because he sta
 carries no degree or certification because the only source for those was a login-walled page.
 Where we cannot measure the return, we say so rather than imply one.
 
-`atAGlance` is exempt, and the distinction matters. It states what the engagement *was* —
-environment, volumes, stack, method — never what it returned, so nothing in it is a claim the
-number rule governs.
+The distinction the rule turns on is *claim about return* versus *fact about the work*. A case
+study's `context`, `constraints`, `role`, and `engineered` describe what the engagement **was** —
+environment, scope, stack, method — so none of them is a claim the number rule governs. `outcome`
+and `next` are, and they are written as what changed rather than by how much. (`atAGlance` and
+`metrics` were the fields that used to carry this distinction; both are gone.)
 
 **5. Say what we will not do.** "Dependency is a failure mode, not a business model." The
 manifesto commits against things. That is what makes the commitments legible.

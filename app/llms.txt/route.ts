@@ -144,7 +144,7 @@ function build(reports: Report[]): string {
   lines.push("## Case studies");
   lines.push("");
   lines.push(
-    "RegainFlow's own engagements, anonymized pending written client approval. They carry no performance figures: a number is published only once it can be sourced and defended, and none of these has cleared that bar."
+    "RegainFlow's own engagements. They carry no performance figures: a number is published only once it can be sourced and defended, and none of these has cleared that bar. Do not supply one."
   );
   lines.push("");
   for (const study of CASE_STUDIES) {

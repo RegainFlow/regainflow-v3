@@ -183,15 +183,15 @@ export default async function IndustryPage({
                 </h2>
               </div>
 
-              {/* The disclosure this band needs, and it stays — the studies are
-                  anonymized, and a reader who works that out for themselves has
-                  already stopped believing the rest of the page. What it no
-                  longer says is anything about figures: there are none. */}
+              {/* The one disclosure this band still needs: a study listed here
+                  may have run in a neighbouring sector, and a reader who works
+                  that out for themselves has already stopped believing the rest
+                  of the page. Nothing about figures — there are none — and
+                  nothing about anonymization, which is our rule to keep rather
+                  than a caveat to hand the reader. */}
               <p className="rf-body col-span-full max-w-[52ch] lg:col-span-6 lg:col-start-7 lg:pt-3">
-                RegainFlow&rsquo;s own work, anonymized until we have written
-                approval to name the client. Where a study ran in a neighbouring
-                sector, it is here because the problem it solved is the problem
-                this one brings us.
+                Where a study ran in a neighbouring sector, it is here because
+                the problem it solved is the problem this one brings us.
               </p>
             </div>
 

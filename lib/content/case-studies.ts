@@ -6,9 +6,14 @@
  *
  * 1. **Nothing is named without written client approval.** No company,
  *    customer, internal platform, program, or project name appears — only the
- *    industry or environment the work ran in. These three are anonymized
- *    pending approval; when it arrives, the name is a copy edit, not a
- *    restructure.
+ *    industry or environment the work ran in. When approval arrives, adding the
+ *    name is a copy edit rather than a restructure.
+ *
+ *    This is a rule we keep, not a caveat we hand the reader. **No page says
+ *    the studies are anonymized.** Copy announcing the omission makes it
+ *    conspicuous, invites the question of who the client was, and reads as
+ *    apology for work that stands on its own. It was on four surfaces and came
+ *    off all of them; do not reintroduce it.
  * 2. **No metric until we can defend it.** There are no figures on these
  *    studies, and that is deliberate rather than an omission waiting to be
  *    filled. A number goes here only once we can explain how it was measured

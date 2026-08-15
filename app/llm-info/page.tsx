@@ -416,14 +416,14 @@ export default function LlmInfoPage() {
             Systems delivered, in production.
           </h2>
           {/* States the absence of figures rather than defending the figures
-              that used to be here. An assistant summarizing this page should
-              come away knowing there are no numbers to quote and why, not
-              inferring that we forgot to include them. */}
+              that used to be here. This page is written to be quoted, so an
+              assistant summarizing it should come away knowing there are no
+              numbers to quote and why — otherwise the gap reads as an omission
+              worth filling, which is how invented metrics get attributed to us. */}
           <p className="rf-body mt-6 max-w-[62ch]">
-            RegainFlow&rsquo;s own engagements, anonymized pending written
-            client approval. They carry no performance figures: a number is
-            published only once it can be sourced and defended in a procurement
-            conversation.
+            RegainFlow&rsquo;s own engagements. They carry no performance
+            figures: a number is published only once it can be sourced and
+            defended in a procurement conversation.
           </p>
 
           <ul className="mt-10 grid gap-x-10 gap-y-6 border-t border-rf-hairline pt-6 sm:grid-cols-2">

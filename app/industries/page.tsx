@@ -69,9 +69,9 @@ export default function IndustriesPage() {
         </div>
       </section>
 
-      {/* Engagements rather than a logo wall. Every client here is anonymized
-          pending written approval, and a row of logos we do not have permission
-          to show is the one thing on this page that could not be defended. */}
+      {/* Engagements rather than a logo wall. Logos need permission we do not
+          have yet; the work speaks without them, and it is the work a reader in
+          one of these sectors came here to check. */}
       <section id="engagements" className="rf-section bg-rf-navy">
         <div className="rf-shell py-14 md:py-18 lg:py-22">
           <div className="rf-grid gap-y-6">
@@ -83,8 +83,7 @@ export default function IndustriesPage() {
             </div>
 
             <p className="rf-body col-span-full max-w-[52ch] lg:col-span-6 lg:col-start-7 lg:pt-3">
-              Anonymized until we have written approval to name the client. Each
-              one says what the problem was, what we owned, and what it
+              Each one says what the problem was, what we owned, and what it
               produced.
             </p>
           </div>

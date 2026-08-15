@@ -53,11 +53,14 @@ export default async function InsightsPage() {
           {/* No totals above this heading and no defence of the figures below
               it. Both existed to make published numbers credible; there are no
               published numbers now, and a paragraph explaining that would be
-              the same defensiveness in a new form. */}
+              the same defensiveness in a new form.
+
+              Nor does this say the studies are anonymized. That is a rule we
+              hold ourselves to (see `lib/content/case-studies.ts`), not news a
+              reader needs — naming the omission is what makes it conspicuous. */}
           <p className="rf-body mt-5 max-w-[58ch]">
-            Anonymized until we have written approval to name the client. Each
-            one says what the problem was, what we owned, what we engineered,
-            and what it produced.
+            Each one says what the problem was, what we owned, what we
+            engineered, and what it produced.
           </p>
 
           {/* All three, with no disclosure. The `<details>` this replaced held

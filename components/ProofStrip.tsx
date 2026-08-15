@@ -30,9 +30,8 @@ export default function ProofStrip() {
               a published number has to be one we can explain how we measured
               and defend in a procurement conversation. */}
           <p className="rf-body col-span-full max-w-[50ch] lg:col-span-5 lg:col-start-8 lg:pt-3">
-            Our own engagements, anonymized until we have written approval to
-            name them. Each one says what the problem was, what we owned, and
-            what it produced.
+            Our own engagements. Each one says what the problem was, what we
+            owned, and what it produced.
           </p>
         </div>
 

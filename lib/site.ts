@@ -227,7 +227,7 @@ export const NAV: NavGroup[] = [
       {
         label: "Case studies",
         href: "/insights#case-studies",
-        hint: "Our own engagements, anonymized",
+        hint: "Our own engagements",
       },
       {
         label: "Reports & Guides",
