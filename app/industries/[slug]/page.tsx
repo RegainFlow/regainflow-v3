@@ -183,14 +183,15 @@ export default async function IndustryPage({
                 </h2>
               </div>
 
-              {/* The disclosure this band needs, and it stays. Some of these
-                  studies ran in aerospace and defense, and a reader who works
-                  out for themselves that the proof is transferable has already
-                  stopped believing the rest of the page. */}
+              {/* The disclosure this band needs, and it stays — the studies are
+                  anonymized, and a reader who works that out for themselves has
+                  already stopped believing the rest of the page. What it no
+                  longer says is anything about figures: there are none. */}
               <p className="rf-body col-span-full max-w-[52ch] lg:col-span-6 lg:col-start-7 lg:pt-3">
-                Some of these ran in other sectors. Each is here because the
-                problem it solved is the problem this one brings us, and every
-                figure on it was published or confirmed.
+                RegainFlow&rsquo;s own work, anonymized until we have written
+                approval to name the client. Where a study ran in a neighbouring
+                sector, it is here because the problem it solved is the problem
+                this one brings us.
               </p>
             </div>
 

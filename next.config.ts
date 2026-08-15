@@ -66,11 +66,27 @@ const nextConfig: NextConfig = {
       "security-testing-automation",
     ];
 
-    return retiredStudies.map((slug) => ({
-      source: `/insights/${slug}`,
-      destination: "/insights",
-      permanent: true,
-    }));
+    // Two industry groups were renamed with the repositioning, and the slugs
+    // moved with the names rather than being left to describe the old ones.
+    // These two go to their own new page, not to the hub — the reader was
+    // asking for a specific sector and that sector still exists.
+    const renamedIndustries: Record<string, string> = {
+      "government-administration": "federal-state-local",
+      "defense-manufacturing": "defense-aerospace",
+    };
+
+    return [
+      ...retiredStudies.map((slug) => ({
+        source: `/insights/${slug}`,
+        destination: "/insights",
+        permanent: true,
+      })),
+      ...Object.entries(renamedIndustries).map(([from, to]) => ({
+        source: `/industries/${from}`,
+        destination: `/industries/${to}`,
+        permanent: true,
+      })),
+    ];
   },
 
   async rewrites() {

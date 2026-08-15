@@ -1,85 +1,105 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import CaseStudyCard from "@/components/CaseStudyCard";
 import ClosingCTA from "@/components/ClosingCTA";
 import DitherReveal from "@/components/DitherReveal";
 import PageHeader from "@/components/PageHeader";
+import { CASE_STUDIES } from "@/lib/content/case-studies";
 import { INDUSTRY_GROUPS } from "@/lib/content/industries";
 import { breadcrumbJsonLd, pageMetadata, serializeJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: "Industries",
   description:
-    "AI systems for public safety, utilities and water, county and state government, and the defense and aerospace organizations we came from. Four groups, thirteen sectors, and the case studies behind each.",
+    "AI engineering for public safety, infrastructure and utilities, federal, state and local government, and defense and aerospace. Four industries, and the page for each one.",
   path: "/industries",
 });
 
+/**
+ * The hub. Four large cards, each the route into a focused industry page.
+ *
+ * This replaced a page that rendered all four groups in full — every sector
+ * card, every lead, alternating bands — which made the hub longer than the
+ * pages it linked to and left the group names as small headings inside their
+ * own sections. A hub's job is to let a reader self-select and leave; the
+ * sectors are named here only as the evidence that a card is the right one.
+ *
+ * The whole card is the link, the same shape `CaseStudyCard` uses.
+ */
 export default function IndustriesPage() {
   return (
     <>
       <PageHeader
         eyebrow="Industries"
-        title="We install the AI systems public agencies run on."
-        lead="Four groups, and the case studies behind each one. If your sector is here, the page for it says where the work usually stalls and what we would build instead."
+        title="We engineer the AI systems public agencies and complex organizations run on."
+        lead="Four industries, and the page for each one. If yours is here, its page says where the work usually stalls and what we would build instead."
       />
 
-      {/* Each group anchors on its own slug, because the navigation dropdown
-          points at these pages directly and the footer and mobile panel share
-          that tree. The `id` is kept anyway so a link written as an anchor
-          still lands somewhere real. */}
-      {INDUSTRY_GROUPS.map((group, groupIndex) => (
-        <section
-          key={group.slug}
-          id={group.slug}
-          className={`rf-section ${groupIndex % 2 === 1 ? "bg-rf-navy" : ""}`}
-        >
-          <div className="rf-shell py-14 md:py-18 lg:py-22">
-            <div className="rf-grid gap-y-6">
-              <div className="col-span-full lg:col-span-5">
-                <p className="rf-eyebrow">{group.hint}</p>
-                <h2 className="rf-h2 mt-5 max-w-[20ch]">
-                  <Link
-                    href={`/industries/${group.slug}`}
-                    className="rf-nav-link"
-                  >
-                    {group.name}
-                  </Link>
-                </h2>
-              </div>
+      <section className="rf-section">
+        <div className="rf-shell py-14 md:py-18 lg:py-22">
+          <ul className="grid gap-4 md:grid-cols-2">
+            {INDUSTRY_GROUPS.map((group, i) => (
+              <li key={group.slug} className="h-full">
+                <DitherReveal className="h-full" delay={(i % 2) * 90}>
+                  <Link href={`/industries/${group.slug}`} className="rf-card">
+                    <p className="rf-utility text-rf-flow-soft">{group.hint}</p>
 
-              <p className="rf-body col-span-full max-w-[52ch] lg:col-span-6 lg:col-start-7 lg:pt-3">
-                {group.lead}
-              </p>
+                    <h2 className="rf-h2 mt-4 max-w-[16ch]">{group.name}</h2>
+
+                    <p className="rf-body mt-4 max-w-[46ch]">{group.lead}</p>
+
+                    {/* `mt-auto` pins the sector row and the affordance to the
+                        bottom, so two cards of unequal copy still line up. */}
+                    <div className="mt-auto pt-8">
+                      <p className="rf-mech">
+                        {group.industries.map((industry) => (
+                          <span key={industry.name}>{industry.name}</span>
+                        ))}
+                      </p>
+                      <span className="rf-nav-link mt-5 inline-block">
+                        {group.name} in full &rarr;
+                      </span>
+                    </div>
+                  </Link>
+                </DitherReveal>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* Engagements rather than a logo wall. Every client here is anonymized
+          pending written approval, and a row of logos we do not have permission
+          to show is the one thing on this page that could not be defended. */}
+      <section id="engagements" className="rf-section bg-rf-navy">
+        <div className="rf-shell py-14 md:py-18 lg:py-22">
+          <div className="rf-grid gap-y-6">
+            <div className="col-span-full lg:col-span-5">
+              <p className="rf-eyebrow">Selected engagements</p>
+              <h2 className="rf-h2 mt-5 max-w-[20ch]">
+                Work we have done, across these environments.
+              </h2>
             </div>
 
-            <ul className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {group.industries.map((industry, i) => (
-                <li key={industry.name} className="h-full">
-                  <DitherReveal className="h-full" delay={(i % 4) * 90}>
-                    {/* Not a link. Sectors have no route of their own yet, and
-                        a card that looks clickable and is not is worse than a
-                        card that plainly is not — the group link above is the
-                        one destination this band has. */}
-                    <div className="rf-card">
-                      <h3 className="rf-h3">{industry.name}</h3>
-                      <p className="rf-body mt-3">{industry.detail}</p>
-                    </div>
-                  </DitherReveal>
-                </li>
-              ))}
-            </ul>
-
-            <p className="mt-10">
-              <Link
-                href={`/industries/${group.slug}`}
-                className="rf-cta-secondary"
-              >
-                {group.name} in full
-              </Link>
+            <p className="rf-body col-span-full max-w-[52ch] lg:col-span-6 lg:col-start-7 lg:pt-3">
+              Anonymized until we have written approval to name the client. Each
+              one says what the problem was, what we owned, and what it
+              produced.
             </p>
           </div>
-        </section>
-      ))}
+
+          <ul className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {CASE_STUDIES.map((study, i) => (
+              <li key={study.slug} className="h-full">
+                <DitherReveal className="h-full" delay={(i % 3) * 90}>
+                  <CaseStudyCard study={study} surface="industries_hub" />
+                </DitherReveal>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
 
       <ClosingCTA />
 

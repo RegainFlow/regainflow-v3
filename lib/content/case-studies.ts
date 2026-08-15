@@ -116,7 +116,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       "An internal knowledge assistant in the organization's own environment, answering questions from its document estate on infrastructure its team already knows how to run.",
     next:
       "The system is evolving from single-turn question answering toward multi-step agentic workflows — moving from answering a question to carrying out the work the answer implies.",
-    industries: ["government-administration"],
+    industries: ["federal-state-local"],
   },
   {
     slug: "aerospace-rag-evaluation",
@@ -147,7 +147,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       "The team could show which processing approach performed better and why, and made its architecture decisions on measured evidence. The critical milestone was met.",
     next:
       "The harness outlasts the engagement: it is the mechanism that tells the team whether the next change to processing or retrieval helped or hurt.",
-    industries: ["defense-manufacturing"],
+    industries: ["defense-aerospace"],
   },
 ];
 

@@ -44,17 +44,6 @@ export interface TeamMember {
    * entity claim it is supposed to strengthen.
    */
   profile?: string;
-  /**
-   * Public URL of this person's resume, on Supabase storage alongside the
-   * capability statement.
-   *
-   * Optional for the same reason `detail` is — one founder's can land before the
-   * other's without the pair looking unfinished. Put the year in the filename,
-   * as `CAPABILITY_STATEMENT_HREF` does: replacing it is then a one-line change
-   * here, and anyone holding the old link still reaches the edition they were
-   * sent.
-   */
-  resume?: string;
 }
 
 export const TEAM: TeamMember[] = [
@@ -69,8 +58,6 @@ export const TEAM: TeamMember[] = [
     credentials: ["Captain, U.S. Army"],
     image: "/brand/team/leo.png",
     profile: "https://www.linkedin.com/in/leonardo-j-ramirez/",
-    resume:
-      "https://qsnaxtjoyqycpbmmghff.supabase.co/storage/v1/object/public/site/Leonardo_J_Ramirez_Resume.pdf",
   },
   {
     name: "William J. Baltus",

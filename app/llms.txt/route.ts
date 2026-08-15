@@ -66,9 +66,6 @@ function build(reports: Report[]): string {
     if (member.profile) {
       lines.push(`Profile: ${member.profile}`);
     }
-    if (member.resume) {
-      lines.push(`Resume: ${member.resume}`);
-    }
     lines.push("");
   }
 

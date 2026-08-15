@@ -200,13 +200,13 @@ export const NAV: NavGroup[] = [
         hint: "Power, water and wastewater, public works",
       },
       {
-        label: "Government & Administration",
-        href: "/industries/government-administration",
-        hint: "County and state agencies, records, risk",
+        label: "Federal, State & Local Government",
+        href: "/industries/federal-state-local",
+        hint: "Federal, state, and local agencies, records, risk",
       },
       {
-        label: "Defense & Advanced Manufacturing",
-        href: "/industries/defense-manufacturing",
+        label: "Defense & Aerospace",
+        href: "/industries/defense-aerospace",
         hint: "Aerospace, defense, federal contractors",
       },
       // No free-assessment item here. It sits under Services and as the header's

@@ -122,33 +122,24 @@ export default function CompanyPage() {
 
                   {/* The profile is the same URL `peopleJsonLd()` emits as
                       `sameAs` — a crawler already had it; this is the version a
-                      person can click. The resume sits beside it because this
-                      block is the answer to "who am I dealing with", and both
-                      links answer it at different depths. */}
-                  {member.profile || member.resume ? (
-                    <p className="mt-6 flex flex-wrap gap-x-8">
-                      {member.profile ? (
-                        <a
-                          href={member.profile}
-                          className="rf-nav-link"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          LinkedIn &#8599;
-                        </a>
-                      ) : null}
-                      {member.resume ? (
-                        <a
-                          href={member.resume}
-                          className="rf-nav-link"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          data-rf-event={RF_EVENTS.resumeOpened}
-                          data-rf-person={member.name}
-                        >
-                          Resume &#8599;
-                        </a>
-                      ) : null}
+                      person can click.
+
+                      A resume link used to sit beside it. It came out because a
+                      founder's resume frames this page as two people looking
+                      for work rather than a firm you would hire, and the bio
+                      above already answers "who am I dealing with" at the depth
+                      a buyer needs. The capability statement is the document
+                      that does this job. */}
+                  {member.profile ? (
+                    <p className="mt-6">
+                      <a
+                        href={member.profile}
+                        className="rf-nav-link"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        LinkedIn &#8599;
+                      </a>
                     </p>
                   ) : null}
                 </div>

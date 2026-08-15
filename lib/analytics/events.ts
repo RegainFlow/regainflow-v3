@@ -69,10 +69,6 @@ export const RF_EVENTS = {
   reportDownloaded: "report_downloaded",
   /** First play of a report's audio overview. Fires once per page view. */
   podcastPlayed: "report_podcast_played",
-  /** A founder resume. Carries `person`. Like the capability statement, it
-   *  converts nothing and is a strong intent signal, so it stays outside the
-   *  `cta_` family. */
-  resumeOpened: "resume_opened",
 } as const;
 
 export type RfEvent = (typeof RF_EVENTS)[keyof typeof RF_EVENTS];
@@ -135,6 +131,13 @@ export type RfLocation =
 export type RfSurface =
   | "home_proof"
   | "featured"
+  /**
+   * The Selected Engagements band on the `/industries` hub. Its own value
+   * rather than `featured`, because a click here comes from a reader browsing
+   * sectors rather than one who came to `/insights` for the work — the two say
+   * different things about how they arrived.
+   */
+  | "industries_hub"
   /**
    * The proof band on an industry group page. Its own value rather than
    * `featured`, because a click here means a reader who already self-selected

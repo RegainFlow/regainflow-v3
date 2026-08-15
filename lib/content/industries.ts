@@ -2,9 +2,7 @@
  * The industries we sell into, grouped.
  *
  * Order is the positioning, not decoration: public safety leads and defense
- * closes, because the firm sells to counties and states now and the aerospace
- * and defense record is what makes that credible rather than the other way
- * round. `INDUSTRY_NAMES` preserves that order for the hero marquee.
+ * closes. `INDUSTRY_NAMES` preserves that order for the hero marquee.
  *
  * Four groups rather than thirteen sector routes. The sectors are named inside
  * their group page, which is where a reader looking for "corrections" finds the
@@ -12,10 +10,19 @@
  * shipping thirteen pages up front would mean nine of them leaning on
  * transferable capability with no case study behind them.
  *
- * `proof` is the constraint that keeps this honest. Every group cites at least
- * two studies from `lib/content/case-studies.ts`, and a group that cannot is a
- * group we are not ready to claim — which is why banking, insurance, pharma,
- * and healthcare are still absent.
+ * **`proof` no longer carries a minimum.** It used to require at least two
+ * studies per group, on the reasoning that a group we cannot evidence is a
+ * group we are not ready to claim. That rule was written against twelve studies
+ * from the founders' pre-RegainFlow careers; those were removed (see the header
+ * in `lib/content/case-studies.ts`), and the three RegainFlow engagements that
+ * replaced them cover two of these four groups.
+ *
+ * The four groups stay anyway, and that is a deliberate trade rather than an
+ * oversight: they are the market the firm sells into, and the pages carry real
+ * weight without a proof band — where the work stalls, and what we install at
+ * each layer. `app/industries/[slug]/page.tsx` renders the band only when there
+ * is something in it. As RegainFlow engagements accumulate, fill these in;
+ * do not pad them with work done somewhere else.
  */
 
 /** A named sector. Rendered as a card inside its group page and in the marquee. */
@@ -36,7 +43,10 @@ export interface IndustryGroup {
   stalls: string[];
   /** What we install, keyed to `LAYERS[].index` so the four layers stay the spine. */
   installs: { layer: string; detail: string }[];
-  /** Case study slugs that count as proof here. Never fewer than two. */
+  /**
+   * Case study slugs that count as proof here, in display order. May be empty —
+   * the band is hidden rather than padded. See the module header.
+   */
   proof: string[];
   /** Sector-specific free-assessment hook. */
   assessmentHook: string;
@@ -77,11 +87,7 @@ export const INDUSTRY_GROUPS: IndustryGroup[] = [
           "Deployment inside your boundary, with logging that shows who asked what and when.",
       },
     ],
-    proof: [
-      "secure-government-document-intelligence",
-      "agentic-knowledge-assistant",
-      "operational-anomaly-detection",
-    ],
+    proof: [],
     assessmentHook:
       "Bring us one records backlog or one report workflow. We will tell you what could be automated, what should not be, and what it would take.",
     industries: [
@@ -108,7 +114,9 @@ export const INDUSTRY_GROUPS: IndustryGroup[] = [
     slug: "infrastructure-utilities",
     name: "Infrastructure & Utilities",
     hint: "Power, water and wastewater, public works",
-    lead: "Utilities and public works run on telemetry that arrives faster than anyone can watch it, and on asset records split between three systems and a filing cabinet. We built the monitoring for a grid operator, and the same approach fits a treatment plant, a lift station, or a fleet.",
+    // No longer opens on "we built the monitoring for a grid operator". That
+    // was pre-RegainFlow work, and the study behind it is gone.
+    lead: "Utilities and public works run on telemetry that arrives faster than anyone can watch it, and on asset records split between three systems and a filing cabinet. We engineer the systems that read that telemetry and surface what is worth a call-out — on a treatment plant, a lift station, a substation, or a fleet.",
     stalls: [
       "Thousands of sensor streams arrive every minute and an operator reads a fraction of them.",
       "A pump fails and its maintenance history is in a spreadsheet nobody has opened since the last person retired.",
@@ -137,11 +145,7 @@ export const INDUSTRY_GROUPS: IndustryGroup[] = [
           "Monitoring that runs on your infrastructure and holds up once the load is real.",
       },
     ],
-    proof: [
-      "operational-anomaly-detection",
-      "secure-internal-paas",
-      "digital-engineering-simulation",
-    ],
+    proof: [],
     assessmentHook:
       "Point us at one asset class and its telemetry. We will tell you what a model could catch, what it would miss, and what the data has to look like first.",
     industries: [
@@ -161,10 +165,10 @@ export const INDUSTRY_GROUPS: IndustryGroup[] = [
     ],
   },
   {
-    slug: "government-administration",
-    name: "Government & Administration",
-    hint: "County and state agencies, records, risk",
-    lead: "County and state departments carry modernization scope on top of the job they already have. We take one of those programs end to end, from the assessment through the build to the handoff, so it does not become another system that needs a champion to survive.",
+    slug: "federal-state-local",
+    name: "Federal, State & Local Government",
+    hint: "Federal, state, and local agencies, records, risk",
+    lead: "Federal, state, and local departments carry modernization scope on top of the job they already have. We take one of those programs end to end, from the assessment through the build to the handoff, so it does not become another system that needs a champion to survive.",
     stalls: [
       "A grant has a spend deadline and the scope was written before anyone looked at the data.",
       "Payroll, finance, and HR each hold a version of the same employee, and reconciliation is a person.",
@@ -193,11 +197,7 @@ export const INDUSTRY_GROUPS: IndustryGroup[] = [
           "Cost, access, and audit logging built in from the first deploy, not added after the first finding.",
       },
     ],
-    proof: [
-      "workforce-data-validation-platform",
-      "records-normalization",
-      "vendor-risk-scorecard",
-    ],
+    proof: ["government-energy-rag-platform"],
     assessmentHook:
       "Bring us the program you were handed. We will tell you what is fundable, what is not, and what the first ninety days should produce.",
     industries: [
@@ -206,7 +206,7 @@ export const INDUSTRY_GROUPS: IndustryGroup[] = [
         detail: "Payroll, finance, HR, and the systems between them.",
       },
       {
-        name: "State Agencies",
+        name: "State & Federal Agencies",
         detail:
           "Program data, case management, and multi-department reporting.",
       },
@@ -221,10 +221,13 @@ export const INDUSTRY_GROUPS: IndustryGroup[] = [
     ],
   },
   {
-    slug: "defense-manufacturing",
-    name: "Defense & Advanced Manufacturing",
+    slug: "defense-aerospace",
+    name: "Defense & Aerospace",
     hint: "Aerospace, defense, federal contractors",
-    lead: "This is where the two of us spent our careers before RegainFlow: enterprise knowledge systems, secure platforms, and engineering workflows inside organizations that audit everything. The case studies on this site are that work.",
+    // No longer claims the site's case studies as this career's work. The
+    // pre-RegainFlow record is a credibility line in the founder bios now, not
+    // a portfolio — see the header in `lib/content/case-studies.ts`.
+    lead: "Technical documentation nobody can search, secure platforms every team rebuilds, and engineering workflows held together by someone moving a file each morning. We engineer retrieval and platform systems inside organizations that audit everything — and it is the environment the two of us spent our careers in before RegainFlow.",
     stalls: [
       "A million technical documents and a search that only matches the words someone typed.",
       "Every team rebuilds the same pipeline, the same security controls, and the same deployment path.",
@@ -253,11 +256,7 @@ export const INDUSTRY_GROUPS: IndustryGroup[] = [
           "Kubernetes, infrastructure as code, and one standardized deployment path, so teams stop rebuilding it.",
       },
     ],
-    proof: [
-      "manufacturing-knowledge-intelligence",
-      "secure-internal-paas",
-      "market-competitive-intelligence",
-    ],
+    proof: ["aerospace-rag-evaluation"],
     assessmentHook:
       "Bring us a stalled pilot or a program someone handed you. We will give you our read on what is worth funding and what we would leave alone.",
     industries: [
