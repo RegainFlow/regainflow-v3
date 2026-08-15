@@ -105,9 +105,13 @@ export const TAGLINE = "AI transformation, from ambition to operation.";
  * defense, and federal systems". That framing came out of the hero, and leaving
  * it here would keep the defense-credibility pitch alive in a second constant
  * that two surfaces still render.
+ *
+ * The four named industries are the market, stated in the same order and words
+ * as `INDUSTRY_GROUPS`. Say nothing here that reads as a client list — this
+ * sentence describes who the work is for, not who has bought it.
  */
 export const AUDIENCE =
-  "Built for public agencies and complex organizations — public safety, utilities and water, public works, the federal, state, and local departments carrying modernization scope, and the defense and aerospace organizations held to the same standards.";
+  "Built for public agencies and complex organizations, across four industries: public safety; infrastructure and utilities; federal, state, and local government; and defense and aerospace.";
 
 export interface NavLink {
   label: string;
