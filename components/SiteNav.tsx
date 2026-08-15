@@ -193,6 +193,12 @@ export default function SiteNav({ cta }: { cta: ReactNode }) {
     // offset does, at the cost of having to put the scroll position back by
     // hand on close.
     const scrollY = window.scrollY;
+    // Read from `location`, not from the `pathname` this component renders
+    // with. The cleanup below needs the route as it is *at cleanup time*, and a
+    // value closed over from this render is by definition the old one. The App
+    // Router pushes history before it commits the new route, so `location` is
+    // already the destination when that cleanup runs.
+    const openedAt = window.location.pathname;
     const previous = {
       position: document.body.style.position,
       top: document.body.style.top,
@@ -229,8 +235,23 @@ export default function SiteNav({ cta }: { cta: ReactNode }) {
       document.body.style.top = previous.top;
       document.body.style.width = previous.width;
       document.body.style.overflow = previous.overflow;
-      // Restoring `position` alone would drop the page back to the top.
-      window.scrollTo(0, scrollY);
+
+      // Restoring `position` alone would drop the page back to the top, so the
+      // offset has to be put back by hand — but only when the reader is still
+      // on the document that was scrolled.
+      //
+      // A route change closes this panel too (see the render-phase reset
+      // above), and this cleanup then ran on the *new* page with the *old*
+      // page's offset. Tapping a nav item from halfway down a long route
+      // therefore landed the reader at that same pixel offset on the
+      // destination — and where the destination was shorter, clamped to its
+      // bottom, which reads as a page that arrived broken or will not scroll.
+      // Navigating in was the trigger; loading the same URL directly was
+      // always fine, which is what made it look intermittent.
+      if (window.location.pathname === openedAt) {
+        window.scrollTo(0, scrollY);
+      }
+
       node?.removeEventListener("keydown", onKeyDown);
     };
   }, [mobileOpen]);
