@@ -223,10 +223,10 @@ export const NAV: NavGroup[] = [
       {
         label: "Case studies",
         href: "/insights#case-studies",
-        hint: "Selected enterprise AI and platform work",
+        hint: "Our own engagements, anonymized",
       },
       {
-        label: "Reports",
+        label: "Reports & Guides",
         href: "/insights/reports",
         hint: "Written research, with an audio version",
       },

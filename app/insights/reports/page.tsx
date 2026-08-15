@@ -34,7 +34,7 @@ export default async function ReportsPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Reports"
+        eyebrow="Reports & Guides"
         title="What we have written down."
         lead="Research we publish because we needed it to exist and it did not. Every report is free, and every one comes with an audio version for the drive."
       />

@@ -42,8 +42,8 @@ export default async function InsightsPage() {
     <>
       <PageHeader
         eyebrow="Insights"
-        title="What we have built, and what we learned building it."
-        lead="Systems taken into production inside government, utilities, aerospace, defense, and regulated enterprise environments — described by what they had to solve rather than by who paid for them."
+        title="Practical lessons from engineering AI systems in real operating environments."
+        lead="Case studies, reports, and field guidance for public-sector and regulated organizations."
       />
 
       <section id="case-studies" className="rf-section">
@@ -87,8 +87,11 @@ export default async function InsightsPage() {
         <section id="reports" className="rf-section bg-rf-navy">
           <div className="rf-shell py-14 md:py-18">
             <div className="rf-grid gap-y-6">
+              {/* "Reports & Guides", not "Thought Leadership". Thought
+                  leadership is something the work demonstrates, not something
+                  we get to call ourselves. */}
               <div className="col-span-full lg:col-span-5">
-                <p className="rf-eyebrow">Reports</p>
+                <p className="rf-eyebrow">Reports &amp; Guides</p>
                 <h2 className="rf-h2 mt-5 max-w-[20ch]">
                   What we have written down.
                 </h2>
