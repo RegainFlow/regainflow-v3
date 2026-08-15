@@ -6,8 +6,11 @@ import { useState } from "react";
 import AsciiField from "@/components/brand/AsciiField";
 import { RF_EVENTS, type RfLocation } from "@/lib/analytics/events";
 import {
+  ASSESSMENT_CALL_NOTE,
   ASSESSMENT_CTA,
+  ASSESSMENT_PROMISE,
   ASSESSMENT_PROOF,
+  ASSESSMENT_REPORT_CONTENTS,
   ASSESSMENT_STEPS,
 } from "@/lib/content/assessment";
 import { FREE_ASSESSMENT_HREF } from "@/lib/site";
@@ -55,15 +58,28 @@ export default function FreeAssessment({
           <div className="col-span-full lg:col-span-6">
             <p className="rf-eyebrow text-rf-flow-soft">Free assessment</p>
             <h2 className="rf-h2 mt-5">
-              Find out what is worth doing&mdash;before you pay anyone to do it.
+              Get a clear read on what is worth doing&mdash;and what it will
+              take.
             </h2>
           </div>
 
           <p className="rf-lead col-span-full max-w-[50ch] lg:col-span-5 lg:col-start-8 lg:pt-3">
             {hook ??
-              "The first conversation is free, and it stays free whether or not it ends in work. You get our read either way."}
+              "A real mini-engagement, not a free first conversation. It runs in four phases and ends in a written report that is yours to act on."}
           </p>
         </div>
+
+        {/* The shape of the commitment, before the terms. A reader deciding
+            whether to book wants to know what they are being offered; the
+            $0/None/Zero trio underneath answers what it costs them. */}
+        <ol className="mt-12 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
+          {ASSESSMENT_PROMISE.map((phase, i) => (
+            <li key={phase} className="border-t border-rf-hairline pt-4">
+              <span className="rf-index">{String(i + 1).padStart(2, "0")}</span>
+              <p className="rf-body mt-3">{phase}</p>
+            </li>
+          ))}
+        </ol>
 
         <dl className="mt-12 grid gap-8 sm:grid-cols-3">
           {ASSESSMENT_PROOF.map((item) => (
@@ -134,6 +150,17 @@ export default function FreeAssessment({
                   <span className="rf-body mt-2 block max-w-[58ch]">
                     {step.detail}
                   </span>
+
+                  {/* The report's contents, in the step that hands it over.
+                      Rendered as a chip row rather than a fourth list, so the
+                      section does not become three stacked enumerations. */}
+                  {step.index === "03" ? (
+                    <span className="rf-mech mt-4 block">
+                      {ASSESSMENT_REPORT_CONTENTS.map((item) => (
+                        <span key={item}>{item}</span>
+                      ))}
+                    </span>
+                  ) : null}
                 </button>
               </li>
             ))}
@@ -151,6 +178,10 @@ export default function FreeAssessment({
           </a>
           <p className="rf-utility">No cost &middot; No obligation</p>
         </div>
+
+        {/* Under the button, because the button is what creates the
+            misreading — booking a slot is not the assessment. */}
+        <p className="rf-cta-note">{ASSESSMENT_CALL_NOTE}</p>
       </div>
     </section>
   );

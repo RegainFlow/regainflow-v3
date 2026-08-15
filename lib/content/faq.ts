@@ -31,12 +31,12 @@ export const FAQ: FaqItem[] = [
   {
     question: "How does an engagement start?",
     answer:
-      "With a free assessment. It is a working conversation about what you are trying to move into production, what is already in flight, and where the real obstacle sits. There is no cost and no obligation, and you leave with an honest read on what is worth doing first — yours to keep and act on, including without us.",
+      "With a free assessment, which is a real mini-engagement rather than a free first conversation. It runs in four phases: an initial qualification and discovery call, a deeper working assessment, a short written opportunity report, and a focused follow-up audit or scoping session if one is needed to validate the recommendation. The 30-minute call is qualification, not the assessment itself. There is no cost and no obligation, and the report is yours to keep and act on, with or without us.",
   },
   {
     question: "What does it cost to start?",
     answer:
-      "Nothing. The first assessment is free, carries no obligation, and involves no sales decks. Scope, price, and success measures belong to a specific engagement and are agreed there — quoting them before we have seen the problem would be promising something we cannot yet know.",
+      "Nothing. The assessment is free through the written opportunity report, and through a focused follow-up session where one is needed to validate the recommendation. It carries no obligation and involves no sales decks. Scope, price, and success measures belong to a specific engagement and are agreed there — quoting them before we have seen the problem would be promising something we cannot yet know.",
   },
   {
     question: "How is RegainFlow different from a typical AI consultancy?",

@@ -1,4 +1,10 @@
-import { ASSESSMENT_PROOF, ASSESSMENT_STEPS } from "@/lib/content/assessment";
+import {
+  ASSESSMENT_CALL_NOTE,
+  ASSESSMENT_PROMISE,
+  ASSESSMENT_PROOF,
+  ASSESSMENT_REPORT_CONTENTS,
+  ASSESSMENT_STEPS,
+} from "@/lib/content/assessment";
 import { CASE_STUDIES } from "@/lib/content/case-studies";
 import { MANIFESTO, MISSION, TEAM } from "@/lib/content/company";
 import { FAQ } from "@/lib/content/faq";
@@ -124,7 +130,13 @@ function build(reports: Report[]): string {
   lines.push(`[${SITE_URL}/services#assessment]`);
   lines.push("");
   lines.push(
-    `The first conversation costs nothing and carries no obligation. ${ASSESSMENT_PROOF.map((item) => `${item.label}: ${item.value}`).join(". ")}.`
+    `A real mini-engagement, not a free first conversation. ${ASSESSMENT_CALL_NOTE} ${ASSESSMENT_PROOF.map((item) => `${item.label}: ${item.value}`).join(". ")}.`
+  );
+  lines.push("");
+  lines.push(`It runs in four phases: ${ASSESSMENT_PROMISE.join("; ")}.`);
+  lines.push("");
+  lines.push(
+    `The written report covers: ${ASSESSMENT_REPORT_CONTENTS.join("; ")}.`
   );
   lines.push("");
   for (const step of ASSESSMENT_STEPS) {
