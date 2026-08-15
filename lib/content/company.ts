@@ -11,7 +11,7 @@ export const MISSION_DETAIL =
   "We focus AI investment on measurable business outcomes, deploy senior operators to execute, and build the secure production capabilities organizations need to scale.";
 
 export const VISION =
-  "To be the most trusted AI transformation partner for enterprise and government — known for turning fragmented AI ambition into secure, scalable systems that create measurable competitive advantage.";
+  "To be the most trusted AI engineering and transformation partner for public agencies and complex organizations — known for turning fragmented AI ambition into secure, scalable systems their own teams can operate.";
 
 export interface TeamMember {
   name: string;

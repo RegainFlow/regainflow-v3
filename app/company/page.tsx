@@ -27,7 +27,7 @@ import {
 export const metadata: Metadata = pageMetadata({
   title: "Company",
   description:
-    "RegainFlow is a senior AI transformation partner based in Orlando, Florida. Who we are, what we believe about AI in production, and how to reach us.",
+    "RegainFlow is an AI engineering and transformation partner based in Orlando, Florida. Who we are, what we believe about AI in production, and how to reach us.",
   path: "/company",
 });
 

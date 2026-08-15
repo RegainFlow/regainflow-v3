@@ -39,7 +39,7 @@ export default async function Image({ params }: { params: Promise<Params> }) {
       title: report ? report.title : "Reports",
       lead: report
         ? report.summary
-        : `Written research from a ${POSITIONING.toLowerCase()}.`,
+        : `Written research from an ${POSITIONING}.`,
       meta: report ? reportDate(report.published) : undefined,
     }),
     { ...size, fonts: await ogFonts() },

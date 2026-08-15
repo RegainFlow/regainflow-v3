@@ -25,7 +25,7 @@ are **not defined**, and are listed as gaps at the end rather than invented here
 | | |
 |---|---|
 | **Name** | RegainFlow |
-| **Category** | AI transformation partner |
+| **Category** | AI engineering & transformation partner |
 | **Tagline** | AI transformation, from ambition to operation. |
 | **Audience** | Counties, cities, and state agencies — public safety, utilities and water, public works, and the administrative departments carrying modernization scope. Aerospace, defense, and federal remain the credibility behind that, not the market being addressed. |
 | **Mission** | RegainFlow helps organizations move at the speed of their ambition. |

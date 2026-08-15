@@ -77,8 +77,8 @@ export default function LlmInfoPage() {
                   definition has to survive being lifted out of the page alone. */}
               <h2 className="rf-h2 mt-5">{MISSION}</h2>
               <p className="rf-body mt-6 max-w-[56ch]">
-                {SITE_NAME} is an {POSITIONING.toLowerCase()} that takes AI work
-                from opportunity through to a running production system. The
+                {SITE_NAME} is an {POSITIONING} that takes AI work from
+                opportunity through to a running production system. The
                 engagement runs in three stages —{" "}
                 {STAGES.map((stage) => stage.name).join(", ")} — covering
                 portfolio direction, production engineering, and the operating

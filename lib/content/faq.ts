@@ -21,12 +21,12 @@ export const FAQ: FaqItem[] = [
   {
     question: "What does RegainFlow do?",
     answer:
-      "RegainFlow is an AI transformation partner that takes AI work from opportunity to production system. The engagement runs in three stages: Discover finds the AI work worth funding and stops the work that is not, Implement builds and ships the production system rather than a prototype you have to finish, and Scale builds the operating layer that keeps it running and then transfers it to your team.",
+      "RegainFlow is an AI engineering and transformation partner that builds production AI systems for public agencies and complex organizations. The engagement runs in three stages: Discover finds the AI work worth funding and stops the work that is not, Implement builds and ships the production system rather than a prototype you have to finish, and Scale engineers the controls that keep it running — evaluation, observability, security, cost, and handoff — and then transfers it to your team.",
   },
   {
     question: "Who does RegainFlow work with?",
     answer:
-      "Law enforcement agencies and aerospace manufacturers, and the defense and federal organizations carrying AI, data, and modernization scope. The common thread is high-consequence environments that do not hand you clean data, a clear brief, or spare time — settings where the work is scrutinized after the fact and the obstacle is rarely the model itself.",
+      "Public agencies and complex organizations: public safety, infrastructure and utilities, federal, state, and local government, and defense and aerospace. The common thread is high-consequence environments that do not hand you clean data, a clear brief, or spare time — settings where the work is scrutinized after the fact and the obstacle is rarely the model itself.",
   },
   {
     question: "How does an engagement start?",

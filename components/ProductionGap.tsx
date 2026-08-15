@@ -23,8 +23,11 @@ const FAILURE_STATES = [
   {
     service: "Scale",
     href: "/services#scale",
+    // "The operating layer" was the phrase here, and it is jargon doing the
+    // work of a description. Naming the five controls says the same thing in
+    // terms a reader can check themselves against.
     response:
-      "We build the operating layer that lets it run — evaluation, observability, access control, cost control, and portability — then hand you the keys.",
+      "We engineer the controls around the AI — evaluation, observability, security, cost, and handoff — so it stays reliable as usage grows and your team can run it.",
     state:
       "A system that cleared procurement and cannot produce the record an auditor asks for.",
   },

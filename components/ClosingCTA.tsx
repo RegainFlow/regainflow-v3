@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import { RF_EVENTS } from "@/lib/analytics/events";
-import { ASSESSMENT_PROOF } from "@/lib/content/assessment";
 import {
   FREE_ASSESSMENT_CTA,
   FREE_ASSESSMENT_HREF,
@@ -16,11 +15,11 @@ export default function ClosingCTA() {
         <div className="col-span-full lg:col-span-7">
           <p className="rf-eyebrow">Start with the opportunity</p>
 
-          <h2 className="rf-h2 mt-5">Bring us your ambitions.</h2>
+          <h2 className="rf-h2 mt-5">Bring us the opportunity.</h2>
 
           <p className="rf-lead mt-6 max-w-[50ch]">
-            We will help you clarify where to focus, what it will take, and
-            whether RegainFlow is the right engineering partner.
+            We&rsquo;ll help determine whether it is worth funding and what it
+            will take.
           </p>
 
           {/* Both routes, ranked. Booking is still the primary conversion; the
@@ -53,18 +52,11 @@ export default function ClosingCTA() {
             </Link>
           </div>
 
-          {/* The terms of the primary, from the same constant `/services` and
-              every industry page read. This shelf closes four routes and was
-              the one place a reader could reach the booking link without ever
-              being told what it costs. */}
-          <dl className="mt-10 grid max-w-[34rem] gap-6 sm:grid-cols-3">
-            {ASSESSMENT_PROOF.map((proof) => (
-              <div key={proof.label}>
-                <dd className="rf-stat">{proof.value}</dd>
-                <dt className="rf-utility mt-2">{proof.label}</dt>
-              </div>
-            ))}
-          </dl>
+          {/* No `ASSESSMENT_PROOF` trio here any more. This shelf is a closing
+              CTA, and restating the assessment's terms turned it into a second
+              copy of the assessment section a screen above it. The terms still
+              render where the offer is actually explained — `FreeAssessment`
+              and `AssessmentCallout`. */}
         </div>
 
         <div className="col-span-full lg:col-span-4 lg:col-start-9 lg:pt-6">

@@ -13,7 +13,7 @@ import { SITE_NAME, TAGLINE } from "@/lib/site";
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: `${SITE_NAME} — AI Transformation Partner`,
+    name: `${SITE_NAME} — AI Engineering & Transformation Partner`,
     short_name: SITE_NAME,
     description: TAGLINE,
     start_url: "/",

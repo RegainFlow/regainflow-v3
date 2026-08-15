@@ -24,19 +24,24 @@ export default function Hero() {
         <div className="max-w-[36rem]">
           <p className="rf-eyebrow">{POSITIONING}</p>
 
-          {/* "Agency", not "county". The audience is counties, cities, *and*
-              state agencies, and a state CIO does not see themselves in
-              "county" — this is the one line on the site that has to hold all
-              three. The sector-specific framing lives on the industry pages,
-              where the reader has already told us which one they are. */}
+          {/* "Public agencies and complex organizations", not "company" and not
+              "agency". Government and regulated environments are the focus, and
+              this line has to say so without shutting out the complex
+              commercial organizations the same engineering applies to. The
+              sector-specific framing lives on the industry pages, where the
+              reader has already told us which one they are. */}
           <h1 className="rf-h1 mt-6">
-            Your agency can move as fast as it decides to.
+            We build production AI systems for public agencies and complex
+            organizations.
           </h1>
 
+          {/* States the part most firms leave out. "Built by the engineers who
+              built them for defense" used to close this paragraph; it sold a
+              past employer's record as ours, and what actually distinguishes
+              the work is that we are still there after the launch. */}
           <p className="rf-lead mt-6 max-w-[48ch]">
-            We install the AI systems your agency runs on: the intake, the
-            search, the monitoring, the records work. Built by the engineers who
-            built them for defense, and handed to your team to operate.
+            We stay through integration, deployment, adoption, and
+            handoff&mdash;so your team can operate what ships.
           </p>
 
           <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">

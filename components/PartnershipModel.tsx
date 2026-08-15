@@ -10,8 +10,12 @@ export default function PartnershipModel() {
       <div className="rf-shell rf-grid gap-y-10 py-14 md:py-18 lg:py-22">
         <div className="col-span-full lg:col-span-5">
           <p className="rf-eyebrow">The partnership model</p>
+          {/* "Clean handoff", not "one accountable path" — that phrase already
+              carries the ProductionGap paragraph above, and hearing it twice on
+              one page made it read as a slogan rather than a commitment. The
+              handoff is also the more specific claim of the two. */}
           <h2 className="rf-h2 mt-5">
-            Senior operators. Shared context. One accountable path.
+            Senior engineers. Shared context. Clean handoff.
           </h2>
 
           <PlayOnView className="mt-8 lg:mt-10 lg:pr-8">

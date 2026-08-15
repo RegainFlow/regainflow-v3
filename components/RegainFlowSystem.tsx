@@ -54,7 +54,7 @@ export default function RegainFlowSystem() {
           <div className="col-span-full lg:col-span-7">
             <p className="rf-eyebrow">The RegainFlow system</p>
             <h2 className="rf-h2 mt-5">
-              One path from decision to dependable operation.
+              From decision to dependable operation.
             </h2>
           </div>
         </div>

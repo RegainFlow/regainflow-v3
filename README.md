@@ -1,6 +1,6 @@
 # RegainFlow — website
 
-Marketing site for RegainFlow, an AI transformation partner.
+Marketing site for RegainFlow, an AI engineering & transformation partner.
 
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · npm.
 No motion, canvas, WebGL, or 3D dependencies — every diagram is SVG and CSS.
