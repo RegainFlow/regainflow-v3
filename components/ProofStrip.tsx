@@ -3,18 +3,7 @@ import Link from "next/link";
 import AsciiField from "@/components/brand/AsciiField";
 import CaseStudyCard from "@/components/CaseStudyCard";
 import DitherReveal from "@/components/DitherReveal";
-import {
-  CASE_STUDIES,
-  HEADLINE_FIGURES,
-  HOME_SLUGS,
-} from "@/lib/content/case-studies";
-
-/** Two, not the three `/insights` leads with — this is a teaser, not the list. */
-/* Mapped over the slug list rather than filtered out of `CASE_STUDIES`, so the
-   order here is the one `HOME_SLUGS` declares. */
-const FEATURED = HOME_SLUGS.flatMap(
-  (slug) => CASE_STUDIES.find((study) => study.slug === slug) ?? [],
-);
+import { CASE_STUDIES } from "@/lib/content/case-studies";
 
 /** Proof on the home page without duplicating `/insights`: totals, two
  *  examples, and a way through. */
@@ -28,30 +17,29 @@ export default function ProofStrip() {
 
       <div className="rf-shell relative z-10 py-14 md:py-16">
         <div className="rf-grid gap-y-10">
-          <div className="col-span-full lg:col-span-5">
-            <p className="rf-eyebrow">Delivered</p>
+          <div className="col-span-full lg:col-span-6">
+            <p className="rf-eyebrow">Featured case studies</p>
             <h2 className="rf-h2 mt-5 max-w-[18ch]">
               Systems in production, not slideware.
             </h2>
-            <Link href="/insights#case-studies" className="rf-nav-link mt-6 inline-block">
-              All case studies &rarr;
-            </Link>
           </div>
 
-          <dl className="col-span-full grid gap-8 sm:grid-cols-3 lg:col-span-6 lg:col-start-7">
-            {HEADLINE_FIGURES.map((figure) => (
-              <div key={figure.label} className="border-t border-rf-hairline pt-4">
-                <dt className="rf-utility">{figure.label}</dt>
-                <dd className="rf-stat mt-3">{figure.value}</dd>
-              </div>
-            ))}
-          </dl>
+          {/* The totals that sat here — estimated value, hours reduced,
+              transformations delivered — are gone. They were career figures
+              presented as RegainFlow's, and none of them survives the rule that
+              a published number has to be one we can explain how we measured
+              and defend in a procurement conversation. */}
+          <p className="rf-body col-span-full max-w-[50ch] lg:col-span-5 lg:col-start-8 lg:pt-3">
+            Our own engagements, anonymized until we have written approval to
+            name them. Each one says what the problem was, what we owned, and
+            what it produced.
+          </p>
         </div>
 
         {/* The same card `/insights` renders, rather than a second inline
             version that has to be kept in sync by hand. */}
-        <ul className="mt-12 grid gap-4 border-t border-rf-hairline pt-10 sm:grid-cols-2">
-          {FEATURED.map((study, i) => (
+        <ul className="mt-12 grid gap-4 border-t border-rf-hairline pt-10 sm:grid-cols-2 lg:grid-cols-3">
+          {CASE_STUDIES.map((study, i) => (
             <li key={study.slug} className="h-full">
               <DitherReveal className="h-full" delay={i * 90}>
                 <CaseStudyCard study={study} surface="home_proof" />
@@ -59,6 +47,12 @@ export default function ProofStrip() {
             </li>
           ))}
         </ul>
+
+        <p className="mt-10">
+          <Link href="/insights#case-studies" className="rf-nav-link">
+            All case studies &rarr;
+          </Link>
+        </p>
       </div>
     </section>
   );

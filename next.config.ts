@@ -38,6 +38,41 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  /**
+   * The twelve case studies this site launched with described work the founders
+   * did before RegainFlow existed. They were removed rather than relabelled —
+   * see the header in `lib/content/case-studies.ts` — which retires twelve live,
+   * indexed URLs.
+   *
+   * A 308 to the listing rather than a 410. Whatever authority those URLs hold
+   * is worth passing to the page that now carries the case studies; a 410 would
+   * discard it to make a point about honesty that the listing copy already
+   * makes. Nothing here 404s in the meantime, which matters most for anyone
+   * holding a link we sent them.
+   */
+  async redirects() {
+    const retiredStudies = [
+      "workforce-data-validation-platform",
+      "agentic-knowledge-assistant",
+      "enterprise-search-modernization",
+      "secure-internal-paas",
+      "operational-anomaly-detection",
+      "digital-engineering-simulation",
+      "market-competitive-intelligence",
+      "secure-government-document-intelligence",
+      "manufacturing-knowledge-intelligence",
+      "records-normalization",
+      "vendor-risk-scorecard",
+      "security-testing-automation",
+    ];
+
+    return retiredStudies.map((slug) => ({
+      source: `/insights/${slug}`,
+      destination: "/insights",
+      permanent: true,
+    }));
+  },
+
   async rewrites() {
     return [
       {

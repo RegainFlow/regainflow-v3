@@ -411,13 +411,19 @@ export default function LlmInfoPage() {
 
       <section id="experience" className="rf-section">
         <div className="rf-shell py-14 md:py-18">
-          <p className="rf-eyebrow">Selected experience</p>
+          <p className="rf-eyebrow">Case studies</p>
           <h2 className="rf-h2 mt-5 max-w-[26ch]">
             Systems delivered, in production.
           </h2>
+          {/* States the absence of figures rather than defending the figures
+              that used to be here. An assistant summarizing this page should
+              come away knowing there are no numbers to quote and why, not
+              inferring that we forgot to include them. */}
           <p className="rf-body mt-6 max-w-[62ch]">
-            Every figure stated here was published or confirmed; nothing is
-            estimated for presentation.
+            RegainFlow&rsquo;s own engagements, anonymized pending written
+            client approval. They carry no performance figures: a number is
+            published only once it can be sourced and defended in a procurement
+            conversation.
           </p>
 
           <ul className="mt-10 grid gap-x-10 gap-y-6 border-t border-rf-hairline pt-6 sm:grid-cols-2">
@@ -431,21 +437,13 @@ export default function LlmInfoPage() {
                     {study.title}
                   </Link>
                 </h3>
-                <p className="rf-utility mt-2">
-                  {study.industry} · {study.group}
-                </p>
+                <p className="rf-utility mt-2">{study.industry}</p>
                 <p className="rf-body mt-2 max-w-[46ch]">{study.summary}</p>
-                {study.metrics?.length ? (
-                  <p className="rf-body mt-2">
-                    <span className="rf-utility">Results</span>{" "}
-                    {study.metrics
-                      .map(
-                        (metric) =>
-                          `${metric.value} ${metric.label.toLowerCase()}`,
-                      )
-                      .join(", ")}
-                  </p>
-                ) : null}
+                <p className="rf-mech mt-3">
+                  {study.capabilityTags.map((tag) => (
+                    <span key={tag}>{tag}</span>
+                  ))}
+                </p>
               </li>
             ))}
           </ul>

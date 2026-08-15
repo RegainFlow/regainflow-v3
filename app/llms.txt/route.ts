@@ -132,43 +132,26 @@ function build(reports: Report[]): string {
   }
   lines.push("");
 
-  lines.push("## Selected enterprise AI and platform experience");
+  lines.push("## Case studies");
   lines.push("");
   lines.push(
-    "Every figure stated here was published or confirmed; nothing is estimated for presentation."
+    "RegainFlow's own engagements, anonymized pending written client approval. They carry no performance figures: a number is published only once it can be sourced and defended, and none of these has cleared that bar."
   );
   lines.push("");
   for (const study of CASE_STUDIES) {
     lines.push(`### ${study.title}`);
     lines.push(`[${SITE_URL}/insights/${study.slug}]`);
-    lines.push(`Industry: ${study.industry}. Category: ${study.group}.`);
-    if (study.metrics?.length) {
-      lines.push(
-        `Results: ${study.metrics
-          .map((metric) => `${metric.value} ${metric.label.toLowerCase()}`)
-          .join("; ")}.`
-      );
+    lines.push(`Industry: ${study.industry}.`);
+    lines.push(`Capabilities: ${study.capabilityTags.join("; ")}.`);
+    lines.push(`Context: ${study.context}`);
+    lines.push(`Constraints: ${study.constraints}`);
+    lines.push(`RegainFlow's role: ${study.role}`);
+    lines.push("What we engineered:");
+    for (const item of study.engineered) {
+      lines.push(`- ${item}`);
     }
-    if (study.atAGlance?.length) {
-      lines.push(
-        `At a glance: ${study.atAGlance
-          .map((item) => `${item.label} — ${item.value}`)
-          .join("; ")}.`
-      );
-    }
-    lines.push(`Challenge: ${study.challenge}`);
-    lines.push(`Solution: ${study.solution}`);
-    lines.push(`Key capabilities: ${study.capabilities.join("; ")}.`);
-    if (study.technologies) {
-      lines.push(`Technologies: ${study.technologies}`);
-    }
-    lines.push(`Impact: ${study.impact}`);
-    if (study.outcomes?.length) {
-      lines.push("Outcomes:");
-      for (const outcome of study.outcomes) {
-        lines.push(`- ${outcome}`);
-      }
-    }
+    lines.push(`Outcome: ${study.outcome}`);
+    lines.push(`What changed next: ${study.next}`);
     lines.push("");
   }
 

@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { RF_EVENTS, type RfSurface } from "@/lib/analytics/events";
-import { GROUP_KEYS, type CaseStudy } from "@/lib/content/case-studies";
+import { type CaseStudy } from "@/lib/content/case-studies";
 
 /**
  * The whole card is the link — the same shape the home proof strip already
@@ -27,10 +27,9 @@ export default function CaseStudyCard({
       className="rf-card"
       data-rf-event={RF_EVENTS.caseStudyOpened}
       data-rf-slug={study.slug}
-      // The stable key, not `study.group` — see `GROUP_KEYS`. With traffic this
-      // low the category rollup is the readable number; per-slug counts will
-      // sit at one or two for a long time.
-      data-rf-group={GROUP_KEYS[study.group]}
+      // No `data-rf-group`. Categories came out with the twelve prior-career
+      // studies — with three, the rollup they existed to make readable is the
+      // per-slug count.
       data-rf-surface={surface}
     >
       <p className="rf-utility text-rf-flow-soft">{study.industry}</p>
@@ -39,24 +38,19 @@ export default function CaseStudyCard({
 
       <p className="rf-body mt-4">{study.summary}</p>
 
-      {/* The lead figure only. A card is read at a glance, and a second number
-          beside the first turns one claim into a table nobody reads; the rest
-          are on the study page. The route tick marks it as a stated result
-          rather than another line of description. */}
-      {study.metrics?.[0] ? (
-        <p className="rf-utility mt-5 flex gap-4 text-rf-flow-soft">
-          <span className="rf-route-tick" aria-hidden="true" />
-          <span>
-            {study.metrics[0].value} &middot; {study.metrics[0].label}
-          </span>
-        </p>
-      ) : null}
+      {/* No figure row. Nothing is published on a card that we cannot explain
+          how we measured — see the header in `lib/content/case-studies.ts`. The
+          capability tags do the qualifying work a metric used to. */}
 
       {/* `mt-auto` pins this row to the bottom of the card, so a short and a
           long study still line up in the same row of the grid. */}
-      <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-rf-hairline pt-5">
-        <p className="rf-utility">{study.group}</p>
-        <span className="rf-nav-link">View more &rarr;</span>
+      <div className="mt-auto border-t border-rf-hairline pt-5">
+        <p className="rf-mech">
+          {study.capabilityTags.slice(0, 3).map((tag) => (
+            <span key={tag}>{tag}</span>
+          ))}
+        </p>
+        <span className="rf-nav-link mt-4 inline-block">View more &rarr;</span>
       </div>
     </Link>
   );

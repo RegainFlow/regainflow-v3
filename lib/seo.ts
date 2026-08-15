@@ -241,8 +241,12 @@ export function breadcrumbJsonLd(
  * `CreativeWork` rather than `Article`: these are accounts of delivered work,
  * not dated editorial, and `Article` without a real `datePublished` invites a
  * rich-result warning for a field we cannot honestly fill. `about` carries the
- * group and `abstract` the executive line, both already authored in
+ * environment and `abstract` the executive line, both already authored in
  * `lib/content/case-studies.ts`.
+ *
+ * No `mentions`. That property restated each study's headline figures, and
+ * there are no figures on these studies — asserting one in structured data that
+ * the page does not display would be a rich-result violation even if we had it.
  */
 export function caseStudyJsonLd(study: CaseStudy) {
   return {
@@ -253,22 +257,10 @@ export function caseStudyJsonLd(study: CaseStudy) {
     headline: study.title,
     abstract: study.summary,
     description: study.summary,
-    about: study.group,
     // The environment the work ran in — the closest thing to a subject these
     // deliberately unnamed studies have.
-    keywords: [study.group, study.industry],
-    // Every figure here was published or confirmed (see the header comment in
-    // `lib/content/case-studies.ts`), which is what makes it safe to restate as
-    // structured data. `mentions` rather than a `QuantitativeValue`: these are
-    // stated results in prose form, not measured properties of the work.
-    ...(study.metrics?.length
-      ? {
-          mentions: study.metrics.map((metric) => ({
-            "@type": "Thing",
-            name: `${metric.value} ${metric.label.toLowerCase()}`,
-          })),
-        }
-      : {}),
+    about: study.industry,
+    keywords: [study.industry, ...study.capabilityTags],
     url: `${SITE_URL}/insights/${study.slug}`,
     inLanguage: "en-US",
     isPartOf: { "@id": `${SITE_URL}/#website` },
@@ -407,7 +399,7 @@ export function caseStudiesJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: "Selected enterprise AI and platform experience",
+    name: "RegainFlow case studies",
     itemListElement: CASE_STUDIES.map((study, index) => ({
       "@type": "ListItem",
       position: index + 1,
@@ -415,7 +407,7 @@ export function caseStudiesJsonLd() {
         "@type": "CreativeWork",
         name: study.title,
         abstract: study.summary,
-        about: study.group,
+        about: study.industry,
         url: `${SITE_URL}/insights/${study.slug}`,
       },
     })),

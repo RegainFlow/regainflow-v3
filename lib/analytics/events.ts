@@ -36,8 +36,6 @@ export const RF_EVENTS = {
   /** Non-converting CTAs, kept separate so they cannot inflate the above. */
   secondaryClicked: "cta_secondary_clicked",
   caseStudyOpened: "case_study_opened",
-  /** The `/insights` disclosure — the clearest "digging" signal on the site. */
-  allWorkOpened: "all_work_opened",
   assessmentStepOpened: "assessment_step_opened",
   /**
    * A footer assistant link. Carries `assistant` — which of them was picked.
@@ -137,8 +135,6 @@ export type RfLocation =
 export type RfSurface =
   | "home_proof"
   | "featured"
-  | "all_work"
-  | "related"
   /**
    * The proof band on an industry group page. Its own value rather than
    * `featured`, because a click here means a reader who already self-selected

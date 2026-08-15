@@ -36,7 +36,7 @@ export default async function Image({
 
   return new ImageResponse(
     ogCard({
-      eyebrow: study ? study.group : POSITIONING,
+      eyebrow: study ? study.industry : POSITIONING,
       title: study ? study.title : "Selected experience",
       lead: study ? study.summary : "Delivered enterprise AI and platform work.",
       meta: study?.industry,
