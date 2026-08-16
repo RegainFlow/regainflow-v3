@@ -178,6 +178,29 @@
     color: var(--color-rf-flow-soft);
   }
 
+  /* The icon counterpart to `.rf-index`, and it carries the same Flow Soft so
+     the two read as one register — a list that swaps its numbers for icons
+     should not change color as well as shape.
+
+     The two `stroke-*` declarations are the whole reason these read as house
+     icons rather than as a library someone installed. Lucide ships
+     `stroke-linecap: round` and `stroke-linejoin: round`; nothing else on this
+     site is round — not a border, not a card, not an isometric model, not the
+     hand-drawn chevron in `SiteNav`. Rounded terminals among all that look
+     borrowed at any size above about 14px. Deleting these two lines is the
+     single easiest way to make the whole set look wrong.
+
+     Sized in `rem` and `flex: none` because every call site sits in a flex row
+     beside body copy, where a percentage-sized icon collapses. */
+  .rf-icon {
+    flex: none;
+    width: 1.125rem;
+    height: 1.125rem;
+    color: var(--color-rf-flow-soft);
+    stroke-linecap: butt;
+    stroke-linejoin: miter;
+  }
+
   .rf-wordmark {
     font-family: var(--font-display);
     font-weight: 600;
