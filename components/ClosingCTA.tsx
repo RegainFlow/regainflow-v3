@@ -11,7 +11,11 @@ import {
 export default function ClosingCTA() {
   return (
     <section id="contact" className="rf-section bg-rf-navy">
-      <div className="rf-shell rf-grid gap-y-12 py-14 md:py-20 lg:py-24">
+      {/* `rf-band`, not `rf-band-lead`. This was the tallest section on the
+          site, which on the home page put a closing shelf above the free
+          assessment it points back at. It closes four routes; on none of them
+          is it the main event. */}
+      <div className="rf-shell rf-grid gap-y-12 rf-band">
         <div className="col-span-full lg:col-span-7">
           <p className="rf-eyebrow">Start with the opportunity</p>
 

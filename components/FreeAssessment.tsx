@@ -61,7 +61,10 @@ export default function FreeAssessment({
           proof strip uses, so this reads as the identity and not an effect. */}
       <AsciiField className="rf-ascii-field rf-ascii-echo" animate={false} />
 
-      <div className="rf-shell relative z-10 py-14 md:py-18 lg:py-22">
+      {/* `rf-band-lead` — the page's one conversion, and the only thing here
+          we give away. The other section carrying this weight is the argument
+          that earns it. */}
+      <div className="rf-shell relative z-10 rf-band-lead">
         <div className="rf-grid gap-y-8">
           <div className="col-span-full lg:col-span-6">
             <p className="rf-eyebrow text-rf-flow-soft">Free assessment</p>

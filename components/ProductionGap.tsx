@@ -35,15 +35,20 @@ const FAILURE_STATES = [
 
 export default function ProductionGap() {
   return (
+    // `rf-band-lead`: this is the argument the rest of the page rests on — if a
+    // reader does not recognise themselves in one of these three states,
+    // nothing after it matters. It gets the weight to say so.
     <section className="rf-section">
-      <div className="rf-shell py-14 md:py-18 lg:py-22">
+      <div className="rf-shell rf-band-lead">
         <div className="rf-grid gap-y-8">
           <div className="col-span-full lg:col-span-7">
             <p className="rf-eyebrow">The production gap</p>
             <h2 className="rf-h2 mt-6">AI is only one part of the system.</h2>
           </div>
 
-          <p className="rf-body col-span-full max-w-[52ch] lg:col-span-5 lg:pt-3">
+          {/* `rf-lead`, not `rf-body`. This paragraph states the thesis; at
+              body size it read as a caption to the heading above it. */}
+          <p className="rf-lead col-span-full max-w-[52ch] lg:col-span-5 lg:pt-3">
             AI programs stall when the mandate, the data, the systems, and the
             people who own them move on separate tracks. RegainFlow turns those
             fragments into one accountable path from decision to production, and

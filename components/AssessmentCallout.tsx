@@ -24,7 +24,10 @@ import { FREE_ASSESSMENT_HREF } from "@/lib/site";
 export default function AssessmentCallout({ hook }: { hook: string }) {
   return (
     <section id="assessment" className="rf-section">
-      <div className="rf-shell py-14 md:py-20 lg:py-24">
+      {/* `rf-band-lead`: on an industry page this is the conversion, and the
+          only section of it. `FreeAssessment` carries the same weight on the
+          routes that render the full version. */}
+      <div className="rf-shell rf-band-lead">
         <div className="rf-grid gap-y-8">
           <div className="col-span-full lg:col-span-5">
             <p className="rf-eyebrow">Free assessment</p>

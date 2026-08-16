@@ -4,7 +4,9 @@ import LayerSystem from "@/components/LayerSystem";
 export default function CapabilityLayers() {
   return (
     <section id="layers" className="rf-section">
-      <div className="rf-shell py-14 md:py-18 lg:py-22">
+      {/* Tight: the detailed layer inventory a reader reaches after the
+          framework and the engagement sequence have already sold the shape. */}
+      <div className="rf-shell rf-band-tight">
         <div className="rf-grid gap-y-5">
           <div className="col-span-full lg:col-span-7">
             <p className="rf-eyebrow">What we engineer</p>

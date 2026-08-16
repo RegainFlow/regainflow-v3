@@ -37,7 +37,8 @@ export default function IndustriesPage() {
       />
 
       <section className="rf-section">
-        <div className="rf-shell py-14 md:py-18 lg:py-22">
+        {/* The hub's whole reason to exist — a reader self-selects here. */}
+        <div className="rf-shell rf-band-lead">
           <ul className="grid gap-4 md:grid-cols-2">
             {INDUSTRY_GROUPS.map((group, i) => (
               <li key={group.slug} className="h-full">
@@ -73,7 +74,7 @@ export default function IndustriesPage() {
           have yet; the work speaks without them, and it is the work a reader in
           one of these sectors came here to check. */}
       <section id="engagements" className="rf-section bg-rf-navy">
-        <div className="rf-shell py-14 md:py-18 lg:py-22">
+        <div className="rf-shell rf-band">
           <div className="rf-grid gap-y-6">
             <div className="col-span-full lg:col-span-5">
               <p className="rf-eyebrow">Selected engagements</p>

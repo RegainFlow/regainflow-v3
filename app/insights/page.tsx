@@ -47,7 +47,8 @@ export default async function InsightsPage() {
       />
 
       <section id="case-studies" className="rf-section">
-        <div className="rf-shell py-14 md:py-18">
+        {/* The page is the case studies; the reports band below supports it. */}
+        <div className="rf-shell rf-band-lead">
           <h2 className="rf-h2 max-w-[24ch]">Our Case Studies</h2>
 
           {/* No totals above this heading and no defence of the figures below
@@ -88,7 +89,7 @@ export default async function InsightsPage() {
           is worse than none. */}
       {reports.length > 0 ? (
         <section id="reports" className="rf-section bg-rf-navy">
-          <div className="rf-shell py-14 md:py-18">
+          <div className="rf-shell rf-band">
             <div className="rf-grid gap-y-6">
               {/* "Reports & Guides", not "Thought Leadership". Thought
                   leadership is something the work demonstrates, not something

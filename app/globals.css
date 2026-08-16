@@ -110,6 +110,65 @@
     border-bottom: 1px solid var(--color-rf-hairline);
   }
 
+  /* --- Section rhythm ------------------------------------------------------
+     Three band heights, and the point of naming them is that a section has to
+     *choose* one.
+
+     Seven of ten sections shipped `py-14 md:py-18 lg:py-22` — byte-identical —
+     so the argument, the offer, the proof, and a two-line teaser all occupied
+     the same vertical weight. A reader scrolling fast got no signal about what
+     mattered, and the page read as one long uniform column no matter how good
+     the individual sections were. Vertical space is the cheapest hierarchy
+     there is and this was spending none of it.
+
+     `lead` is for the two or three sections a page genuinely stands on — the
+     argument that earns the offer, and the conversion. It stops meaning
+     anything the moment a fourth section takes it, so take it from something
+     else rather than adding it.
+
+     `tight` is for a section that exists to point somewhere: a summary whose
+     job is finished when the reader clicks through.
+
+     The middle step is deliberately the old default, so a section that has not
+     been considered yet looks exactly as it did.
+  ------------------------------------------------------------------------- */
+
+  .rf-band {
+    padding-block: 3.5rem;
+  }
+
+  .rf-band-lead {
+    padding-block: 4.5rem;
+  }
+
+  .rf-band-tight {
+    padding-block: 3rem;
+  }
+
+  @media (min-width: 768px) {
+    .rf-band {
+      padding-block: 4.5rem;
+    }
+    .rf-band-lead {
+      padding-block: 6rem;
+    }
+    .rf-band-tight {
+      padding-block: 3.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .rf-band {
+      padding-block: 5.5rem;
+    }
+    .rf-band-lead {
+      padding-block: 7.5rem;
+    }
+    .rf-band-tight {
+      padding-block: 4rem;
+    }
+  }
+
   /* --- Type ------------------------------------------------------------ */
 
   .rf-h1 {

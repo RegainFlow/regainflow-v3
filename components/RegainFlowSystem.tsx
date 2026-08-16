@@ -49,7 +49,9 @@ export default function RegainFlowSystem() {
 
   return (
     <section className="rf-section">
-      <div className="rf-shell py-14 md:py-18 lg:py-22">
+      {/* `rf-band-lead` — the primary framework on `/services`, and the first
+          thing after the hero. */}
+      <div className="rf-shell rf-band-lead">
         <div className="rf-grid gap-y-5">
           <div className="col-span-full lg:col-span-7">
             <p className="rf-eyebrow">The RegainFlow system</p>

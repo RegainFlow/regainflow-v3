@@ -15,7 +15,7 @@ export default function ProofStrip() {
           than a hero effect. */}
       <AsciiField className="rf-ascii-field rf-ascii-echo" animate={false} />
 
-      <div className="rf-shell relative z-10 py-14 md:py-16">
+      <div className="rf-shell relative z-10 rf-band">
         <div className="rf-grid gap-y-10">
           <div className="col-span-full lg:col-span-6">
             <p className="rf-eyebrow">Featured case studies</p>

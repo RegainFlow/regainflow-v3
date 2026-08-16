@@ -8,7 +8,9 @@ import { PRINCIPLES } from "@/lib/content/company";
 export default function PartnershipModel() {
   return (
     <section id="partnership" className="rf-section">
-      <div className="rf-shell rf-grid gap-y-10 py-14 md:py-18 lg:py-22">
+      {/* Quiet on purpose. It sits between the conversion above and the closing
+          CTA below, and a third full-weight section there competes with both. */}
+      <div className="rf-shell rf-grid gap-y-10 rf-band-tight">
         <div className="col-span-full lg:col-span-5">
           <p className="rf-eyebrow">The partnership model</p>
           {/* "Clean handoff", not "one accountable path" — that phrase already
