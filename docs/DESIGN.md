@@ -77,8 +77,13 @@ Where we cannot measure the return, we say so rather than imply one.
 The distinction the rule turns on is *claim about return* versus *fact about the work*. A case
 study's `context`, `constraints`, `role`, and `engineered` describe what the engagement **was** —
 environment, scope, stack, method — so none of them is a claim the number rule governs. `outcome`
-and `next` are, and they are written as what changed rather than by how much. (`atAGlance` and
-`metrics` were the fields that used to carry this distinction; both are gone.)
+and `next` are, and they are written as what changed rather than by how much.
+
+**`atAGlance` is the one field that carries numbers, and it is allowed to because it counts what
+was *delivered*.** "2 workshop tracks" and "4 hrs of live delivery" are facts about the
+engagement's scope; "40% faster reviews" would be a claim about its return and does not go there
+or anywhere else. If a figure would need a footnote to defend, it is the wrong kind of figure.
+(The old `metrics` field, which held exactly the wrong kind, is gone.)
 
 **5. Say what we will not do.** "Dependency is a failure mode, not a business model." The
 manifesto commits against things. That is what makes the commitments legible.
