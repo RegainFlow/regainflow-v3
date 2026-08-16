@@ -1,9 +1,10 @@
 import {
-  ASSESSMENT_CALL_NOTE,
-  ASSESSMENT_PROMISE,
+  ASSESSMENT_PHASES,
   ASSESSMENT_PROOF,
   ASSESSMENT_REPORT_CONTENTS,
-  ASSESSMENT_STEPS,
+  REPORT_NAME,
+  REPORT_PRICE,
+  REPORT_TERMS,
 } from "@/lib/content/assessment";
 import { CASE_STUDIES } from "@/lib/content/case-studies";
 import { MANIFESTO, MISSION, TEAM } from "@/lib/content/company";
@@ -127,17 +128,16 @@ function build(reports: Report[]): string {
   lines.push(`[${SITE_URL}/services#assessment]`);
   lines.push("");
   lines.push(
-    `A real mini-engagement, not a free first conversation. ${ASSESSMENT_CALL_NOTE} ${ASSESSMENT_PROOF.map((item) => `${item.label}: ${item.value}`).join(". ")}.`
+    `A real mini-engagement, not a free first conversation. ${ASSESSMENT_PROOF.map((item) => `${item.label}: ${item.value}`).join(". ")}.`
   );
-  lines.push("");
-  lines.push(`It runs in four phases: ${ASSESSMENT_PROMISE.join("; ")}.`);
   lines.push("");
   lines.push(
-    `The written report covers: ${ASSESSMENT_REPORT_CONTENTS.join("; ")}.`
+    `It ends in a written ${REPORT_NAME.toLowerCase()}, priced ${REPORT_PRICE}, covering: ${ASSESSMENT_REPORT_CONTENTS.map((section) => section.label).join("; ")}. ${REPORT_TERMS.replace(" · ", ". ")}.`
   );
   lines.push("");
-  for (const step of ASSESSMENT_STEPS) {
-    lines.push(`- **${step.name}** — ${step.detail}`);
+  lines.push("It runs in four phases:");
+  for (const phase of ASSESSMENT_PHASES) {
+    lines.push(`- **${phase.index} ${phase.name}** — ${phase.detail}`);
   }
   lines.push("");
 

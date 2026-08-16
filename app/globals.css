@@ -1643,6 +1643,65 @@
     }
   }
 
+  /* --- The opportunity report ----------------------------------------------
+     The deliverable, drawn as a document. Hairline on Navy like `.rf-card`,
+     deliberately *without* extending it: every card on this site is a link, and
+     inheriting the hover border would promise a destination this has none of.
+  ------------------------------------------------------------------------- */
+
+  .rf-report {
+    margin: 0;
+    border: 1px solid var(--color-rf-hairline);
+    background: var(--color-rf-navy);
+  }
+
+  /* The title bar, ruled off like a real document header. `baseline` rather
+     than `center`: the label is 0.6875rem mono and the price is display-sized,
+     and centring them left the price sitting visibly low against the rule. */
+  .rf-report-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.35rem;
+    border-bottom: 1px solid var(--color-rf-hairline);
+  }
+
+  /* Smaller than `.rf-stat`, which is tuned for a row of three. One number on
+     its own at that size out-shouts the heading above the panel. */
+  .rf-report-price {
+    font-size: 1.75rem;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--color-rf-flow-soft);
+  }
+
+  .rf-report-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    padding: 1.35rem;
+  }
+
+  /* `start`, not `center`: two of the six labels wrap at narrow widths, and a
+     centred icon then floats to the middle of a two-line row. The 0.1em nudge
+     optically seats an 18px glyph against the cap height beside it. */
+  .rf-report-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+  }
+
+  .rf-report-row .rf-icon {
+    margin-top: 0.1em;
+  }
+
+  .rf-report-foot {
+    padding: 0.85rem 1.35rem;
+    border-top: 1px solid var(--color-rf-hairline);
+  }
+
   /* --- Free assessment steps -----------------------------------------------
      The layer rows' behaviour, in a flatter register: no spine, because these
      are four beats of one conversation rather than a stack. The active row is

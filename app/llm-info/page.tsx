@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import PageHeader from "@/components/PageHeader";
-import { ASSESSMENT_STEPS } from "@/lib/content/assessment";
+import {
+  ASSESSMENT_PHASES,
+  ASSESSMENT_REPORT_CONTENTS,
+  REPORT_NAME,
+  REPORT_TERMS,
+} from "@/lib/content/assessment";
 import { CASE_STUDIES } from "@/lib/content/case-studies";
 import { MANIFESTO, MISSION, TEAM, VISION } from "@/lib/content/company";
 import { FAQ } from "@/lib/content/faq";
@@ -309,14 +314,26 @@ export default function LlmInfoPage() {
           <div className="mt-12 border-t border-rf-hairline pt-8">
             <p className="rf-eyebrow">What the free assessment involves</p>
             <ul className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
-              {ASSESSMENT_STEPS.map((step) => (
-                <li key={step.index}>
-                  <span className="rf-index">{step.index}</span>
-                  <h3 className="rf-h3 mt-2">{step.name}</h3>
-                  <p className="rf-body mt-2">{step.detail}</p>
+              {ASSESSMENT_PHASES.map((phase) => (
+                <li key={phase.index}>
+                  <span className="rf-index">{phase.index}</span>
+                  <h3 className="rf-h3 mt-2">{phase.name}</h3>
+                  <p className="rf-body mt-2">{phase.detail}</p>
                 </li>
               ))}
             </ul>
+
+            {/* The deliverable, stated as a list rather than drawn. This page
+                is written to be quoted, and the panel's visual framing does not
+                survive being lifted into an answer — the words have to. */}
+            <p className="rf-body mt-8 max-w-[62ch]">
+              It ends in a written {REPORT_NAME.toLowerCase()}, at no cost,
+              covering:{" "}
+              {ASSESSMENT_REPORT_CONTENTS.map((section) => section.label)
+                .join("; ")
+                .toLowerCase()}
+              . {REPORT_TERMS.replace(" · ", ". ")}.
+            </p>
           </div>
         </div>
       </section>
