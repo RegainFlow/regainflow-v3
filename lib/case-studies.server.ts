@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import type {
   Artifact,
   CaseStudy,
+  CaseStudyCta,
   GlanceFact,
   Stage,
   Track,
@@ -33,7 +34,7 @@ const PUBLISHED = "published";
  * including one added for internal notes — into a page and its structured data.
  */
 const COLUMNS =
-  "slug, title, industry, eyebrow, summary, capability_tags, meta_title, meta_description, context, constraints, role, engineered, outcome, next_label, next_body, image_url, image_alt, at_a_glance, deliverables, stages, tracks, artifacts, industries, sort_order";
+  "slug, title, industry, eyebrow, summary, capability_tags, meta_title, meta_description, context, constraints, role, engineered, outcome, next_label, next_body, image_url, image_alt, cta, at_a_glance, deliverables, stages, tracks, artifacts, industries, sort_order";
 
 /** The row as PostgREST returns it. snake_case, and only what `COLUMNS` asks for. */
 interface CaseStudyRow {
@@ -58,6 +59,7 @@ interface CaseStudyRow {
   // runtime — the same trust `reports.findings` places in the table. A
   // malformed block renders wrong; it does not crash the page, because every
   // consumer guards on presence and maps over an array.
+  cta: CaseStudyCta | null;
   at_a_glance: GlanceFact[] | null;
   deliverables: string[] | null;
   stages: Stage[] | null;
@@ -95,6 +97,7 @@ function toCaseStudy(row: CaseStudyRow): CaseStudy {
     ...(row.next_label ? { nextLabel: row.next_label } : {}),
     ...(row.image_url ? { image: row.image_url } : {}),
     ...(row.image_alt ? { imageAlt: row.image_alt } : {}),
+    ...(row.cta ? { cta: row.cta } : {}),
     ...(row.at_a_glance?.length ? { atAGlance: row.at_a_glance } : {}),
     ...(row.deliverables?.length ? { deliverables: row.deliverables } : {}),
     ...(row.stages?.length ? { stages: row.stages } : {}),

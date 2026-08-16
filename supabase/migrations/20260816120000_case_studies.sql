@@ -115,6 +115,15 @@ create table if not exists public.case_studies (
   -- "two workshops", it is the shape of work split across contexts.
   tracks jsonb,
 
+  -- Overrides the closing CTA's copy. {heading, body, secondaryLabel}.
+  --
+  -- One column rather than three, because these are only ever set together —
+  -- a heading without its body is a worse CTA than the default. The
+  -- destinations are deliberately NOT here: they are the free assessment and
+  -- the contact form, they are the same on every page of this site, and a
+  -- column holding a URL is a column that will eventually hold a broken one.
+  cta jsonb,
+
   -- Sanitized diagrams. [{kind, title, caption, nodes[]}].
   --
   -- `kind` is a **closed union** resolved to a React component, the same

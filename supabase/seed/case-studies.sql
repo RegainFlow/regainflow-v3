@@ -30,7 +30,7 @@ insert into public.case_studies (
   slug, title, industry, eyebrow, summary, capability_tags,
   meta_title, meta_description,
   context, constraints, role, engineered, outcome, next_label, next_body,
-  at_a_glance, stages, tracks, artifacts, deliverables,
+  cta, at_a_glance, stages, tracks, artifacts, deliverables,
   industries, sort_order, status
 ) values (
   'ai-engineering-enablement',
@@ -62,6 +62,15 @@ insert into public.case_studies (
 
   'Designed to compound',
   'The engagement produced a repeatable method for turning a client brief into practical engineering enablement—while preserving the technical specificity that makes each workshop credible.',
+
+  -- Copy only. Both buttons still go to the free assessment and the contact
+  -- form; the words change because this reader might be a partner rather than
+  -- an end client.
+  '{
+    "heading": "Equip your team—or your client''s.",
+    "body": "Whether you are enabling your own engineers or need a technical partner behind a client engagement, we''ll turn the context into a practical path to production.",
+    "secondaryLabel": "Discuss a partner engagement"
+  }'::jsonb,
 
   -- Scope facts. Every one of these counts something delivered.
   '[
@@ -163,7 +172,7 @@ on conflict (slug) do update set
   context = excluded.context, constraints = excluded.constraints, role = excluded.role,
   engineered = excluded.engineered, outcome = excluded.outcome,
   next_label = excluded.next_label, next_body = excluded.next_body,
-  at_a_glance = excluded.at_a_glance, stages = excluded.stages,
+  cta = excluded.cta, at_a_glance = excluded.at_a_glance, stages = excluded.stages,
   tracks = excluded.tracks, artifacts = excluded.artifacts,
   deliverables = excluded.deliverables, industries = excluded.industries,
   sort_order = excluded.sort_order, status = excluded.status;

@@ -8,7 +8,25 @@ import {
   CONTACT_PATH,
 } from "@/lib/site";
 
-export default function ClosingCTA() {
+/**
+ * The shelf that closes most routes.
+ *
+ * `override` swaps the copy where a page has earned more specific words than
+ * "Bring us the opportunity" — a case study whose reader is a consulting
+ * partner is being asked something different from a visitor on `/insights`.
+ * Copy only: the destinations stay the free assessment and the contact form on
+ * every surface, because two buttons that go somewhere different depending on
+ * the page is how a site grows a broken link nobody notices.
+ *
+ * Extended rather than forked. A second closing component would drift from this
+ * one within a release, and the analytics locations below would stop being
+ * comparable across routes.
+ */
+export default function ClosingCTA({
+  override,
+}: {
+  override?: { heading: string; body: string; secondaryLabel: string };
+} = {}) {
   return (
     <section id="contact" className="rf-section bg-rf-navy">
       {/* `rf-band`, not `rf-band-lead`. This was the tallest section on the
@@ -19,11 +37,13 @@ export default function ClosingCTA() {
         <div className="col-span-full lg:col-span-7">
           <p className="rf-eyebrow">Start with the opportunity</p>
 
-          <h2 className="rf-h2 mt-5">Bring us the opportunity.</h2>
+          <h2 className="rf-h2 mt-5">
+            {override?.heading ?? "Bring us the opportunity."}
+          </h2>
 
           <p className="rf-lead mt-6 max-w-[50ch]">
-            We&rsquo;ll help determine whether it is worth funding and what it
-            will take.
+            {override?.body ??
+              "We’ll help determine whether it is worth funding and what it will take."}
           </p>
 
           {/* Both routes, ranked. Booking is still the primary conversion; the
@@ -52,7 +72,7 @@ export default function ClosingCTA() {
               data-rf-event={RF_EVENTS.contactClicked}
               data-rf-location="closing_cta_contact"
             >
-              {CONTACT_CTA}
+              {override?.secondaryLabel ?? CONTACT_CTA}
             </Link>
           </div>
 

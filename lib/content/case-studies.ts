@@ -84,6 +84,20 @@ export interface Artifact {
   nodes: string[];
 }
 
+/**
+ * Per-study override for the closing CTA's copy.
+ *
+ * Copy only. The destinations stay in `lib/site.ts` — they are the same on
+ * every page and a field holding a URL is a field that eventually holds a
+ * broken one.
+ */
+export interface CaseStudyCta {
+  heading: string;
+  body: string;
+  /** The secondary button. The primary is always the free assessment. */
+  secondaryLabel: string;
+}
+
 export interface CaseStudy {
   slug: string;
   title: string;
@@ -130,6 +144,7 @@ export interface CaseStudy {
   /** Required whenever `image` is set — these are content images. */
   imageAlt?: string;
 
+  cta?: CaseStudyCta;
   atAGlance?: GlanceFact[];
   deliverables?: string[];
   stages?: Stage[];
