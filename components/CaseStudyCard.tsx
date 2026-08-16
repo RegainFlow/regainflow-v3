@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { RF_EVENTS, type RfSurface } from "@/lib/analytics/events";
@@ -32,6 +33,26 @@ export default function CaseStudyCard({
       // per-slug count.
       data-rf-surface={surface}
     >
+      {/* Optional, and the card is designed to look deliberate without it —
+          most studies will have no art for a long time, and a placeholder
+          frame is worse than no frame. `.rf-case-cover` declares the ratio so
+          `fill` has a box and a row of cards stays level either way. */}
+      {study.image ? (
+        <div className="rf-case-cover mb-5">
+          <Image
+            src={study.image}
+            // `imageAlt` is authored per study. Falling back to the title is a
+            // weak alt but a truthful one; an empty string would claim the
+            // image is decorative, which it is not.
+            alt={study.imageAlt ?? study.title}
+            fill
+            // A third of an 80rem shell at desktop, full width below `md`.
+            // Asking for the rendered size keeps the request proportionate.
+            sizes="(min-width: 1024px) 360px, (min-width: 768px) 45vw, 90vw"
+          />
+        </div>
+      ) : null}
+
       <p className="rf-utility text-rf-flow-soft">{study.industry}</p>
 
       <h3 className="rf-h3 mt-3">{study.title}</h3>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -95,6 +96,23 @@ export default async function CaseStudyPage({
 
       <section className="rf-section">
         <div className="rf-shell py-12 md:py-16">
+          {/* Between the header and the tags, where a lead image belongs: after
+              the reader knows what they are looking at, before they commit to
+              reading. Absent on a study without art, and the page closes up
+              rather than leaving a frame. */}
+          {study.image ? (
+            <div className="rf-case-cover rf-case-hero mb-10">
+              <Image
+                src={study.image}
+                alt={study.imageAlt ?? study.title}
+                fill
+                // The LCP element on this route when it exists.
+                priority
+                sizes="(min-width: 1280px) 1120px, 100vw"
+              />
+            </div>
+          ) : null}
+
           {/* Capability tags open the page. They are what a reader scanning for
               relevance actually wants first, and they replace the headline
               figures that used to sit here — see the figure rule in

@@ -749,6 +749,35 @@
     max-width: 24rem;
   }
 
+  /* Case study artwork. 16:9 rather than the report cover's 17:22, because a
+     study's image is a scene rather than a document — and because a portrait
+     block at the top of a card pushes the title below the fold in a
+     three-across grid.
+
+     `cover`, not the report's `contain`: there is no title to crop off, and
+     letterboxing an arbitrary image inside a card reads as a mistake. The ratio
+     is declared here so nothing intrinsic has to travel with a URL pasted into
+     the table, and so a row of cards stays level whether or not each study has
+     art — the same reasoning as `.rf-report-cover`. */
+  .rf-case-cover {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border: 1px solid var(--color-rf-hairline);
+    background: var(--color-rf-navy);
+  }
+
+  .rf-case-cover img {
+    object-fit: cover;
+  }
+
+  /* On the study page the same frame runs wider and shallower — at 16:9 across
+     a full shell it would push the first section a screen down. */
+  .rf-case-hero {
+    aspect-ratio: 21 / 9;
+  }
+
   /* The gate and the audio block are both bounded modules on the page rather
      than sections of it — a border is what says "this is the thing you came
      for" without an elevation shadow the system does not have. */
