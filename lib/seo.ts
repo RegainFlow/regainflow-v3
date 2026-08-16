@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 
-import { CASE_STUDIES, type CaseStudy } from "@/lib/content/case-studies";
+// Type-only, and it has to stay that way. `lib/content/case-studies.ts` no
+// longer holds data — the studies come from Supabase through
+// `lib/case-studies.server.ts` — and a value import here would drag a
+// server-only module into one that does nothing but build strings.
+import type { CaseStudy } from "@/lib/content/case-studies";
 import { TEAM } from "@/lib/content/company";
 import { FAQ } from "@/lib/content/faq";
 import type { IndustryGroup } from "@/lib/content/industries";
@@ -395,12 +399,20 @@ export function faqJsonLd() {
   };
 }
 
-export function caseStudiesJsonLd() {
+/**
+ * Takes the studies rather than reading them.
+ *
+ * It read a module-level array until the studies moved into Supabase. Fetching
+ * here would make this async and pull the secret-key client into a module whose
+ * only job is building strings — and every caller already has the data, because
+ * it just rendered the list this describes.
+ */
+export function caseStudiesJsonLd(studies: CaseStudy[]) {
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",
     name: "RegainFlow case studies",
-    itemListElement: CASE_STUDIES.map((study, index) => ({
+    itemListElement: studies.map((study, index) => ({
       "@type": "ListItem",
       position: index + 1,
       item: {

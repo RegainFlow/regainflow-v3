@@ -5,7 +5,7 @@ import CaseStudyCard from "@/components/CaseStudyCard";
 import ClosingCTA from "@/components/ClosingCTA";
 import DitherReveal from "@/components/DitherReveal";
 import PageHeader from "@/components/PageHeader";
-import { CASE_STUDIES } from "@/lib/content/case-studies";
+import { getCaseStudies } from "@/lib/case-studies.server";
 import { INDUSTRY_GROUPS } from "@/lib/content/industries";
 import { breadcrumbJsonLd, pageMetadata, serializeJsonLd } from "@/lib/seo";
 
@@ -27,7 +27,12 @@ export const metadata: Metadata = pageMetadata({
  *
  * The whole card is the link, the same shape `CaseStudyCard` uses.
  */
-export default function IndustriesPage() {
+// The selected-engagements band reads the case studies table.
+export const dynamic = "force-dynamic";
+
+export default async function IndustriesPage() {
+  const studies = await getCaseStudies();
+
   return (
     <>
       <PageHeader
@@ -90,7 +95,7 @@ export default function IndustriesPage() {
           </div>
 
           <ul className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {CASE_STUDIES.map((study, i) => (
+            {studies.map((study, i) => (
               <li key={study.slug} className="h-full">
                 <DitherReveal className="h-full" delay={(i % 3) * 90}>
                   <CaseStudyCard study={study} surface="industries_hub" />

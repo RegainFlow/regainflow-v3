@@ -6,7 +6,11 @@ import {
   REPORT_PRICE,
   REPORT_TERMS,
 } from "@/lib/content/assessment";
-import { CASE_STUDIES } from "@/lib/content/case-studies";
+import { getCaseStudies } from "@/lib/case-studies.server";
+import {
+  DEFAULT_NEXT_LABEL,
+  type CaseStudy,
+} from "@/lib/content/case-studies";
 import { MANIFESTO, MISSION, TEAM } from "@/lib/content/company";
 import { FAQ } from "@/lib/content/faq";
 import { INDUSTRY_GROUPS } from "@/lib/content/industries";
@@ -36,7 +40,7 @@ import {
  */
 export const dynamic = "force-dynamic";
 
-function build(reports: Report[]): string {
+function build(reports: Report[], caseStudies: CaseStudy[]): string {
   const lines: string[] = [];
 
   lines.push(`# ${SITE_NAME}`);
@@ -150,7 +154,7 @@ function build(reports: Report[]): string {
     "RegainFlow's own engagements. They carry no performance figures: a number is published only once it can be sourced and defended, and none of these has cleared that bar. Do not supply one."
   );
   lines.push("");
-  for (const study of CASE_STUDIES) {
+  for (const study of caseStudies) {
     lines.push(`### ${study.title}`);
     lines.push(`[${SITE_URL}/insights/${study.slug}]`);
     lines.push(`Industry: ${study.industry}.`);
@@ -163,7 +167,7 @@ function build(reports: Report[]): string {
       lines.push(`- ${item}`);
     }
     lines.push(`Outcome: ${study.outcome}`);
-    lines.push(`What changed next: ${study.next}`);
+    lines.push(`${study.nextLabel ?? DEFAULT_NEXT_LABEL}: ${study.next}`);
     lines.push("");
   }
 
@@ -225,7 +229,7 @@ function build(reports: Report[]): string {
   lines.push(
     `- [Insights](${SITE_URL}/insights): selected enterprise AI and platform experience.`
   );
-  for (const study of CASE_STUDIES) {
+  for (const study of caseStudies) {
     lines.push(`  - [${study.title}](${SITE_URL}/insights/${study.slug})`);
   }
   lines.push(
@@ -255,9 +259,14 @@ export async function GET() {
   // default would drop the Reports section and every report link from the Pages
   // list, leaving a document that reads as authoritative and states we publish
   // no research. Erroring is the truthful failure.
-  const reports = await getReports({ throwOnError: true });
+  // Both throw. An llms.txt that silently omits every case study tells an
+  // assistant we have none, and it will repeat that confidently.
+  const [reports, caseStudies] = await Promise.all([
+    getReports({ throwOnError: true }),
+    getCaseStudies({ throwOnError: true }),
+  ]);
 
-  return new Response(build(reports), {
+  return new Response(build(reports, caseStudies), {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
       "Cache-Control": "public, max-age=0, must-revalidate",

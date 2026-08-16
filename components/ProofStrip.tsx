@@ -3,11 +3,25 @@ import Link from "next/link";
 import AsciiField from "@/components/brand/AsciiField";
 import CaseStudyCard from "@/components/CaseStudyCard";
 import DitherReveal from "@/components/DitherReveal";
-import { CASE_STUDIES } from "@/lib/content/case-studies";
+import { getCaseStudies } from "@/lib/case-studies.server";
 
-/** Proof on the home page without duplicating `/insights`: totals, two
- *  examples, and a way through. */
-export default function ProofStrip() {
+/**
+ * Proof on the home page without duplicating `/insights`.
+ *
+ * **This is what makes the home page dynamic.** The studies live in Supabase
+ * now, and the home page is the highest-traffic route on the site — that cost
+ * is stated here rather than only in the migration, because this component is
+ * where someone would discover it.
+ *
+ * `getCaseStudies()` degrades to `[]`, and the section returns `null` on an
+ * empty list rather than rendering an empty grid under a heading. A blip costs
+ * the proof band; it does not cost the home page.
+ */
+export default async function ProofStrip() {
+  const studies = await getCaseStudies();
+
+  if (studies.length === 0) return null;
+
   return (
     <section className="rf-section relative isolate overflow-clip bg-rf-navy">
       {/* The wave, once more and almost imperceptibly. The hero carries it
@@ -38,7 +52,7 @@ export default function ProofStrip() {
         {/* The same card `/insights` renders, rather than a second inline
             version that has to be kept in sync by hand. */}
         <ul className="mt-12 grid gap-4 border-t border-rf-hairline pt-10 sm:grid-cols-2 lg:grid-cols-3">
-          {CASE_STUDIES.map((study, i) => (
+          {studies.map((study, i) => (
             <li key={study.slug} className="h-full">
               <DitherReveal className="h-full" delay={i * 90}>
                 <CaseStudyCard study={study} surface="home_proof" />

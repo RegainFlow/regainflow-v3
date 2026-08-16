@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 
 import ClosingCTA from "@/components/ClosingCTA";
 import PageHeader from "@/components/PageHeader";
-import { CASE_STUDIES } from "@/lib/content/case-studies";
+import { getCaseStudy } from "@/lib/case-studies.server";
+import { DEFAULT_NEXT_LABEL } from "@/lib/content/case-studies";
 import {
   breadcrumbJsonLd,
   caseStudyJsonLd,
@@ -14,13 +15,13 @@ import {
 
 type Params = { slug: string };
 
-export function generateStaticParams(): Params[] {
-  return CASE_STUDIES.map((study) => ({ slug: study.slug }));
-}
-
-function find(slug: string) {
-  return CASE_STUDIES.find((study) => study.slug === slug);
-}
+/**
+ * No `generateStaticParams`. The slugs live in Supabase now, so prerendering
+ * them would freeze the set at deploy time and a study inserted afterwards
+ * would 404 until the next build — which is the staleness the table exists to
+ * remove. See the migration for what this costs.
+ */
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -28,13 +29,19 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const study = find(slug);
+  // An outage here would otherwise fail the whole render before the page gets a
+  // chance to. Metadata degrades to empty; the page below still throws, which
+  // is where the 500 belongs.
+  const study = await getCaseStudy(slug).catch(() => null);
 
   if (!study) return {};
 
   return pageMetadata({
-    title: study.title,
-    description: study.summary,
+    // `metaTitle` where a study has one. An `h1` earns attention from someone
+    // already reading; a `<title>` has to win a result page, and the two are
+    // rarely the same sentence.
+    title: study.metaTitle ?? study.title,
+    description: study.metaDescription ?? study.summary,
     path: `/insights/${study.slug}`,
     // This segment generates its own card in `opengraph-image.tsx`; naming it
     // here is what stops the default site card from being used instead.
@@ -59,7 +66,11 @@ export default async function CaseStudyPage({
   params: Promise<Params>;
 }) {
   const { slug } = await params;
-  const study = find(slug);
+  // Deliberately not caught. `null` means no such published slug and reaches
+  // `notFound()`; a Supabase outage throws and becomes a 500. A 404 tells a
+  // crawler to drop the page, so degrading here would de-index a live study
+  // over a blip — see `lib/case-studies.server.ts`.
+  const study = await getCaseStudy(slug);
 
   if (!study) notFound();
 
@@ -71,13 +82,13 @@ export default async function CaseStudyPage({
 
   const after = [
     { label: "Outcome", body: study.outcome },
-    { label: "What changed next", body: study.next },
+    { label: study.nextLabel ?? DEFAULT_NEXT_LABEL, body: study.next },
   ];
 
   return (
     <>
       <PageHeader
-        eyebrow={study.industry}
+        eyebrow={study.eyebrow ?? study.industry}
         title={study.title}
         lead={study.summary}
       />

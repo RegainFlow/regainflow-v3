@@ -6,8 +6,8 @@ import ClosingCTA from "@/components/ClosingCTA";
 import DitherReveal from "@/components/DitherReveal";
 import PageHeader from "@/components/PageHeader";
 import ReportCard from "@/components/ReportCard";
+import { getCaseStudies } from "@/lib/case-studies.server";
 import { getReports } from "@/lib/reports.server";
-import { CASE_STUDIES } from "@/lib/content/case-studies";
 import {
   breadcrumbJsonLd,
   caseStudiesJsonLd,
@@ -18,25 +18,24 @@ import {
 export const metadata: Metadata = pageMetadata({
   title: "Insights",
   description:
-    "Selected enterprise AI and platform experience: retrieval, knowledge, interoperability, telemetry monitoring, and secure platform systems delivered inside government, utilities, aerospace, defense, and regulated enterprise environments.",
+    "Practical lessons from engineering AI systems in real operating environments — case studies, reports, and field guidance for public-sector and regulated organizations.",
   path: "/insights",
 });
 
 /**
- * The case studies below are still authored in the repository and would
- * prerender happily. The reports band is what makes the whole route dynamic —
- * one fetch, and no PPR configured to isolate it. Accepted deliberately: the
- * band is three cards near the bottom of a page that is already server rendered,
- * and splitting it into a client-fetched island to save the prerender would cost
- * more than it returns.
+ * Both bands on this route read a table now — the case studies as well as the
+ * reports — so there was never a prerender left to protect here.
  */
 export const dynamic = "force-dynamic";
 
 export default async function InsightsPage() {
-  // Degrades to `[]`, which hides the band entirely — the same thing it does
-  // before the first report is published. A visible page missing one section
-  // beats an error page.
-  const reports = await getReports();
+  // Both degrade to `[]` rather than throwing, which hides the band that failed
+  // and leaves the rest of the page standing. That is the right default for a
+  // page a human is looking at; `app/sitemap.ts` opts out of it deliberately.
+  const [studies, reports] = await Promise.all([
+    getCaseStudies(),
+    getReports(),
+  ]);
 
   return (
     <>
@@ -69,7 +68,7 @@ export default async function InsightsPage() {
               chips and pagination land when the library needs them, not
               before. */}
           <ul className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {CASE_STUDIES.map((study, i) => (
+            {studies.map((study, i) => (
               <li key={study.slug} className="h-full">
                 {/* Staggered inside a row, so the row arrives rather than the
                     whole grid snapping in at once. */}
@@ -138,7 +137,7 @@ export default async function InsightsPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: serializeJsonLd(caseStudiesJsonLd()),
+          __html: serializeJsonLd(caseStudiesJsonLd(studies)),
         }}
       />
     </>

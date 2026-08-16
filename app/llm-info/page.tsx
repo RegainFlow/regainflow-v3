@@ -8,7 +8,7 @@ import {
   REPORT_NAME,
   REPORT_TERMS,
 } from "@/lib/content/assessment";
-import { CASE_STUDIES } from "@/lib/content/case-studies";
+import { getCaseStudies } from "@/lib/case-studies.server";
 import { MANIFESTO, MISSION, TEAM, VISION } from "@/lib/content/company";
 import { FAQ } from "@/lib/content/faq";
 import { INDUSTRY_GROUPS } from "@/lib/content/industries";
@@ -64,7 +64,12 @@ const KEY_FACTS: { term: string; detail: string }[] = [
   { term: "Contact", detail: CONTACT_EMAIL },
 ];
 
-export default function LlmInfoPage() {
+// The case-study section reads the table.
+export const dynamic = "force-dynamic";
+
+export default async function LlmInfoPage() {
+  const studies = await getCaseStudies();
+
   return (
     <>
       <PageHeader
@@ -444,7 +449,7 @@ export default function LlmInfoPage() {
           </p>
 
           <ul className="mt-10 grid gap-x-10 gap-y-6 border-t border-rf-hairline pt-6 sm:grid-cols-2">
-            {CASE_STUDIES.map((study) => (
+            {studies.map((study) => (
               <li key={study.slug}>
                 <h3 className="rf-h3">
                   <Link

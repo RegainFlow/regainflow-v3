@@ -7,6 +7,7 @@ import CaseStudyCard from "@/components/CaseStudyCard";
 import DitherReveal from "@/components/DitherReveal";
 import Icon from "@/components/Icon";
 import PageHeader from "@/components/PageHeader";
+import { getCaseStudies } from "@/lib/case-studies.server";
 import { studiesForIndustry } from "@/lib/content/case-studies";
 import { INDUSTRY_GROUPS, groupBySlug } from "@/lib/content/industries";
 import { LAYERS } from "@/lib/content/layers";
@@ -19,9 +20,18 @@ import {
 
 type Params = { slug: string };
 
+/**
+ * The four groups still come from the repository, so the slugs are known at
+ * build time. The proof band's *content* does not, which is what makes the
+ * route dynamic below — but keeping this means an unknown slug still 404s
+ * rather than rendering an empty page.
+ */
 export function generateStaticParams(): Params[] {
   return INDUSTRY_GROUPS.map((group) => ({ slug: group.slug }));
 }
+
+/** The proof band reads the case studies table. */
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -61,7 +71,11 @@ export default async function IndustryPage({
 
   if (!group) notFound();
 
-  const studies = studiesForIndustry(group.proof);
+  // `group.proof` still decides which studies lead this page and in what order —
+  // that stays in the repository. The table only supplies the content behind
+  // each slug, so a study whose `industries` names this group but which `proof`
+  // does not list appears nowhere. See the migration.
+  const studies = studiesForIndustry(group.proof, await getCaseStudies());
   const layers = LAYERS.map((layer) => ({
     ...layer,
     // Falls back to the generic line rather than rendering an empty row, so a
