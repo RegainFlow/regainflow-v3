@@ -29,7 +29,7 @@ lockfile that ships.
 
 | Route                                                          | Purpose                                                                                         |
 | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `/`                                                            | Positioning, the production gap, condensed services, proof, free assessment, partnership model  |
+| `/`                                                            | Positioning, the production gap, condensed services, proof, free assessment, partnership model. **Dynamic** — `ProofStrip` reads the case studies table |
 | `/services`                                                    | Full Discover / Implement / Scale, the engagement path, the four capability layers, free assessment |
 | `/industries`                                                  | Hub: four large cards into the group pages, then the selected engagements                       |
 | `/industries/[slug]`                                           | One group: sectors, where the work stalls, what we install, proof, and the assessment callout   |
@@ -51,13 +51,15 @@ lockfile that ships.
 | `app/globals.css`          | Palette tokens, type scale, the wave, navigation, cards, model styles, keyframes |
 | `lib/ascii/`               | The ASCII engine — `dither`, `field`, `monogram`                                 |
 | `lib/site.ts`              | Domain, contact destinations, positioning copy, navigation tree                  |
-| `lib/content/`             | Stages, layers, industries, case studies, company, reports — the single source for every page |
+| `lib/content/`             | Stages, layers, industries, company — authored copy. Case studies and reports are **types only**; the data is in Supabase |
+| `lib/case-studies.server.ts` | Reads `public.case_studies`. Server only                                          |
+| `supabase/seed/`           | Authored rows, run by hand. Not migrations — see the file header                  |
 | `lib/seo.ts`               | JSON-LD builders and the `<` escape used before injection                        |
 | `lib/forms.ts`             | Field limits and validators. **No imports** — read by client and server both      |
 | `lib/forms.server.ts`      | IP hashing and the rate limiter. `server-only`                                    |
 | `lib/supabase.ts`          | The secret-key client. Server only, constructed lazily                            |
 | `lib/mail.ts`              | Resend notification for contact submissions. Best-effort by design                |
-| `supabase/migrations/`     | The two tables the forms write to, their grants, and their RLS posture            |
+| `supabase/migrations/`     | Schema: the form tables, `reports`, and `case_studies` — grants and RLS posture   |
 | `components/brand/`        | `AsciiField` (animated), `AsciiMonogram` (still)                                 |
 | `components/Icon.tsx`      | The icon set. **The only module that may import `lucide-react`**                  |
 | `components/SiteNav.tsx`   | Desktop dropdowns and the mobile menu (the only navigation client component)     |
@@ -408,7 +410,32 @@ render — only submission fails, which is what keeps a checkout without credent
 
 ### Case studies
 
-The three entries in `lib/content/case-studies.ts` are **RegainFlow's own engagements**.
+Case studies live in the **`public.case_studies` table**, not in the repository. Publishing
+one is an insert; it is no longer a commit. `lib/content/case-studies.ts` keeps the type,
+`lib/case-studies.server.ts` reads the table, and `supabase/seed/case-studies.sql` holds the
+authored rows to run by hand.
+
+That was done so a generator can produce a study by running SQL, which is why the schema holds
+everything a page needs. It is a **common spine plus a small named set of optional blocks**:
+every study answers the same six narrative questions, and `at_a_glance`, `deliverables`,
+`stages`, `tracks`, `artifacts`, `cta`, and the image are optional and render only when
+present. A study filling none of them looks exactly like the three that predate the table.
+
+**The cost:** the home page, `/industries` and its group pages, `/llm-info`, and the case
+studies all render per request now. `getCaseStudies()` degrades to `[]` so a Supabase blip
+costs a proof band rather than the home page, while `app/sitemap.ts` and `app/llms.txt` pass
+`throwOnError` — a confidently empty sitemap is a de-index, a 500 is a retry. `app/page.tsx`
+needs `force-dynamic` explicitly, because `ProofStrip` fetches inside the component and Next
+would otherwise prerender home with an empty list.
+
+Two things the table cannot enforce that the repository used to:
+
+- **`IndustryGroup.proof` is still authoritative and still in the repo.** Filling a row's
+  `industries` column does *not* put it on an industry page — that is a repository change.
+- **The naming and no-metric rules now govern whoever types the row.** They are restated in
+  the seed file header and the type.
+
+The three current entries are **RegainFlow's own engagements**.
 
 They replaced twelve studies describing work the founders did before RegainFlow existed.
 Presented on this site those read as RegainFlow delivery, which is not what they were, so

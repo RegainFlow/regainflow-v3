@@ -185,6 +185,40 @@ a name that does not exist fails the typecheck rather than rendering an empty bo
 `/llm-info` deliberately keeps route ticks where the industry pages take icons: it is written to
 be quoted, and a glyph carries nothing into a retrieved chunk.
 
+## Case study artifacts
+
+A case study may carry **artifacts** — sanitized diagrams reconstructed from an engagement.
+They follow the same closed-union pattern as the icons: `kind` picks a layout component,
+the row supplies the labels. `spine` and `branch-stack` render a directed run whose last node
+takes the Flow Blue edge; `kit` renders an unordered grid, because contents are not a sequence.
+
+Two rules, and the second is not negotiable:
+
+- **Built from HTML and CSS, never an image of words.** Labels stay selectable, translatable,
+  and readable by a screen reader.
+- **Never a screenshot of a source document.** The material behind these is confidential, and
+  a screenshot is the one format that cannot be sanitized by review. Reconstruct the concept.
+
+The `figcaption` doubles as the accessible description, so it has to carry the meaning without
+the layout — the arrangement is presentational.
+
+Adding a fourth `kind` means adding a branch to `components/case-study/Artifact.tsx` and a
+member to `ArtifactKind`. An unknown kind degrades to a list rather than throwing, so a row a
+generator wrote against a newer vocabulary still renders something readable.
+
+## Case study images
+
+`.rf-case-cover` is 16:9, against the report cover's 17:22 — a study's image is a scene rather
+than a document, and a portrait block at the top of a card pushes the title below the fold in a
+three-across grid. `object-fit` is `cover` rather than the report's `contain`: there is no title
+to crop off, and letterboxing an arbitrary image reads as a mistake. `.rf-case-hero` widens it
+to 21:9 on the study page.
+
+The ratio is declared in CSS so nothing intrinsic travels with a URL pasted into the table, and
+so a row of cards stays level whether or not each study has art. **Both surfaces render nothing
+when the image is absent** — most studies will have none for a long time, and a placeholder
+frame is worse than no frame.
+
 ## Color
 
 Eight tokens, declared once in `@theme` in `app/globals.css`. There are no others, and every
