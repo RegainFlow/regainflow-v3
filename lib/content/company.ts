@@ -1,7 +1,13 @@
+import type { IconName } from "@/components/Icon";
+
 /**
  * Company content. Mission and vision are taken from the RegainFlow model
  * canvas; the principle detail lines are RegainFlow-authored framing, pending
  * commercial review.
+ *
+ * `IconName` is a type-only import, so this module still ships no runtime
+ * dependency on the component layer — see `components/Icon.tsx` for why the
+ * icon is a name here rather than a component.
  */
 
 export const MISSION =
@@ -73,22 +79,34 @@ export const TEAM: TeamMember[] = [
   },
 ];
 
-/** What clients are actually buying, beyond the deliverable. */
-export const PRINCIPLES = [
+/**
+ * What clients are actually buying, beyond the deliverable.
+ *
+ * Three parallel principles, not three steps — there is no order here, and the
+ * `01/02/03` these used to carry implied one. They take icons instead; see
+ * `docs/DESIGN.md` for when each treatment applies.
+ */
+export const PRINCIPLES: {
+  icon: IconName;
+  title: string;
+  detail: string;
+}[] = [
   {
-    index: "01",
+    icon: "workflow",
     title: "Strategy through production",
     detail:
       "The people who frame the opportunity stay accountable for what ships.",
   },
   {
-    index: "02",
+    icon: "team",
     title: "Embedded collaboration without hidden handoffs",
     detail:
       "We work inside your repositories, your review process, and your delivery rhythm.",
   },
   {
-    index: "03",
+    // The site already says "hand you the keys" in `STAGES`; this is that
+    // sentence's mark.
+    icon: "keys",
     title:
       "Flexible ownership: continue together, scale down, or transfer cleanly",
     detail:

@@ -1,3 +1,5 @@
+import type { IconName } from "@/components/Icon";
+
 /**
  * The industries we sell into, grouped.
  *
@@ -25,6 +27,21 @@
  * do not pad them with work done somewhere else.
  */
 
+/**
+ * One place the work gets stuck, and the mark for it.
+ *
+ * These are four parallel symptoms, not four steps — a reader recognises
+ * themselves in one of them, and which one has nothing to do with order. They
+ * carried `01`–`04` until the numbering audit; the icon has to earn its place
+ * by naming the specific failure, so pick for the sentence rather than for the
+ * sector. A generic warning triangle on all four would be worse than the
+ * numbers were.
+ */
+export interface Stall {
+  text: string;
+  icon: IconName;
+}
+
 /** A named sector. Rendered as a card inside its group page and in the marquee. */
 export interface Industry {
   name: string;
@@ -40,7 +57,7 @@ export interface IndustryGroup {
   /** Page lead. Two sentences. */
   lead: string;
   /** Where the work gets stuck here. Lines a reader recognises themselves in. */
-  stalls: string[];
+  stalls: Stall[];
   /** What we install, keyed to `LAYERS[].index` so the four layers stay the spine. */
   installs: { layer: string; detail: string }[];
   /**
@@ -60,10 +77,22 @@ export const INDUSTRY_GROUPS: IndustryGroup[] = [
     hint: "Law enforcement, fire & EMS, corrections, dispatch",
     lead: "Public safety agencies generate more record than anyone has time to read — CAD logs, incident reports, body camera transcripts, inspection histories. We build the systems that make that record searchable and answerable, and we build them so every answer traces back to the document it came from.",
     stalls: [
-      "A records request lands with a ten-day clock and the search runs on a field nobody standardized.",
-      "Every shift writes reports into one system and reads intelligence out of another, and the two never reconcile.",
-      "A vendor demo answered questions beautifully and could not say which document it read.",
-      "CAD and RMS both hold the address history, and they disagree.",
+      {
+        icon: "clock",
+        text: "A records request lands with a ten-day clock and the search runs on a field nobody standardized.",
+      },
+      {
+        icon: "unreconciled",
+        text: "Every shift writes reports into one system and reads intelligence out of another, and the two never reconcile.",
+      },
+      {
+        icon: "fileSearch",
+        text: "A vendor demo answered questions beautifully and could not say which document it read.",
+      },
+      {
+        icon: "compare",
+        text: "CAD and RMS both hold the address history, and they disagree.",
+      },
     ],
     installs: [
       {
@@ -118,10 +147,22 @@ export const INDUSTRY_GROUPS: IndustryGroup[] = [
     // was pre-RegainFlow work, and the study behind it is gone.
     lead: "Utilities and public works run on telemetry that arrives faster than anyone can watch it, and on asset records split between three systems and a filing cabinet. We engineer the systems that read that telemetry and surface what is worth a call-out — on a treatment plant, a lift station, a substation, or a fleet.",
     stalls: [
-      "Thousands of sensor streams arrive every minute and an operator reads a fraction of them.",
-      "A pump fails and its maintenance history is in a spreadsheet nobody has opened since the last person retired.",
-      "The historian holds ten years of data and no one has ever asked it a question.",
-      "A consent decree needs a quarterly report and the numbers are assembled by hand every time.",
+      {
+        icon: "activity",
+        text: "Thousands of sensor streams arrive every minute and an operator reads a fraction of them.",
+      },
+      {
+        icon: "archive",
+        text: "A pump fails and its maintenance history is in a spreadsheet nobody has opened since the last person retired.",
+      },
+      {
+        icon: "database",
+        text: "The historian holds ten years of data and no one has ever asked it a question.",
+      },
+      {
+        icon: "clipboardList",
+        text: "A consent decree needs a quarterly report and the numbers are assembled by hand every time.",
+      },
     ],
     installs: [
       {
@@ -170,10 +211,22 @@ export const INDUSTRY_GROUPS: IndustryGroup[] = [
     hint: "Federal, state, and local agencies, records, risk",
     lead: "Federal, state, and local departments carry modernization scope on top of the job they already have. We take one of those programs end to end, from the assessment through the build to the handoff, so it does not become another system that needs a champion to survive.",
     stalls: [
-      "A grant has a spend deadline and the scope was written before anyone looked at the data.",
-      "Payroll, finance, and HR each hold a version of the same employee, and reconciliation is a person.",
-      "Every department normalizes vendor spreadsheets its own way, so nothing rolls up.",
-      "A system passed procurement and cannot produce the audit trail the auditor asks for.",
+      {
+        icon: "calendarClock",
+        text: "A grant has a spend deadline and the scope was written before anyone looked at the data.",
+      },
+      {
+        icon: "duplicates",
+        text: "Payroll, finance, and HR each hold a version of the same employee, and reconciliation is a person.",
+      },
+      {
+        icon: "spreadsheet",
+        text: "Every department normalizes vendor spreadsheets its own way, so nothing rolls up.",
+      },
+      {
+        icon: "trail",
+        text: "A system passed procurement and cannot produce the audit trail the auditor asks for.",
+      },
     ],
     installs: [
       {
@@ -229,10 +282,22 @@ export const INDUSTRY_GROUPS: IndustryGroup[] = [
     // a portfolio — see the header in `lib/content/case-studies.ts`.
     lead: "Technical documentation nobody can search, secure platforms every team rebuilds, and engineering workflows held together by someone moving a file each morning. We engineer retrieval and platform systems inside organizations that audit everything — and it is the environment the two of us spent our careers in before RegainFlow.",
     stalls: [
-      "A million technical documents and a search that only matches the words someone typed.",
-      "Every team rebuilds the same pipeline, the same security controls, and the same deployment path.",
-      "The engineering workflow depends on someone moving a file between two tools every morning.",
-      "A retrieval system is in production and nobody can say whether its answers got better or worse this quarter.",
+      {
+        icon: "search",
+        text: "A million technical documents and a search that only matches the words someone typed.",
+      },
+      {
+        icon: "rebuild",
+        text: "Every team rebuilds the same pipeline, the same security controls, and the same deployment path.",
+      },
+      {
+        icon: "handoff",
+        text: "The engineering workflow depends on someone moving a file between two tools every morning.",
+      },
+      {
+        icon: "unmeasured",
+        text: "A retrieval system is in production and nobody can say whether its answers got better or worse this quarter.",
+      },
     ],
     installs: [
       {

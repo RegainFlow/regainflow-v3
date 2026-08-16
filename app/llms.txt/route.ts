@@ -96,8 +96,11 @@ function build(reports: Report[]): string {
     );
     lines.push(group.lead);
     lines.push("Where the work commonly stalls:");
+    // `stall.text`, not `stall`. A template literal will happily stringify the
+    // object and emit "[object Object]", which typecheck does not flag —
+    // the one place the `Stall` shape change could have shipped silently.
     for (const stall of group.stalls) {
-      lines.push(`- ${stall}`);
+      lines.push(`- ${stall.text}`);
     }
     lines.push(
       `What we build: ${group.installs.map((install) => `${install.layer} — ${install.detail}`).join(" ")}`

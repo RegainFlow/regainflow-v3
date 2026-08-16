@@ -184,10 +184,14 @@ export default function LlmInfoPage() {
 
                   <p className="rf-utility mt-6">Where the work stalls</p>
                   <ul className="mt-2 flex flex-col gap-2">
+                    {/* The route tick stays rather than becoming the icon the
+                        industry pages now use. This page is written to be
+                        quoted, and a glyph carries nothing into a retrieved
+                        chunk — the words are the whole payload here. */}
                     {group.stalls.map((stall) => (
-                      <li key={stall} className="rf-body flex gap-4">
+                      <li key={stall.text} className="rf-body flex gap-4">
                         <span className="rf-route-tick" aria-hidden="true" />
-                        <span className="max-w-[62ch]">{stall}</span>
+                        <span className="max-w-[62ch]">{stall.text}</span>
                       </li>
                     ))}
                   </ul>
@@ -351,22 +355,18 @@ export default function LlmInfoPage() {
             </p>
           </div>
 
-          <ol className="col-span-full border-t border-rf-hairline lg:col-span-7 lg:col-start-6">
-            {MANIFESTO.map((item, i) => (
+          {/* Unmarked, matching `/company#manifesto` — see the note there. */}
+          <ul className="col-span-full border-t border-rf-hairline lg:col-span-7 lg:col-start-6">
+            {MANIFESTO.map((item) => (
               <li
                 key={item.claim}
-                className="flex gap-5 border-b border-rf-hairline py-6"
+                className="border-b border-rf-hairline py-6"
               >
-                <span className="rf-index pt-1">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <div>
-                  <h3 className="rf-h3">{item.claim}</h3>
-                  <p className="rf-body mt-2 max-w-[52ch]">{item.detail}</p>
-                </div>
+                <h3 className="rf-h3">{item.claim}</h3>
+                <p className="rf-body mt-2 max-w-[52ch]">{item.detail}</p>
               </li>
             ))}
-          </ol>
+          </ul>
         </div>
       </section>
 

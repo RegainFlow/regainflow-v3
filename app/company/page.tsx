@@ -160,22 +160,25 @@ export default function CompanyPage() {
             </PlayOnView>
           </div>
 
-          <ol className="col-span-full border-t border-rf-hairline lg:col-span-7 lg:col-start-6">
-            {MANIFESTO.map((item, i) => (
+          {/* No marker of any kind, and that is the considered choice rather
+              than an omission. These eight are arguments, not categories — "A
+              pilot is not a result", "Nobody gets used", "You should be able to
+              leave" — so a number implies a sequence that does not exist and an
+              icon would be decoration standing in front of a claim. The
+              register here is a flat assertion followed by the reasoning that
+              earns it; anything to the left of the claim competes with it. The
+              hairline rule already does the separating. */}
+          <ul className="col-span-full border-t border-rf-hairline lg:col-span-7 lg:col-start-6">
+            {MANIFESTO.map((item) => (
               <li
                 key={item.claim}
-                className="flex gap-5 border-b border-rf-hairline py-6"
+                className="border-b border-rf-hairline py-6"
               >
-                <span className="rf-index pt-1">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <div>
-                  <h3 className="rf-h3">{item.claim}</h3>
-                  <p className="rf-body mt-2 max-w-[52ch]">{item.detail}</p>
-                </div>
+                <h3 className="rf-h3">{item.claim}</h3>
+                <p className="rf-body mt-2 max-w-[52ch]">{item.detail}</p>
               </li>
             ))}
-          </ol>
+          </ul>
         </div>
       </section>
 

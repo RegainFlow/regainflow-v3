@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import AssessmentCallout from "@/components/AssessmentCallout";
 import CaseStudyCard from "@/components/CaseStudyCard";
 import DitherReveal from "@/components/DitherReveal";
+import Icon from "@/components/Icon";
 import PageHeader from "@/components/PageHeader";
 import { studiesForIndustry } from "@/lib/content/case-studies";
 import { INDUSTRY_GROUPS, groupBySlug } from "@/lib/content/industries";
@@ -104,21 +105,25 @@ export default async function IndustryPage({
             </p>
           </div>
 
-          <ol className="mt-12 border-b border-rf-hairline md:mt-16">
-            {group.stalls.map((stall, i) => (
+          {/* `ul`, not `ol`. These are four symptoms a reader recognises
+              themselves in, and which one has nothing to do with order — the
+              `01`–`04` they used to carry implied a sequence that is not
+              there. The icon names the specific failure instead. */}
+          <ul className="mt-12 border-b border-rf-hairline md:mt-16">
+            {group.stalls.map((stall) => (
               <li
-                key={stall}
+                key={stall.text}
                 className="rf-grid gap-y-3 border-t border-rf-hairline py-7 md:py-8"
               >
-                <p className="rf-index col-span-full lg:col-span-2 lg:pt-1">
-                  {String(i + 1).padStart(2, "0")}
+                <p className="col-span-full lg:col-span-2 lg:pt-1">
+                  <Icon name={stall.icon} />
                 </p>
                 <h3 className="rf-h3 col-span-full max-w-[54ch] lg:col-span-9 lg:col-start-4">
-                  {stall}
+                  {stall.text}
                 </h3>
               </li>
             ))}
-          </ol>
+          </ul>
         </div>
       </section>
 
