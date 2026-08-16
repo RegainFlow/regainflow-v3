@@ -127,6 +127,64 @@ width depends on font metrics. `textLength="1000"` pins it to the container at a
 extrusion; place the mark on a light ground (none is defined); stretch it — the ASCII cell must
 stay square or the letterform distorts.
 
+## Iconography
+
+Icons come from **Lucide**, behind `components/Icon.tsx` — the only module permitted to import
+`lucide-react`. Content modules hold an `IconName` string, never a component, because
+`lib/content/*` is read by `app/llms.txt/route.ts` and the JSON-LD builders, neither of which
+has any use for a React element.
+
+Lucide was chosen against Phosphor on evidence rather than reputation. Phosphor is **filled
+paths at every weight**, including `thin` — the thinness is baked into a 256×256 path, so
+stroke width and terminals cannot be adjusted at all. Lucide draws `fill="none"
+stroke="currentColor"` on a 24×24 grid, which is exactly the convention the hand-drawn SVGs in
+`SiteNav.tsx` already use, and is therefore tunable to it.
+
+**Two corrections make the set read as house rather than as a library someone installed:**
+
+| Property | Lucide ships | We set | Where | Matches |
+|---|---|---|---|---|
+| `stroke-width` | `2` | `1.4` | `Icon.tsx` prop | The `SiteNav` chevron |
+| `stroke-linecap` | `round` | `butt` | `.rf-icon` | Nothing here is round |
+| `stroke-linejoin` | `round` | `miter` | `.rf-icon` | Same |
+
+Presentation attributes lose to any CSS rule, which is why the two `stroke-*` overrides live in
+`.rf-icon` and work despite Lucide writing `round` onto every `<svg>`. **Deleting those two
+lines is the single easiest way to make the whole set look wrong** — nothing else on this site
+has a rounded terminal, not a border, not a card, not an isometric model.
+
+Icons carry `--color-rf-flow-soft`, the same as `.rf-index`, so a list that swaps numbers for
+icons does not change color as well as shape. They are always `aria-hidden`: every call site
+pairs the icon with the text it belongs to, so announcing it would read the item twice.
+
+### Icons or numbers — the rule
+
+**Structural devices encode something true about the content.** One question decides it:
+
+> Does order carry information the reader needs?
+
+- **Yes → number it.** `STAGES` (Discover before Implement), `ENGAGEMENT_PATH`, the assessment
+  phases. An icon cannot express sequence. `L1`–`L4` also keep their marks, but those are
+  identifiers rather than ordinals.
+- **No → icon it.** `PRINCIPLES`, industry `stalls`. These are parallel items where which one a
+  reader lands on has nothing to do with position. Use `ul`, not `ol` — the list type makes the
+  same claim the marker does.
+- **Neither, sometimes.** The manifesto takes no marker at all. Its eight entries are arguments,
+  not categories — *"A pilot is not a result"*, *"Nobody gets used"* — so a number implies a
+  sequence that does not exist and an icon is decoration standing in front of a claim. The
+  register there is a flat assertion followed by the reasoning that earns it; anything to the
+  left of the claim competes with it.
+
+**Pick the icon for the sentence, not for the section.** A generic warning triangle on all
+sixteen industry stalls would be worse than the numbers it replaced. If no honest icon exists
+for an item, that list wants no marker.
+
+`ICONS` in `Icon.tsx` is a **closed map**, like `AI_GLYPHS`. `IconName` derives from its keys, so
+a name that does not exist fails the typecheck rather than rendering an empty box.
+
+`/llm-info` deliberately keeps route ticks where the industry pages take icons: it is written to
+be quoted, and a glyph carries nothing into a retrieved chunk.
+
 ## Color
 
 Eight tokens, declared once in `@theme` in `app/globals.css`. There are no others, and every
@@ -268,7 +326,7 @@ point. All classes are defined in `app/globals.css` under `@layer components`.
 
 ```tsx
 <section className="rf-section">
-  <div className="rf-shell rf-grid gap-y-10 py-14 md:py-18 lg:py-22">
+  <div className="rf-shell rf-grid gap-y-10 rf-band">
     <div className="col-span-full lg:col-span-5">
       <p className="rf-eyebrow">Label</p>
       <h2 className="rf-h2 mt-5">Headline</h2>
@@ -286,17 +344,39 @@ point. All classes are defined in `app/globals.css` under `@layer components`.
 - **`.rf-grid`** — 12 columns, `column-gap: clamp(1rem, 2.2vw, 2rem)`. Row gap is set per
   section (`gap-y-*`), because it varies with content.
 
-**Vertical rhythm.** Three values, and they are a closed set. This is invisible in code and is
-the rule most easily broken by eye:
+**Vertical rhythm — a section must choose a weight.** Three bands, declared once in
+`app/globals.css`. They replaced a single standard padding that seven of ten sections used
+byte-identically, which meant the argument, the offer, the proof, and a two-line teaser all
+occupied the same vertical space. A reader scrolling fast got no signal about what mattered.
 
-| Section | Padding |
+| Class | Padding (base → `md` → `lg`) | For |
+|---|---|---|
+| `.rf-band-lead` | `4.5rem` → `6rem` → `7.5rem` | The two or three sections a page stands on |
+| `.rf-band` | `3.5rem` → `4.5rem` → `5.5rem` | Default. The previous standard value, unchanged |
+| `.rf-band-tight` | `3rem` → `3.5rem` → `4rem` | A section whose job is finished when the reader clicks through |
+
+**`lead` stops meaning anything the moment a third section on the same page takes it.** Take it
+from something else rather than adding it. Every route currently spends it exactly twice or
+once:
+
+| Route | `lead` sections |
 |---|---|
-| Standard content section | `py-14 md:py-18 lg:py-22` |
-| `PageHeader` — the opening block on every route below home | `py-12 md:py-16 lg:py-20` |
-| `ClosingCTA` — the last block on a page | `py-14 md:py-20 lg:py-24` |
+| `/` | `ProductionGap` (the argument), `FreeAssessment` (the conversion) |
+| `/services` | `RegainFlowSystem` (the framework), `FreeAssessment` |
+| `/industries` | The four industry cards — the hub's whole reason to exist |
+| `/industries/[slug]` | `AssessmentCallout` — the conversion, and the only one on the page |
+| `/insights` | The case studies |
 
-`ProofStrip` and `Hero` use `py-14 md:py-16` because both carry a full-bleed element that
-supplies its own space.
+**Ground alternates with weight.** Void and Navy carry the beat — the home page ran four Void
+sections back to back, and the change to Navy at `StageSummary` is what tells a scrolling reader
+the diagnosis has ended and the offer has started. Never leave more than two same-ground
+sections adjacent unless one carries the wave, which distinguishes it on its own.
+
+`PageHeader` keeps `py-12 md:py-16 lg:py-20` — it is the opening block, not a band. `Hero` sets
+its own, because it carries a full-bleed element that supplies the space.
+
+The reference and form routes (`/llm-info`, the report pages, `/contact`, `/company`) still use
+raw `py-*` values. Move each to a band when you next touch it.
 
 **Layout convention.** Headline column left at `lg:col-span-5`, content right at
 `lg:col-span-6 lg:col-start-7`, everything `col-span-full` below `lg`. Card grids are
@@ -572,6 +652,10 @@ reveal genuinely does need scripting and the file behind it is public anyway.
 The site has never needed these, so no convention exists. Anyone adding one is designing, not
 applying — extend the vocabulary above deliberately rather than importing a component library.
 
+(Lucide is not the exception it looks like. It supplies *geometry*, not components: every icon
+is retuned to the house stroke in `.rf-icon` and gated behind one module. A library that shipped
+its own layout, spacing, or color would still be the thing this rule forbids.)
+
 Tables · toasts and notifications · modals and dialogs · skeleton states · pagination · tabs ·
 tooltips · light mode · route-level error states (404/500 render Next.js defaults).
 
@@ -593,4 +677,5 @@ and a route out when nothing is published, rather than an empty grid.
 | `supabase/migrations/` | The two tables the forms write to, their grants, and their RLS posture |
 | `lib/og.tsx` | The OG card **and a hand-mirrored copy of the palette** |
 | `lib/ascii/monogram.ts` | The mark's geometry, traced from the icon |
+| `components/Icon.tsx` | The icon set. **The only module that may import `lucide-react`** |
 | `components/stage-models/iso.tsx` | Isometric primitives |

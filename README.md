@@ -3,7 +3,9 @@
 Marketing site for RegainFlow, an AI engineering & transformation partner.
 
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · pnpm.
-No motion, canvas, WebGL, or 3D dependencies — every diagram is SVG and CSS.
+No motion, canvas, WebGL, or 3D dependencies — every diagram is SVG and CSS, and so is the
+icon set (`lucide-react`, retuned to the house stroke — see
+[Iconography](docs/DESIGN.md#iconography)).
 
 ## Requirements
 
@@ -57,6 +59,7 @@ lockfile that ships.
 | `lib/mail.ts`              | Resend notification for contact submissions. Best-effort by design                |
 | `supabase/migrations/`     | The two tables the forms write to, their grants, and their RLS posture            |
 | `components/brand/`        | `AsciiField` (animated), `AsciiMonogram` (still)                                 |
+| `components/Icon.tsx`      | The icon set. **The only module that may import `lucide-react`**                  |
 | `components/SiteNav.tsx`   | Desktop dropdowns and the mobile menu (the only navigation client component)     |
 | `components/stage-models/` | The isometric primitives and the four stage models                               |
 
