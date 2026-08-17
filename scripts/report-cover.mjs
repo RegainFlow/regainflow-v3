@@ -1,7 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { join } from "node:path";
-
-import { pdf } from "pdf-to-img";
+import { renderCover, TARGET_WIDTH } from "./lib/cover.mjs";
 
 /**
  * Renders page 1 of a report PDF to the cover image the listing and detail
@@ -10,53 +7,14 @@ import { pdf } from "pdf-to-img";
  *   pnpm report:cover <pdf-path-or-url> <slug> [--width 1000]
  *
  * **This is an authoring tool, not a build step, and that is deliberate.** The
- * PNG it writes is committed to the repository, which buys three things a
- * build-time render would cost us:
+ * PNG it writes is committed to the repository, which keeps a cover that cannot
+ * be produced a broken commit — caught here, by hand — rather than a red deploy,
+ * and keeps the output deterministic and reviewable in a diff.
  *
- *   1. `next/image` optimizes a local file, and `next.config.ts` needs no
- *      `images.remotePatterns` entry — the site would otherwise be trusting its
- *      first remote image origin to render a thumbnail.
- *   2. The Vercel build never fetches a PDF over the network or loads a native
- *      canvas. A cover that cannot be produced is a broken commit, caught here,
- *      rather than a red deploy.
- *   3. The output is deterministic and reviewable in a diff.
- *
- * `pdf-to-img` is a devDependency for the same reason. It never ships.
+ * The rendering itself now lives in `scripts/lib/cover.mjs`, shared with
+ * `pnpm report:publish`. This command stays because replacing a PDF means
+ * re-rendering its cover, and that is worth being able to do on its own.
  */
-
-const TARGET_WIDTH = 1000;
-
-/**
- * PNG dimensions, straight out of the IHDR chunk — width and height are two
- * big-endian uint32s at a fixed offset in every PNG ever written. A whole image
- * library to read eight bytes would not be worth the install.
- */
-function pngSize(buffer) {
-  return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
-}
-
-/**
- * Returns a `Buffer`, and the type matters. A plain `Uint8Array` view fails
- * inside pdfjs with "Cannot transfer object of unsupported type" when it hands
- * the data to its worker; a Node `Buffer` goes through. `readFile` already
- * returns one — the fetch path has to be converted rather than wrapped.
- */
-async function load(source) {
-  if (/^https?:\/\//.test(source)) {
-    const response = await fetch(source);
-    if (!response.ok) {
-      throw new Error(`Could not fetch the PDF: ${response.status} ${response.statusText}`);
-    }
-    return Buffer.from(await response.arrayBuffer());
-  }
-
-  return readFile(source);
-}
-
-async function firstPage(data, scale) {
-  const document = await pdf(data, { scale });
-  return { image: await document.getPage(1), pages: document.length };
-}
 
 async function main() {
   const args = process.argv.slice(2);
@@ -79,30 +37,16 @@ async function main() {
     process.exit(1);
   }
 
-  const data = await load(source);
+  const { relative, size, pages, bytes } = await renderCover(source, slug, width);
+  const kb = Math.round(bytes / 1024);
 
-  // Two passes rather than arithmetic on the page box. `scale` is relative to
-  // the PDF's own 72dpi geometry, and reports are not reliably US Letter — a
-  // deck exported at 16:9 would come out at half the intended width. Rendering
-  // once to measure costs a few hundred milliseconds in a command run by hand.
-  const probe = await firstPage(data, 1);
-  const natural = pngSize(probe.image);
-  const { image, pages } = await firstPage(data, width / natural.width);
-  const size = pngSize(image);
-
-  const dir = join(process.cwd(), "public", "reports");
-  const file = join(dir, `${slug}-cover.png`);
-  await mkdir(dir, { recursive: true });
-  await writeFile(file, image);
-
-  const kb = Math.round(image.byteLength / 1024);
-
-  console.log(`\nWrote public/reports/${slug}-cover.png — ${size.width}×${size.height}, ${kb} KB`);
+  console.log(`\nWrote ${relative} — ${size.width}×${size.height}, ${kb} KB`);
   console.log(`The PDF has ${pages} page${pages === 1 ? "" : "s"}.\n`);
   console.log(`Next: upload this PNG, the PDF, and the audio to the \`reports\``);
   console.log(`bucket under ${slug}/, then set on the row in the \`reports\` table:\n`);
   console.log(`  cover_url  <public URL of ${slug}-cover.png>`);
   console.log(`  pages      ${pages}\n`);
+  console.log(`Or let \`pnpm report:publish\` do all of that — see the README.\n`);
   // No width or height any more. They were columns on the authored entry back
   // when the cover was a committed file; `.rf-report-cover` declares the aspect
   // ratio in CSS and `<Image fill>` fills it, so there is nothing to measure —

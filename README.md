@@ -349,25 +349,47 @@ Reports live in the `public.reports` table, not in the repository. Publishing on
 in the Supabase UI and refreshing the page — no commit, no deploy. `lib/content/reports.ts` keeps
 only the `Report` type and `reportDate()`; `lib/reports.server.ts` does the reading.
 
-The cover is **generated from page 1 of the PDF**, never exported by hand:
+**Ask Claude to publish it.** `.claude/skills/publish-report/` is the front door: hand it the PDF and
+the recording and it collects the slug and date, drafts the title, summary, and findings from the
+document, runs that copy through `no-ai-slop`, and stops for approval before anything goes live. The
+commands below are what it drives, and what to use by hand.
+
+One command does the whole thing — cover, uploads, URLs, and the row:
 
 ```bash
-pnpm report:cover <pdf-url-or-path> <slug> [--width 1000]
+pnpm report:publish --pdf <path> --audio <path> --meta <meta.json> --slug <slug> [--dry-run]
+pnpm report:publish --slug <slug> --publish      # a separate, deliberate act
+pnpm report:publish --slug <slug> --unpublish    # takes it off the site, keeps the row
 ```
 
-It writes `public/reports/<slug>-cover.png` and reports the page count. Re-run it whenever the PDF
-is replaced — the PDF is the source of truth, and a cover that disagrees with page 1 is a bug a
-reader finds before we do.
+`--meta` is a small JSON holding `title`, `summary`, `findings`, and an optional `published`
+(defaulting to today). Everything else is **derived rather than typed**: the cover is rendered from
+page 1, `pages` is counted against the file, `audio_length` is measured off the audio, and the three
+storage URLs are read back from the API rather than string-built. Those were the columns most
+likely to be wrong, because they are the ones nobody can check by eye.
 
-Then, in the Supabase UI:
+`--dry-run` renders, counts, and measures without touching anything remote. `.claude/skills/publish-report/`
+drives all of this conversationally, including drafting the copy.
 
-1. Upload the PDF, the audio, and the cover PNG to the `reports` bucket under `<slug>/`.
-2. Insert a row: paste the three public URLs into `cover_url` / `pdf_url` / `audio_url`, write
-   `title`, `summary`, and `findings`, and leave `status` at its `draft` default.
-3. Flip `status` to `published`. It is live on the next refresh.
+**Publishing is two commands on purpose.** The content run leaves the row at its `draft` default and
+never writes `status` — on insert or on update — so re-running against a corrected PDF cannot flip a
+report's visibility as a side effect. Approving copy stays an act someone takes rather than a flag
+someone forgets. The pages read this table on every request, so there is no build step standing
+between a half-checked row and a visitor.
 
-`status` defaults to `draft` for a reason: the pages read this table on every request, so there is
-no build step standing between a half-typed row and a visitor.
+The script defaults to **`.env`** and prints the target host on every run: `.env.local` points at a
+local Supabase stack and takes precedence in `next dev`, which is right for development and wrong
+for publishing. `--env <file>` overrides it.
+
+The cover is **generated from page 1 of the PDF**, never exported by hand. `pnpm report:publish` does
+it as one step; `pnpm report:cover <pdf-url-or-path> <slug> [--width 1000]` does it alone, which is
+what you want when a PDF is replaced and nothing else changed. Both share `scripts/lib/cover.mjs`.
+The PDF is the source of truth, and a cover that disagrees with page 1 is a bug a reader finds
+before we do.
+
+The manual path still works and is worth knowing: upload the three files to the `reports` bucket
+under `<slug>/`, insert a row with the three public URLs in `cover_url` / `pdf_url` / `audio_url`,
+and flip `status` to `published`.
 
 `pdf-to-img` stays a devDependency that never ships, and the generated PNG stays out of the
 deployed bundle — the site reads the uploaded copy. Covers are remote now, which is why
