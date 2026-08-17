@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import CaseStudyCard from "@/components/CaseStudyCard";
+import Artifact from "@/components/case-study/Artifact";
+import TrackMap from "@/components/case-study/TrackMap";
 import ClosingCTA from "@/components/ClosingCTA";
-import DitherReveal from "@/components/DitherReveal";
 import PageHeader from "@/components/PageHeader";
-import { CASE_STUDIES, studiesInGroup } from "@/lib/content/case-studies";
+import { getCaseStudy } from "@/lib/case-studies.server";
+import {
+  DEFAULT_NEXT_LABEL,
+  DEFAULT_SECTION_HEADINGS,
+} from "@/lib/content/case-studies";
 import {
   breadcrumbJsonLd,
   caseStudyJsonLd,
@@ -16,13 +21,13 @@ import {
 
 type Params = { slug: string };
 
-export function generateStaticParams(): Params[] {
-  return CASE_STUDIES.map((study) => ({ slug: study.slug }));
-}
-
-function find(slug: string) {
-  return CASE_STUDIES.find((study) => study.slug === slug);
-}
+/**
+ * No `generateStaticParams`. The slugs live in Supabase now, so prerendering
+ * them would freeze the set at deploy time and a study inserted afterwards
+ * would 404 until the next build — which is the staleness the table exists to
+ * remove. See the migration for what this costs.
+ */
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -30,13 +35,19 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const study = find(slug);
+  // An outage here would otherwise fail the whole render before the page gets a
+  // chance to. Metadata degrades to empty; the page below still throws, which
+  // is where the 500 belongs.
+  const study = await getCaseStudy(slug).catch(() => null);
 
   if (!study) return {};
 
   return pageMetadata({
-    title: study.title,
-    description: study.summary,
+    // `metaTitle` where a study has one. An `h1` earns attention from someone
+    // already reading; a `<title>` has to win a result page, and the two are
+    // rarely the same sentence.
+    title: study.metaTitle ?? study.title,
+    description: study.metaDescription ?? study.summary,
     path: `/insights/${study.slug}`,
     // This segment generates its own card in `opengraph-image.tsx`; naming it
     // here is what stops the default site card from being used instead.
@@ -48,9 +59,21 @@ export async function generateMetadata({
 }
 
 /**
- * The full study. The listing card carries the executive read; this is where
- * the technical detail is allowed to appear — challenge, solution, the
- * capability inventory, and the stack where the stack is the point.
+ * The full study.
+ *
+ * Every study answers the same six questions — context, constraints, our role,
+ * what we engineered, outcome, what came next — and that fixed spine is the
+ * point: a reader comparing two studies is comparing the same six answers.
+ *
+ * Everything else on this page is optional and renders only when the row fills
+ * it. A study with no `tracks` is not a study with an empty tracks section; the
+ * page closes up around what is there. That is what lets one template serve a
+ * three-paragraph engagement and a dual-track workshop programme without either
+ * looking like a degraded version of the other.
+ *
+ * `stages` **replaces** `engineered` where present rather than joining it —
+ * both answer "what we engineered", and rendering both prints the same content
+ * twice under one heading.
  */
 export default async function CaseStudyPage({
   params,
@@ -58,149 +81,258 @@ export default async function CaseStudyPage({
   params: Promise<Params>;
 }) {
   const { slug } = await params;
-  const study = find(slug);
+  // Deliberately not caught. `null` means no such published slug and reaches
+  // `notFound()`; a Supabase outage throws and becomes a 500. A 404 tells a
+  // crawler to drop the page, so degrading here would de-index a live study
+  // over a blip — see `lib/case-studies.server.ts`.
+  const study = await getCaseStudy(slug);
 
   if (!study) notFound();
 
-  const siblings = studiesInGroup(study.group).filter(
-    (other) => other.slug !== study.slug,
-  );
-
-  const sections = [
-    { label: "Challenge", body: study.challenge },
-    { label: "Solution", body: study.solution },
-    { label: "Impact", body: study.impact },
+  const before = [
+    { label: "Context", body: study.context },
+    { label: "Constraints", body: study.constraints },
+    { label: "RegainFlow's role", body: study.role },
   ];
+
+  const after = [
+    { label: "Outcome", body: study.outcome },
+    { label: study.nextLabel ?? DEFAULT_NEXT_LABEL, body: study.next },
+  ];
+
+  // Spread per section rather than over the whole object, so a study can rename
+  // one heading without restating the rest of its section. The pipeline omits
+  // empty members rather than writing null, which would spread over a default
+  // and blank it.
+  const headings = {
+    tracks: {
+      ...DEFAULT_SECTION_HEADINGS.tracks,
+      ...study.sectionHeadings?.tracks,
+    },
+    artifacts: {
+      ...DEFAULT_SECTION_HEADINGS.artifacts,
+      ...study.sectionHeadings?.artifacts,
+    },
+    deliverables: {
+      ...DEFAULT_SECTION_HEADINGS.deliverables,
+      ...study.sectionHeadings?.deliverables,
+    },
+  };
 
   return (
     <>
       <PageHeader
-        eyebrow={study.industry}
+        eyebrow={study.eyebrow ?? study.industry}
         title={study.title}
         lead={study.summary}
       />
 
-      <section className="rf-section">
-        <div className="rf-shell py-12 md:py-16">
-          {/* Rendered as its own block rather than a grid cell: the disclaimer
-              that used to sit beside it is gone, so a study without figures
-              would otherwise open with an empty grid row. */}
-          {study.metrics?.length ? (
-            <dl className="flex flex-wrap gap-x-16 gap-y-8">
-              {study.metrics.map((metric) => (
-                <div key={metric.label} className="max-w-[22ch]">
-                  <dd className="rf-stat">{metric.value}</dd>
-                  <dt className="rf-utility mt-3">{metric.label}</dt>
-                </div>
-              ))}
-            </dl>
-          ) : null}
+      <article className="rf-article">
+        <section className="rf-section">
+          <div className="rf-shell rf-band-tight">
+            {/* Above the fold-line of the article, not under the header, so a
+                reader who arrived from search can see where they are before
+                they start reading. */}
+            <nav aria-label="Breadcrumb">
+              <ol className="rf-crumbs rf-utility">
+                <li>
+                  <Link href="/insights" className="rf-nav-link">
+                    Insights
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/insights#case-studies" className="rf-nav-link">
+                    Case studies
+                  </Link>
+                </li>
+              </ol>
+            </nav>
 
-          {/* Scope before narrative. A reader deciding whether this study is
-              relevant to them wants the environment and the volumes, and both
-              are facts about the engagement rather than claims about its
-              return — which is why this block is not governed by the figure
-              rule the metrics above are. */}
-          {study.atAGlance?.length ? (
-            <div
-              className={`rf-grid gap-y-4 ${study.metrics?.length ? "mt-12" : ""}`}
-            >
-              <h2 className="rf-h3 col-span-full lg:col-span-3">At a glance</h2>
-              <dl className="col-span-full grid gap-x-10 gap-y-6 sm:grid-cols-2 lg:col-span-8">
-                {study.atAGlance.map((item) => (
-                  <div key={item.label}>
-                    <dt className="rf-utility">{item.label}</dt>
-                    <dd className="rf-body mt-2 max-w-[38ch]">{item.value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          ) : null}
-
-          <div
-            className={`border-t border-rf-hairline ${
-              study.metrics?.length || study.atAGlance?.length ? "mt-12" : ""
-            }`}
-          >
-            {sections.map((section) => (
-              <div
-                key={section.label}
-                className="rf-grid gap-y-3 border-b border-rf-hairline py-8"
-              >
-                <h2 className="rf-h3 col-span-full lg:col-span-3">
-                  {section.label}
-                </h2>
-                <p className="rf-body col-span-full max-w-[68ch] lg:col-span-8">
-                  {section.body}
-                </p>
+            {/* A lead image belongs after the reader knows what they are
+                looking at and before they commit to reading. Absent on a study
+                without art, and the page closes up rather than leaving a
+                frame. */}
+            {study.image ? (
+              <div className="rf-case-cover rf-case-hero mt-8">
+                <Image
+                  src={study.image}
+                  alt={study.imageAlt ?? study.title}
+                  fill
+                  // The LCP element on this route when it exists.
+                  priority
+                  sizes="(min-width: 1280px) 1120px, 100vw"
+                />
               </div>
-            ))}
-          </div>
+            ) : null}
 
-          {/* `impact` is the paragraph; this is the itemized version of it.
-              Both are kept because the paragraph is what an assistant quotes
-              and the list is what a skimming reader actually reads. */}
-          {study.outcomes?.length ? (
-            <div className="rf-grid mt-10 gap-y-4">
-              <h2 className="rf-h3 col-span-full lg:col-span-3">Outcomes</h2>
-              <ul className="col-span-full flex flex-col gap-4 lg:col-span-8">
-                {study.outcomes.map((outcome) => (
-                  <li key={outcome} className="rf-body flex gap-4">
-                    <span className="rf-route-tick" aria-hidden="true" />
-                    <span className="max-w-[64ch]">{outcome}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-
-          <div className="rf-grid mt-10 gap-y-4">
-            <h2 className="rf-h3 col-span-full lg:col-span-3">
-              Key capabilities
-            </h2>
-            <div className="col-span-full lg:col-span-8">
-              <p className="rf-mech">
-                {study.capabilities.map((capability) => (
-                  <span key={capability}>{capability}</span>
-                ))}
-              </p>
-
-              {study.technologies ? (
-                <p className="rf-body mt-6 flex gap-4">
-                  <span className="rf-route-tick" aria-hidden="true" />
-                  <span>{study.technologies}</span>
-                </p>
-              ) : null}
-            </div>
-          </div>
-
-          <p className="mt-12">
-            <Link href="/insights#case-studies" className="rf-nav-link">
-              &larr; All case studies
-            </Link>
-          </p>
-        </div>
-      </section>
-
-      {siblings.length > 0 ? (
-        <section className="rf-section bg-rf-navy">
-          <div className="rf-shell py-12 md:py-16">
-            <p className="rf-eyebrow">More in {study.group}</p>
-
-            <ul className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {siblings.slice(0, 3).map((other, i) => (
-                <li key={other.slug} className="h-full">
-                  <DitherReveal className="h-full" delay={i * 90}>
-                    <CaseStudyCard study={other} surface="related" />
-                  </DitherReveal>
+            {/* A real list, not a pipe-separated `.rf-mech` run. Each tag wraps
+                as a unit, so a long one breaks the line rather than itself. */}
+            <ul className="rf-tags mt-8">
+              {study.capabilityTags.map((tag) => (
+                <li key={tag} className="rf-tag">
+                  {tag}
                 </li>
               ))}
             </ul>
+
+            {/* Scope facts. What was delivered, never what it returned — see
+                the figure rule in `lib/content/case-studies.ts`. */}
+            {study.atAGlance?.length ? (
+              <dl className="rf-glance mt-10">
+                {study.atAGlance.map((fact) => (
+                  <div key={fact.label}>
+                    <dd>{fact.value}</dd>
+                    <dt className="rf-utility mt-2">{fact.label}</dt>
+                  </div>
+                ))}
+              </dl>
+            ) : null}
           </div>
         </section>
-      ) : null}
 
-      <ClosingCTA />
+        {/* The three opening answers. No rule between them: spacing and the
+            heading carry the hierarchy, and a divider under every block was
+            what made every section on this page look identical. */}
+        <section className="rf-section">
+          <div className="rf-shell rf-band">
+            <div className="flex flex-col gap-12">
+              {before.map((section) => (
+                <div key={section.label} className="rf-grid gap-y-3">
+                  <h2 className="rf-h3 col-span-full lg:col-span-3">
+                    {section.label}
+                  </h2>
+                  <p className="rf-body rf-measure col-span-full lg:col-span-8">
+                    {section.body}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {study.tracks?.length ? (
+          <section className="rf-section bg-rf-navy">
+            <div className="rf-shell rf-band">
+              <div className="rf-grid gap-y-6">
+                <div className="col-span-full lg:col-span-5">
+                  <p className="rf-eyebrow">{headings.tracks.eyebrow}</p>
+                  <h2 className="rf-h2 mt-5 max-w-[20ch]">
+                    {headings.tracks.title}
+                  </h2>
+                </div>
+                <p className="rf-body rf-measure col-span-full lg:col-span-6 lg:col-start-7 lg:pt-3">
+                  {headings.tracks.lead}
+                </p>
+              </div>
+
+              <div className="mt-12">
+                <TrackMap tracks={study.tracks} />
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        <section className="rf-section">
+          <div className="rf-shell rf-band">
+            <h2 className="rf-h2 max-w-[22ch]">What RegainFlow engineered</h2>
+
+            {/* `stages` wins where a study has them — see the note above the
+                component. Numbered, because a process is a sequence and order
+                is information (`docs/DESIGN.md#iconography`). */}
+            {study.stages?.length ? (
+              <ol className="mt-10 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+                {study.stages.map((stage, i) => (
+                  <li
+                    key={stage.name}
+                    className="border-t border-rf-hairline pt-4"
+                  >
+                    <span className="rf-index">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <h3 className="rf-h3 mt-3">{stage.name}</h3>
+                    <p className="rf-body mt-2">{stage.detail}</p>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <ul className="mt-10 flex flex-col gap-4">
+                {study.engineered.map((item) => (
+                  <li key={item} className="rf-body rf-measure flex gap-4">
+                    <span className="rf-route-tick" aria-hidden="true" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </section>
+
+        {study.artifacts?.length ? (
+          <section className="rf-section">
+            <div className="rf-shell rf-band-tight">
+              <p className="rf-eyebrow">{headings.artifacts.eyebrow}</p>
+              <h2 className="rf-h2 mt-5 max-w-[22ch]">
+                {headings.artifacts.title}
+              </h2>
+
+              <div className="mt-10 flex flex-col gap-4">
+                {study.artifacts.map((artifact) => (
+                  <Artifact key={artifact.title} artifact={artifact} />
+                ))}
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        {study.deliverables?.length ? (
+          <section className="rf-section bg-rf-navy">
+            <div className="rf-shell rf-band-tight">
+              <div className="rf-grid gap-y-6">
+                <h2 className="rf-h2 col-span-full max-w-[20ch] lg:col-span-4">
+                  {headings.deliverables.title}
+                </h2>
+                <ul className="col-span-full flex flex-col gap-3 lg:col-span-7 lg:col-start-6">
+                  {study.deliverables.map((item) => (
+                    <li key={item} className="rf-body flex gap-4">
+                      <span className="rf-route-tick" aria-hidden="true" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        <section className="rf-section">
+          <div className="rf-shell rf-band">
+            <div className="flex flex-col gap-12">
+              {after.map((section) => (
+                <div key={section.label} className="rf-grid gap-y-3">
+                  <h2 className="rf-h3 col-span-full lg:col-span-3">
+                    {section.label}
+                  </h2>
+                  <p className="rf-body rf-measure col-span-full lg:col-span-8">
+                    {section.body}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <p className="mt-14">
+              <Link href="/insights#case-studies" className="rf-nav-link">
+                &larr; All case studies
+              </Link>
+            </p>
+          </div>
+        </section>
+      </article>
+
+      {/* No "more in this category" band. With three studies, a related-work
+          shelf is the other two every time, which is what `/insights` already
+          shows one click away. */}
+
+      <ClosingCTA override={study.cta} />
 
       <script
         type="application/ld+json"

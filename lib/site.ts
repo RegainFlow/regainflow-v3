@@ -82,22 +82,36 @@ export const PROFILES: Profile[] = [
 
 export const LOCATION = "Orlando, Florida";
 
-export const POSITIONING = "AI transformation partner";
+/**
+ * Cased for use mid-sentence as well as in the eyebrow, which is why "AI" is
+ * capitalized and nothing else is. Two call sites drop it into running prose —
+ * `app/llm-info/page.tsx` and the reports OG card — and both used to lowercase
+ * it, which turned the term into "ai engineering" and left one of them reading
+ * "a ai". Render this constant as written; the eyebrow's own CSS handles caps.
+ */
+export const POSITIONING = "AI engineering & transformation partner";
 
 export const TAGLINE = "AI transformation, from ambition to operation.";
 
 /**
- * Who the site is written for. Named in the hero because the first test the
- * page has to pass is "can you tell who we're targeting".
+ * Who the site is written for. Rendered on `/llm-info` and in `llms.txt`.
  *
- * State and local leads; aerospace and defense closes. That order is the
- * positioning: the firm sells to counties and states now, and the defense
- * record is what makes a two-person firm credible to them rather than the
- * market being addressed. Reversing the sentence puts a county administrator in
- * front of a defense contractor's website, which is the problem this replaced.
+ * Public agencies lead; complex organizations follow. The firm is
+ * engineering-led and focused on government and regulated environments, and
+ * this sentence has to hold that focus without excluding the complex commercial
+ * organizations the same engineering applies to.
+ *
+ * It deliberately no longer closes on "the same engineers behind aerospace,
+ * defense, and federal systems". That framing came out of the hero, and leaving
+ * it here would keep the defense-credibility pitch alive in a second constant
+ * that two surfaces still render.
+ *
+ * The four named industries are the market, stated in the same order and words
+ * as `INDUSTRY_GROUPS`. Say nothing here that reads as a client list — this
+ * sentence describes who the work is for, not who has bought it.
  */
 export const AUDIENCE =
-  "Built for counties, cities, and state agencies — public safety, utilities and water, public works, and the administrative departments carrying modernization scope. The same engineers behind aerospace, defense, and federal systems.";
+  "Built for public agencies and complex organizations, across four industries: public safety; infrastructure and utilities; federal, state, and local government; and defense and aerospace.";
 
 export interface NavLink {
   label: string;
@@ -190,27 +204,20 @@ export const NAV: NavGroup[] = [
         hint: "Power, water and wastewater, public works",
       },
       {
-        label: "Government & Administration",
-        href: "/industries/government-administration",
-        hint: "County and state agencies, records, risk",
+        label: "Federal, State & Local Government",
+        href: "/industries/federal-state-local",
+        hint: "Federal, state, and local agencies, records, risk",
       },
       {
-        label: "Defense & Advanced Manufacturing",
-        href: "/industries/defense-manufacturing",
+        label: "Defense & Aerospace",
+        href: "/industries/defense-aerospace",
         hint: "Aerospace, defense, federal contractors",
       },
-      // Straight to the booking page rather than to `/services#assessment`.
-      // Every item above this rule is a page that explains something; this one
-      // is the ask, and a reader who opened this panel already knows which
-      // sector they are in.
-      {
-        label: "Free assessment",
-        href: FREE_ASSESSMENT_HREF,
-        hint: "No cost, no obligation",
-        secondary: true,
-        external: true,
-        event: RF_EVENTS.bookingClicked,
-      },
+      // No free-assessment item here. It sits under Services and as the header's
+      // primary CTA, and a third copy in this panel made the offer read as the
+      // thing we lead with in every sector rather than the one route into the
+      // work. Removing it here takes it out of the footer column too, which is
+      // the same decision.
     ],
   },
   {
@@ -220,10 +227,10 @@ export const NAV: NavGroup[] = [
       {
         label: "Case studies",
         href: "/insights#case-studies",
-        hint: "Selected enterprise AI and platform work",
+        hint: "Our own engagements",
       },
       {
-        label: "Reports",
+        label: "Reports & Guides",
         href: "/insights/reports",
         hint: "Written research, with an audio version",
       },

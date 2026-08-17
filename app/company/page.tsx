@@ -27,7 +27,7 @@ import {
 export const metadata: Metadata = pageMetadata({
   title: "Company",
   description:
-    "RegainFlow is a senior AI transformation partner based in Orlando, Florida. Who we are, what we believe about AI in production, and how to reach us.",
+    "RegainFlow is an AI engineering and transformation partner based in Orlando, Florida. Who we are, what we believe about AI in production, and how to reach us.",
   path: "/company",
 });
 
@@ -122,33 +122,24 @@ export default function CompanyPage() {
 
                   {/* The profile is the same URL `peopleJsonLd()` emits as
                       `sameAs` — a crawler already had it; this is the version a
-                      person can click. The resume sits beside it because this
-                      block is the answer to "who am I dealing with", and both
-                      links answer it at different depths. */}
-                  {member.profile || member.resume ? (
-                    <p className="mt-6 flex flex-wrap gap-x-8">
-                      {member.profile ? (
-                        <a
-                          href={member.profile}
-                          className="rf-nav-link"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          LinkedIn &#8599;
-                        </a>
-                      ) : null}
-                      {member.resume ? (
-                        <a
-                          href={member.resume}
-                          className="rf-nav-link"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          data-rf-event={RF_EVENTS.resumeOpened}
-                          data-rf-person={member.name}
-                        >
-                          Resume &#8599;
-                        </a>
-                      ) : null}
+                      person can click.
+
+                      A resume link used to sit beside it. It came out because a
+                      founder's resume frames this page as two people looking
+                      for work rather than a firm you would hire, and the bio
+                      above already answers "who am I dealing with" at the depth
+                      a buyer needs. The capability statement is the document
+                      that does this job. */}
+                  {member.profile ? (
+                    <p className="mt-6">
+                      <a
+                        href={member.profile}
+                        className="rf-nav-link"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        LinkedIn &#8599;
+                      </a>
                     </p>
                   ) : null}
                 </div>
@@ -169,22 +160,25 @@ export default function CompanyPage() {
             </PlayOnView>
           </div>
 
-          <ol className="col-span-full border-t border-rf-hairline lg:col-span-7 lg:col-start-6">
-            {MANIFESTO.map((item, i) => (
+          {/* No marker of any kind, and that is the considered choice rather
+              than an omission. These eight are arguments, not categories — "A
+              pilot is not a result", "Nobody gets used", "You should be able to
+              leave" — so a number implies a sequence that does not exist and an
+              icon would be decoration standing in front of a claim. The
+              register here is a flat assertion followed by the reasoning that
+              earns it; anything to the left of the claim competes with it. The
+              hairline rule already does the separating. */}
+          <ul className="col-span-full border-t border-rf-hairline lg:col-span-7 lg:col-start-6">
+            {MANIFESTO.map((item) => (
               <li
                 key={item.claim}
-                className="flex gap-5 border-b border-rf-hairline py-6"
+                className="border-b border-rf-hairline py-6"
               >
-                <span className="rf-index pt-1">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <div>
-                  <h3 className="rf-h3">{item.claim}</h3>
-                  <p className="rf-body mt-2 max-w-[52ch]">{item.detail}</p>
-                </div>
+                <h3 className="rf-h3">{item.claim}</h3>
+                <p className="rf-body mt-2 max-w-[52ch]">{item.detail}</p>
               </li>
             ))}
-          </ol>
+          </ul>
         </div>
       </section>
 

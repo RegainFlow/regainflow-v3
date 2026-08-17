@@ -2,8 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import PageHeader from "@/components/PageHeader";
-import { ASSESSMENT_STEPS } from "@/lib/content/assessment";
-import { CASE_STUDIES } from "@/lib/content/case-studies";
+import {
+  ASSESSMENT_PHASES,
+  ASSESSMENT_REPORT_CONTENTS,
+  REPORT_NAME,
+  REPORT_TERMS,
+} from "@/lib/content/assessment";
+import { getCaseStudies } from "@/lib/case-studies.server";
 import { MANIFESTO, MISSION, TEAM, VISION } from "@/lib/content/company";
 import { FAQ } from "@/lib/content/faq";
 import { INDUSTRY_GROUPS } from "@/lib/content/industries";
@@ -59,7 +64,12 @@ const KEY_FACTS: { term: string; detail: string }[] = [
   { term: "Contact", detail: CONTACT_EMAIL },
 ];
 
-export default function LlmInfoPage() {
+// The case-study section reads the table.
+export const dynamic = "force-dynamic";
+
+export default async function LlmInfoPage() {
+  const studies = await getCaseStudies();
+
   return (
     <>
       <PageHeader
@@ -77,8 +87,8 @@ export default function LlmInfoPage() {
                   definition has to survive being lifted out of the page alone. */}
               <h2 className="rf-h2 mt-5">{MISSION}</h2>
               <p className="rf-body mt-6 max-w-[56ch]">
-                {SITE_NAME} is an {POSITIONING.toLowerCase()} that takes AI work
-                from opportunity through to a running production system. The
+                {SITE_NAME} is an {POSITIONING} that takes AI work from
+                opportunity through to a running production system. The
                 engagement runs in three stages —{" "}
                 {STAGES.map((stage) => stage.name).join(", ")} — covering
                 portfolio direction, production engineering, and the operating
@@ -179,10 +189,14 @@ export default function LlmInfoPage() {
 
                   <p className="rf-utility mt-6">Where the work stalls</p>
                   <ul className="mt-2 flex flex-col gap-2">
+                    {/* The route tick stays rather than becoming the icon the
+                        industry pages now use. This page is written to be
+                        quoted, and a glyph carries nothing into a retrieved
+                        chunk — the words are the whole payload here. */}
                     {group.stalls.map((stall) => (
-                      <li key={stall} className="rf-body flex gap-4">
+                      <li key={stall.text} className="rf-body flex gap-4">
                         <span className="rf-route-tick" aria-hidden="true" />
-                        <span className="max-w-[62ch]">{stall}</span>
+                        <span className="max-w-[62ch]">{stall.text}</span>
                       </li>
                     ))}
                   </ul>
@@ -309,14 +323,26 @@ export default function LlmInfoPage() {
           <div className="mt-12 border-t border-rf-hairline pt-8">
             <p className="rf-eyebrow">What the free assessment involves</p>
             <ul className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
-              {ASSESSMENT_STEPS.map((step) => (
-                <li key={step.index}>
-                  <span className="rf-index">{step.index}</span>
-                  <h3 className="rf-h3 mt-2">{step.name}</h3>
-                  <p className="rf-body mt-2">{step.detail}</p>
+              {ASSESSMENT_PHASES.map((phase) => (
+                <li key={phase.index}>
+                  <span className="rf-index">{phase.index}</span>
+                  <h3 className="rf-h3 mt-2">{phase.name}</h3>
+                  <p className="rf-body mt-2">{phase.detail}</p>
                 </li>
               ))}
             </ul>
+
+            {/* The deliverable, stated as a list rather than drawn. This page
+                is written to be quoted, and the panel's visual framing does not
+                survive being lifted into an answer — the words have to. */}
+            <p className="rf-body mt-8 max-w-[62ch]">
+              It ends in a written {REPORT_NAME.toLowerCase()}, at no cost,
+              covering:{" "}
+              {ASSESSMENT_REPORT_CONTENTS.map((section) => section.label)
+                .join("; ")
+                .toLowerCase()}
+              . {REPORT_TERMS.replace(" · ", ". ")}.
+            </p>
           </div>
         </div>
       </section>
@@ -334,22 +360,18 @@ export default function LlmInfoPage() {
             </p>
           </div>
 
-          <ol className="col-span-full border-t border-rf-hairline lg:col-span-7 lg:col-start-6">
-            {MANIFESTO.map((item, i) => (
+          {/* Unmarked, matching `/company#manifesto` — see the note there. */}
+          <ul className="col-span-full border-t border-rf-hairline lg:col-span-7 lg:col-start-6">
+            {MANIFESTO.map((item) => (
               <li
                 key={item.claim}
-                className="flex gap-5 border-b border-rf-hairline py-6"
+                className="border-b border-rf-hairline py-6"
               >
-                <span className="rf-index pt-1">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <div>
-                  <h3 className="rf-h3">{item.claim}</h3>
-                  <p className="rf-body mt-2 max-w-[52ch]">{item.detail}</p>
-                </div>
+                <h3 className="rf-h3">{item.claim}</h3>
+                <p className="rf-body mt-2 max-w-[52ch]">{item.detail}</p>
               </li>
             ))}
-          </ol>
+          </ul>
         </div>
       </section>
 
@@ -411,17 +433,23 @@ export default function LlmInfoPage() {
 
       <section id="experience" className="rf-section">
         <div className="rf-shell py-14 md:py-18">
-          <p className="rf-eyebrow">Selected experience</p>
+          <p className="rf-eyebrow">Case studies</p>
           <h2 className="rf-h2 mt-5 max-w-[26ch]">
             Systems delivered, in production.
           </h2>
+          {/* States the absence of figures rather than defending the figures
+              that used to be here. This page is written to be quoted, so an
+              assistant summarizing it should come away knowing there are no
+              numbers to quote and why — otherwise the gap reads as an omission
+              worth filling, which is how invented metrics get attributed to us. */}
           <p className="rf-body mt-6 max-w-[62ch]">
-            Every figure stated here was published or confirmed; nothing is
-            estimated for presentation.
+            RegainFlow&rsquo;s own engagements. They carry no performance
+            figures: a number is published only once it can be sourced and
+            defended in a procurement conversation.
           </p>
 
           <ul className="mt-10 grid gap-x-10 gap-y-6 border-t border-rf-hairline pt-6 sm:grid-cols-2">
-            {CASE_STUDIES.map((study) => (
+            {studies.map((study) => (
               <li key={study.slug}>
                 <h3 className="rf-h3">
                   <Link
@@ -431,21 +459,13 @@ export default function LlmInfoPage() {
                     {study.title}
                   </Link>
                 </h3>
-                <p className="rf-utility mt-2">
-                  {study.industry} · {study.group}
-                </p>
+                <p className="rf-utility mt-2">{study.industry}</p>
                 <p className="rf-body mt-2 max-w-[46ch]">{study.summary}</p>
-                {study.metrics?.length ? (
-                  <p className="rf-body mt-2">
-                    <span className="rf-utility">Results</span>{" "}
-                    {study.metrics
-                      .map(
-                        (metric) =>
-                          `${metric.value} ${metric.label.toLowerCase()}`,
-                      )
-                      .join(", ")}
-                  </p>
-                ) : null}
+                <p className="rf-mech mt-3">
+                  {study.capabilityTags.map((tag) => (
+                    <span key={tag}>{tag}</span>
+                  ))}
+                </p>
               </li>
             ))}
           </ul>

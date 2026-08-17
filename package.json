@@ -8,11 +8,15 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test \"scripts/**/*.test.mts\"",
     "report:cover": "node scripts/report-cover.mjs",
-    "report:publish": "node scripts/publish-report.mjs"
+    "report:publish": "node scripts/publish-report.mjs",
+    "case-study": "node --env-file=.env.local --import tsx scripts/case-study-pipeline.mts",
+    "case-study:prod": "node --env-file=.env --import tsx scripts/case-study-pipeline.mts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.2",
+    "lucide-react": "^1.31.0",
     "next": "16.2.11",
     "posthog-js": "^1.409.5",
     "react": "19.2.4",
@@ -30,6 +34,9 @@
     "pdf-to-img": "^6.2.0",
     "supabase": "^2.113.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "tsx": "^4.23.12",
+    "typescript": "^5",
+    "yaml": "^2.9.0",
+    "zod": "^4.4.3"
   }
 }

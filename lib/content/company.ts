@@ -1,7 +1,13 @@
+import type { IconName } from "@/components/Icon";
+
 /**
  * Company content. Mission and vision are taken from the RegainFlow model
  * canvas; the principle detail lines are RegainFlow-authored framing, pending
  * commercial review.
+ *
+ * `IconName` is a type-only import, so this module still ships no runtime
+ * dependency on the component layer — see `components/Icon.tsx` for why the
+ * icon is a name here rather than a component.
  */
 
 export const MISSION =
@@ -11,7 +17,7 @@ export const MISSION_DETAIL =
   "We focus AI investment on measurable business outcomes, deploy senior operators to execute, and build the secure production capabilities organizations need to scale.";
 
 export const VISION =
-  "To be the most trusted AI transformation partner for enterprise and government — known for turning fragmented AI ambition into secure, scalable systems that create measurable competitive advantage.";
+  "To be the most trusted AI engineering and transformation partner for public agencies and complex organizations — known for turning fragmented AI ambition into secure, scalable systems their own teams can operate.";
 
 export interface TeamMember {
   name: string;
@@ -44,17 +50,6 @@ export interface TeamMember {
    * entity claim it is supposed to strengthen.
    */
   profile?: string;
-  /**
-   * Public URL of this person's resume, on Supabase storage alongside the
-   * capability statement.
-   *
-   * Optional for the same reason `detail` is — one founder's can land before the
-   * other's without the pair looking unfinished. Put the year in the filename,
-   * as `CAPABILITY_STATEMENT_HREF` does: replacing it is then a one-line change
-   * here, and anyone holding the old link still reaches the edition they were
-   * sent.
-   */
-  resume?: string;
 }
 
 export const TEAM: TeamMember[] = [
@@ -69,8 +64,6 @@ export const TEAM: TeamMember[] = [
     credentials: ["Captain, U.S. Army"],
     image: "/brand/team/leo.png",
     profile: "https://www.linkedin.com/in/leonardo-j-ramirez/",
-    resume:
-      "https://qsnaxtjoyqycpbmmghff.supabase.co/storage/v1/object/public/site/Leonardo_J_Ramirez_Resume.pdf",
   },
   {
     name: "William J. Baltus",
@@ -86,22 +79,34 @@ export const TEAM: TeamMember[] = [
   },
 ];
 
-/** What clients are actually buying, beyond the deliverable. */
-export const PRINCIPLES = [
+/**
+ * What clients are actually buying, beyond the deliverable.
+ *
+ * Three parallel principles, not three steps — there is no order here, and the
+ * `01/02/03` these used to carry implied one. They take icons instead; see
+ * `docs/DESIGN.md` for when each treatment applies.
+ */
+export const PRINCIPLES: {
+  icon: IconName;
+  title: string;
+  detail: string;
+}[] = [
   {
-    index: "01",
+    icon: "workflow",
     title: "Strategy through production",
     detail:
       "The people who frame the opportunity stay accountable for what ships.",
   },
   {
-    index: "02",
+    icon: "team",
     title: "Embedded collaboration without hidden handoffs",
     detail:
       "We work inside your repositories, your review process, and your delivery rhythm.",
   },
   {
-    index: "03",
+    // The site already says "hand you the keys" in `STAGES`; this is that
+    // sentence's mark.
+    icon: "keys",
     title:
       "Flexible ownership: continue together, scale down, or transfer cleanly",
     detail:

@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import { RF_EVENTS } from "@/lib/analytics/events";
-import { ASSESSMENT_PROOF } from "@/lib/content/assessment";
 import {
   FREE_ASSESSMENT_CTA,
   FREE_ASSESSMENT_HREF,
@@ -9,18 +8,42 @@ import {
   CONTACT_PATH,
 } from "@/lib/site";
 
-export default function ClosingCTA() {
+/**
+ * The shelf that closes most routes.
+ *
+ * `override` swaps the copy where a page has earned more specific words than
+ * "Bring us the opportunity" — a case study whose reader is a consulting
+ * partner is being asked something different from a visitor on `/insights`.
+ * Copy only: the destinations stay the free assessment and the contact form on
+ * every surface, because two buttons that go somewhere different depending on
+ * the page is how a site grows a broken link nobody notices.
+ *
+ * Extended rather than forked. A second closing component would drift from this
+ * one within a release, and the analytics locations below would stop being
+ * comparable across routes.
+ */
+export default function ClosingCTA({
+  override,
+}: {
+  override?: { heading: string; body: string; secondaryLabel: string };
+} = {}) {
   return (
     <section id="contact" className="rf-section bg-rf-navy">
-      <div className="rf-shell rf-grid gap-y-12 py-14 md:py-20 lg:py-24">
+      {/* `rf-band`, not `rf-band-lead`. This was the tallest section on the
+          site, which on the home page put a closing shelf above the free
+          assessment it points back at. It closes four routes; on none of them
+          is it the main event. */}
+      <div className="rf-shell rf-grid gap-y-12 rf-band">
         <div className="col-span-full lg:col-span-7">
           <p className="rf-eyebrow">Start with the opportunity</p>
 
-          <h2 className="rf-h2 mt-5">Bring us your ambitions.</h2>
+          <h2 className="rf-h2 mt-5">
+            {override?.heading ?? "Bring us the opportunity."}
+          </h2>
 
           <p className="rf-lead mt-6 max-w-[50ch]">
-            We will help you clarify where to focus, what it will take, and
-            whether RegainFlow is the right engineering partner.
+            {override?.body ??
+              "We’ll help determine whether it is worth funding and what it will take."}
           </p>
 
           {/* Both routes, ranked. Booking is still the primary conversion; the
@@ -49,22 +72,15 @@ export default function ClosingCTA() {
               data-rf-event={RF_EVENTS.contactClicked}
               data-rf-location="closing_cta_contact"
             >
-              {CONTACT_CTA}
+              {override?.secondaryLabel ?? CONTACT_CTA}
             </Link>
           </div>
 
-          {/* The terms of the primary, from the same constant `/services` and
-              every industry page read. This shelf closes four routes and was
-              the one place a reader could reach the booking link without ever
-              being told what it costs. */}
-          <dl className="mt-10 grid max-w-[34rem] gap-6 sm:grid-cols-3">
-            {ASSESSMENT_PROOF.map((proof) => (
-              <div key={proof.label}>
-                <dd className="rf-stat">{proof.value}</dd>
-                <dt className="rf-utility mt-2">{proof.label}</dt>
-              </div>
-            ))}
-          </dl>
+          {/* No `ASSESSMENT_PROOF` trio here any more. This shelf is a closing
+              CTA, and restating the assessment's terms turned it into a second
+              copy of the assessment section a screen above it. The terms still
+              render where the offer is actually explained — `FreeAssessment`
+              and `AssessmentCallout`. */}
         </div>
 
         <div className="col-span-full lg:col-span-4 lg:col-start-9 lg:pt-6">

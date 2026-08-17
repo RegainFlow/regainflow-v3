@@ -25,9 +25,9 @@ are **not defined**, and are listed as gaps at the end rather than invented here
 | | |
 |---|---|
 | **Name** | RegainFlow |
-| **Category** | AI transformation partner |
+| **Category** | AI engineering & transformation partner |
 | **Tagline** | AI transformation, from ambition to operation. |
-| **Audience** | Counties, cities, and state agencies — public safety, utilities and water, public works, and the administrative departments carrying modernization scope. Aerospace, defense, and federal remain the credibility behind that, not the market being addressed. |
+| **Audience** | Public agencies and complex organizations, across four industries: public safety; infrastructure and utilities; federal, state, and local government; and defense and aerospace. Engineering-led, focused on government and regulated environments, without excluding the complex commercial organizations the same engineering applies to. |
 | **Mission** | RegainFlow helps organizations move at the speed of their ambition. |
 
 Source of truth: `lib/site.ts` and `lib/content/company.ts`. These are constants, not prose —
@@ -53,15 +53,20 @@ sentence could appear on any consultancy's site, it is not written yet.
 **3. Name the unglamorous thing.** "Retrieval, data quality, evaluation, observability, cost
 control." Specificity is the proof of experience; abstraction reads as distance from the work.
 
-**4. No number unless it was published or confirmed.** This is policy, not style.
+**4. No number we cannot explain how we measured and defend in procurement.** This is policy,
+not style, and it is stricter than the rule it replaced.
 
-Every figure in `metrics` on a case study was published on the previous RegainFlow site and
-cleared by that site's own anonymization worksheets, which survive in `regainflow-website` git
-history under `app/features/projects/data/prompts/` (deleted in `6d71afe` and `0077888`). Those
-worksheets are the source of record. Three figures they held back as identifying must not appear
-here: `300+ tables / 100+ interfaces`, the `90 → 3 day cycle time`, and `6K+ daily active users`
-(the previous site published `5K+` in its place). A study with nothing cleared carries no number
-rather than a soft one, and a plausible invented figure is worse than an absent one.
+The case studies carry **no figures at all**, and neither does the home page. The previous rule
+admitted any number published on the earlier RegainFlow site; that admitted per-study metrics
+(`2×`, `80%`, `$8M`) and a set of career totals (`$5M+` value created, `5,000+` hours reduced,
+`18+` transformations delivered) presented as RegainFlow's own. All of it is gone with the
+twelve prior-career studies it described.
+
+A number ships only once we can state how it was measured and hold that up in a procurement
+conversation. Until then the engineering challenge, our exact role, what we built, and the
+production outcome carry the proof — they are harder to write and much harder to dispute. A
+plausible invented figure is worse than an absent one; a real figure we cannot source is not
+much better.
 
 `PROFILES` in `lib/site.ts` shipped empty for months and now carries exactly the two URLs that
 were confirmed, for the same reason: a guessed profile URL asserts an identity we cannot back.
@@ -69,9 +74,16 @@ The same test governs prose: Leo's bio carries his service record because he sta
 carries no degree or certification because the only source for those was a login-walled page.
 Where we cannot measure the return, we say so rather than imply one.
 
-`atAGlance` is exempt, and the distinction matters. It states what the engagement *was* —
-environment, volumes, stack, method — never what it returned, so nothing in it is a claim the
-number rule governs.
+The distinction the rule turns on is *claim about return* versus *fact about the work*. A case
+study's `context`, `constraints`, `role`, and `engineered` describe what the engagement **was** —
+environment, scope, stack, method — so none of them is a claim the number rule governs. `outcome`
+and `next` are, and they are written as what changed rather than by how much.
+
+**`atAGlance` is the one field that carries numbers, and it is allowed to because it counts what
+was *delivered*.** "2 workshop tracks" and "4 hrs of live delivery" are facts about the
+engagement's scope; "40% faster reviews" would be a claim about its return and does not go there
+or anywhere else. If a figure would need a footnote to defend, it is the wrong kind of figure.
+(The old `metrics` field, which held exactly the wrong kind, is gone.)
 
 **5. Say what we will not do.** "Dependency is a failure mode, not a business model." The
 manifesto commits against things. That is what makes the commitments legible.
@@ -119,6 +131,98 @@ width depends on font metrics. `textLength="1000"` pins it to the container at a
 **Never:** recolor the face or the depth; add a drop shadow or glow beyond the defined
 extrusion; place the mark on a light ground (none is defined); stretch it — the ASCII cell must
 stay square or the letterform distorts.
+
+## Iconography
+
+Icons come from **Lucide**, behind `components/Icon.tsx` — the only module permitted to import
+`lucide-react`. Content modules hold an `IconName` string, never a component, because
+`lib/content/*` is read by `app/llms.txt/route.ts` and the JSON-LD builders, neither of which
+has any use for a React element.
+
+Lucide was chosen against Phosphor on evidence rather than reputation. Phosphor is **filled
+paths at every weight**, including `thin` — the thinness is baked into a 256×256 path, so
+stroke width and terminals cannot be adjusted at all. Lucide draws `fill="none"
+stroke="currentColor"` on a 24×24 grid, which is exactly the convention the hand-drawn SVGs in
+`SiteNav.tsx` already use, and is therefore tunable to it.
+
+**Two corrections make the set read as house rather than as a library someone installed:**
+
+| Property | Lucide ships | We set | Where | Matches |
+|---|---|---|---|---|
+| `stroke-width` | `2` | `1.4` | `Icon.tsx` prop | The `SiteNav` chevron |
+| `stroke-linecap` | `round` | `butt` | `.rf-icon` | Nothing here is round |
+| `stroke-linejoin` | `round` | `miter` | `.rf-icon` | Same |
+
+Presentation attributes lose to any CSS rule, which is why the two `stroke-*` overrides live in
+`.rf-icon` and work despite Lucide writing `round` onto every `<svg>`. **Deleting those two
+lines is the single easiest way to make the whole set look wrong** — nothing else on this site
+has a rounded terminal, not a border, not a card, not an isometric model.
+
+Icons carry `--color-rf-flow-soft`, the same as `.rf-index`, so a list that swaps numbers for
+icons does not change color as well as shape. They are always `aria-hidden`: every call site
+pairs the icon with the text it belongs to, so announcing it would read the item twice.
+
+### Icons or numbers — the rule
+
+**Structural devices encode something true about the content.** One question decides it:
+
+> Does order carry information the reader needs?
+
+- **Yes → number it.** `STAGES` (Discover before Implement), `ENGAGEMENT_PATH`, the assessment
+  phases. An icon cannot express sequence. `L1`–`L4` also keep their marks, but those are
+  identifiers rather than ordinals.
+- **No → icon it.** `PRINCIPLES`, industry `stalls`. These are parallel items where which one a
+  reader lands on has nothing to do with position. Use `ul`, not `ol` — the list type makes the
+  same claim the marker does.
+- **Neither, sometimes.** The manifesto takes no marker at all. Its eight entries are arguments,
+  not categories — *"A pilot is not a result"*, *"Nobody gets used"* — so a number implies a
+  sequence that does not exist and an icon is decoration standing in front of a claim. The
+  register there is a flat assertion followed by the reasoning that earns it; anything to the
+  left of the claim competes with it.
+
+**Pick the icon for the sentence, not for the section.** A generic warning triangle on all
+sixteen industry stalls would be worse than the numbers it replaced. If no honest icon exists
+for an item, that list wants no marker.
+
+`ICONS` in `Icon.tsx` is a **closed map**, like `AI_GLYPHS`. `IconName` derives from its keys, so
+a name that does not exist fails the typecheck rather than rendering an empty box.
+
+`/llm-info` deliberately keeps route ticks where the industry pages take icons: it is written to
+be quoted, and a glyph carries nothing into a retrieved chunk.
+
+## Case study artifacts
+
+A case study may carry **artifacts** — sanitized diagrams reconstructed from an engagement.
+They follow the same closed-union pattern as the icons: `kind` picks a layout component,
+the row supplies the labels. `spine` and `branch-stack` render a directed run whose last node
+takes the Flow Blue edge; `kit` renders an unordered grid, because contents are not a sequence.
+
+Two rules, and the second is not negotiable:
+
+- **Built from HTML and CSS, never an image of words.** Labels stay selectable, translatable,
+  and readable by a screen reader.
+- **Never a screenshot of a source document.** The material behind these is confidential, and
+  a screenshot is the one format that cannot be sanitized by review. Reconstruct the concept.
+
+The `figcaption` doubles as the accessible description, so it has to carry the meaning without
+the layout — the arrangement is presentational.
+
+Adding a fourth `kind` means adding a branch to `components/case-study/Artifact.tsx` and a
+member to `ArtifactKind`. An unknown kind degrades to a list rather than throwing, so a row a
+generator wrote against a newer vocabulary still renders something readable.
+
+## Case study images
+
+`.rf-case-cover` is 16:9, against the report cover's 17:22 — a study's image is a scene rather
+than a document, and a portrait block at the top of a card pushes the title below the fold in a
+three-across grid. `object-fit` is `cover` rather than the report's `contain`: there is no title
+to crop off, and letterboxing an arbitrary image reads as a mistake. `.rf-case-hero` widens it
+to 21:9 on the study page.
+
+The ratio is declared in CSS so nothing intrinsic travels with a URL pasted into the table, and
+so a row of cards stays level whether or not each study has art. **Both surfaces render nothing
+when the image is absent** — most studies will have none for a long time, and a placeholder
+frame is worse than no frame.
 
 ## Color
 
@@ -261,7 +365,7 @@ point. All classes are defined in `app/globals.css` under `@layer components`.
 
 ```tsx
 <section className="rf-section">
-  <div className="rf-shell rf-grid gap-y-10 py-14 md:py-18 lg:py-22">
+  <div className="rf-shell rf-grid gap-y-10 rf-band">
     <div className="col-span-full lg:col-span-5">
       <p className="rf-eyebrow">Label</p>
       <h2 className="rf-h2 mt-5">Headline</h2>
@@ -279,17 +383,39 @@ point. All classes are defined in `app/globals.css` under `@layer components`.
 - **`.rf-grid`** — 12 columns, `column-gap: clamp(1rem, 2.2vw, 2rem)`. Row gap is set per
   section (`gap-y-*`), because it varies with content.
 
-**Vertical rhythm.** Three values, and they are a closed set. This is invisible in code and is
-the rule most easily broken by eye:
+**Vertical rhythm — a section must choose a weight.** Three bands, declared once in
+`app/globals.css`. They replaced a single standard padding that seven of ten sections used
+byte-identically, which meant the argument, the offer, the proof, and a two-line teaser all
+occupied the same vertical space. A reader scrolling fast got no signal about what mattered.
 
-| Section | Padding |
+| Class | Padding (base → `md` → `lg`) | For |
+|---|---|---|
+| `.rf-band-lead` | `4.5rem` → `6rem` → `7.5rem` | The two or three sections a page stands on |
+| `.rf-band` | `3.5rem` → `4.5rem` → `5.5rem` | Default. The previous standard value, unchanged |
+| `.rf-band-tight` | `3rem` → `3.5rem` → `4rem` | A section whose job is finished when the reader clicks through |
+
+**`lead` stops meaning anything the moment a third section on the same page takes it.** Take it
+from something else rather than adding it. Every route currently spends it exactly twice or
+once:
+
+| Route | `lead` sections |
 |---|---|
-| Standard content section | `py-14 md:py-18 lg:py-22` |
-| `PageHeader` — the opening block on every route below home | `py-12 md:py-16 lg:py-20` |
-| `ClosingCTA` — the last block on a page | `py-14 md:py-20 lg:py-24` |
+| `/` | `ProductionGap` (the argument), `FreeAssessment` (the conversion) |
+| `/services` | `RegainFlowSystem` (the framework), `FreeAssessment` |
+| `/industries` | The four industry cards — the hub's whole reason to exist |
+| `/industries/[slug]` | `AssessmentCallout` — the conversion, and the only one on the page |
+| `/insights` | The case studies |
 
-`ProofStrip` and `Hero` use `py-14 md:py-16` because both carry a full-bleed element that
-supplies its own space.
+**Ground alternates with weight.** Void and Navy carry the beat — the home page ran four Void
+sections back to back, and the change to Navy at `StageSummary` is what tells a scrolling reader
+the diagnosis has ended and the offer has started. Never leave more than two same-ground
+sections adjacent unless one carries the wave, which distinguishes it on its own.
+
+`PageHeader` keeps `py-12 md:py-16 lg:py-20` — it is the opening block, not a band. `Hero` sets
+its own, because it carries a full-bleed element that supplies the space.
+
+The reference and form routes (`/llm-info`, the report pages, `/contact`, `/company`) still use
+raw `py-*` values. Move each to a band when you next touch it.
 
 **Layout convention.** Headline column left at `lg:col-span-5`, content right at
 `lg:col-span-6 lg:col-start-7`, everything `col-span-full` below `lg`. Card grids are
@@ -565,6 +691,10 @@ reveal genuinely does need scripting and the file behind it is public anyway.
 The site has never needed these, so no convention exists. Anyone adding one is designing, not
 applying — extend the vocabulary above deliberately rather than importing a component library.
 
+(Lucide is not the exception it looks like. It supplies *geometry*, not components: every icon
+is retuned to the house stroke in `.rf-icon` and gated behind one module. A library that shipped
+its own layout, spacing, or color would still be the thing this rule forbids.)
+
 Tables · toasts and notifications · modals and dialogs · skeleton states · pagination · tabs ·
 tooltips · light mode · route-level error states (404/500 render Next.js defaults).
 
@@ -586,4 +716,5 @@ and a route out when nothing is published, rather than an empty grid.
 | `supabase/migrations/` | The two tables the forms write to, their grants, and their RLS posture |
 | `lib/og.tsx` | The OG card **and a hand-mirrored copy of the palette** |
 | `lib/ascii/monogram.ts` | The mark's geometry, traced from the icon |
+| `components/Icon.tsx` | The icon set. **The only module that may import `lucide-react`** |
 | `components/stage-models/iso.tsx` | Isometric primitives |

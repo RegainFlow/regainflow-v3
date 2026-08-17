@@ -36,8 +36,6 @@ export const RF_EVENTS = {
   /** Non-converting CTAs, kept separate so they cannot inflate the above. */
   secondaryClicked: "cta_secondary_clicked",
   caseStudyOpened: "case_study_opened",
-  /** The `/insights` disclosure — the clearest "digging" signal on the site. */
-  allWorkOpened: "all_work_opened",
   assessmentStepOpened: "assessment_step_opened",
   /**
    * A footer assistant link. Carries `assistant` — which of them was picked.
@@ -71,10 +69,6 @@ export const RF_EVENTS = {
   reportDownloaded: "report_downloaded",
   /** First play of a report's audio overview. Fires once per page view. */
   podcastPlayed: "report_podcast_played",
-  /** A founder resume. Carries `person`. Like the capability statement, it
-   *  converts nothing and is a strong intent signal, so it stays outside the
-   *  `cta_` family. */
-  resumeOpened: "resume_opened",
 } as const;
 
 export type RfEvent = (typeof RF_EVENTS)[keyof typeof RF_EVENTS];
@@ -137,8 +131,13 @@ export type RfLocation =
 export type RfSurface =
   | "home_proof"
   | "featured"
-  | "all_work"
-  | "related"
+  /**
+   * The Selected Engagements band on the `/industries` hub. Its own value
+   * rather than `featured`, because a click here comes from a reader browsing
+   * sectors rather than one who came to `/insights` for the work — the two say
+   * different things about how they arrived.
+   */
+  | "industries_hub"
   /**
    * The proof band on an industry group page. Its own value rather than
    * `featured`, because a click here means a reader who already self-selected

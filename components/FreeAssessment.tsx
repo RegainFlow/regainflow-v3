@@ -3,16 +3,16 @@
 import posthog from "posthog-js";
 import { useState } from "react";
 
+import AssessmentReport from "@/components/AssessmentReport";
 import AsciiField from "@/components/brand/AsciiField";
 import { RF_EVENTS, type RfLocation } from "@/lib/analytics/events";
 import {
   ASSESSMENT_CTA,
-  ASSESSMENT_PROOF,
-  ASSESSMENT_STEPS,
+  ASSESSMENT_PHASES,
 } from "@/lib/content/assessment";
 import { FREE_ASSESSMENT_HREF } from "@/lib/site";
 
-/** Where each step's route leaves the column, in SVG units. */
+/** Where each phase's route leaves the column, in SVG units. */
 const NODE_Y = [40, 100, 160, 220];
 const JUNCTION = 130;
 
@@ -20,13 +20,24 @@ const JUNCTION = 130;
  * The free assessment — the page's one conversion, and the only thing on this
  * site we give away.
  *
- * Every step's copy is rendered at rest. Highlighting a step lights its route
+ * The section answers two questions and is ordered so neither can be missed:
+ * **what you get** (the report panel, immediately under the lead) and **what it
+ * costs** (the price on that panel). Everything after them is how it runs.
+ *
+ * That ordering is the fix for what this was. The section used to open with
+ * four phases, then a second list of four steps saying the same thing from
+ * another angle, then a $0/None/Zero stat row, with the report's actual
+ * contents buried as a chip row inside step 03's body copy. A reader had to
+ * work to find out what arrived, and the price read as a claim rather than a
+ * price. See `lib/content/assessment.ts` for the content-side half of that.
+ *
+ * Every phase's copy is rendered at rest. Highlighting one lights its route
  * into the junction and lifts the row; it never reveals text that was hidden,
  * because a visitor with JavaScript off has to be able to read all four.
  *
  * `hook` swaps the lead for a caller-supplied one. `/services` and the home
  * page both take the default; the shorter `AssessmentCallout` is what industry
- * pages use, since four steps and a traced diagram repeated at the foot of
+ * pages use, since four phases and a traced diagram repeated at the foot of
  * every sector page stop reading as substance.
  *
  * `location` is the analytics value for the booking anchor, because this now
@@ -50,33 +61,36 @@ export default function FreeAssessment({
           proof strip uses, so this reads as the identity and not an effect. */}
       <AsciiField className="rf-ascii-field rf-ascii-echo" animate={false} />
 
-      <div className="rf-shell relative z-10 py-14 md:py-18 lg:py-22">
+      {/* `rf-band-lead` — the page's one conversion, and the only thing here
+          we give away. The other section carrying this weight is the argument
+          that earns it. */}
+      <div className="rf-shell relative z-10 rf-band-lead">
         <div className="rf-grid gap-y-8">
           <div className="col-span-full lg:col-span-6">
             <p className="rf-eyebrow text-rf-flow-soft">Free assessment</p>
             <h2 className="rf-h2 mt-5">
-              Find out what is worth doing&mdash;before you pay anyone to do it.
+              Get a clear read on what is worth doing&mdash;and what it will
+              take.
             </h2>
           </div>
 
           <p className="rf-lead col-span-full max-w-[50ch] lg:col-span-5 lg:col-start-8 lg:pt-3">
             {hook ??
-              "The first conversation is free, and it stays free whether or not it ends in work. You get our read either way."}
+              "A real mini-engagement, not a free first conversation. It runs in four phases and ends in a written report that is yours to act on."}
           </p>
         </div>
 
-        <dl className="mt-12 grid gap-8 sm:grid-cols-3">
-          {ASSESSMENT_PROOF.map((item) => (
-            <div key={item.label} className="border-t border-rf-hairline pt-4">
-              <dt className="rf-utility">{item.label}</dt>
-              <dd className="rf-stat mt-3 text-rf-flow-soft">{item.value}</dd>
-            </div>
-          ))}
-        </dl>
+        {/* What you get, and what it costs — the two questions this section
+            exists to answer, in one object, before anything about process. The
+            panel is capped and left-aligned rather than full-bleed: a document
+            that spans twelve columns stops reading as a document. */}
+        <div className="mt-12 max-w-[34rem]">
+          <AssessmentReport />
+        </div>
 
         <p className="rf-utility mt-14 text-rf-flow-soft">
           <span className="rf-on-touch">Tap</span>
-          <span className="rf-on-pointer">Hover</span> a step to trace it
+          <span className="rf-on-pointer">Hover</span> a phase to trace it
         </p>
 
         {/* Grid only from `lg` — see the note in `LayerSystem`; below that the
@@ -91,7 +105,7 @@ export default function FreeAssessment({
           {/* `self-start`: the row is as tall as the sticky diagram beside it,
               and a stretched list drags its last rule into empty space. */}
           <ol className="rf-assess-steps mt-10 self-start lg:col-span-7 lg:col-start-1 lg:row-start-1 lg:mt-0">
-            {ASSESSMENT_STEPS.map((step) => (
+            {ASSESSMENT_PHASES.map((step) => (
               <li
                 key={step.index}
                 className="rf-assess-step"
@@ -131,6 +145,9 @@ export default function FreeAssessment({
                     <span className="sr-only"> — highlight this step</span>
                   </span>
 
+                  {/* No report-contents chip row here any more. It was only
+                      discoverable by reading phase 03 to the end; the panel
+                      above carries it where a reader looks first. */}
                   <span className="rf-body mt-2 block max-w-[58ch]">
                     {step.detail}
                   </span>
@@ -151,12 +168,17 @@ export default function FreeAssessment({
           </a>
           <p className="rf-utility">No cost &middot; No obligation</p>
         </div>
+
+        {/* The "this call is qualification, not the assessment" note used to
+            live here as its own constant. It now opens phase 01, which is the
+            phase it describes — a caveat under the button was answering a
+            question the reader had already formed two screens earlier. */}
       </div>
     </section>
   );
 }
 
-/** Four steps converging on one read. Decorative — the list carries the copy. */
+/** Four phases converging on one read. Decorative — the list carries the copy. */
 function AssessmentRoute({ active }: { active: string | null }) {
   return (
     <svg
@@ -167,7 +189,7 @@ function AssessmentRoute({ active }: { active: string | null }) {
       aria-hidden="true"
       focusable="false"
     >
-      {ASSESSMENT_STEPS.map((step, i) => {
+      {ASSESSMENT_PHASES.map((step, i) => {
         const y = NODE_Y[i];
         const on = active === step.index;
 

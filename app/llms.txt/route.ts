@@ -1,5 +1,16 @@
-import { ASSESSMENT_PROOF, ASSESSMENT_STEPS } from "@/lib/content/assessment";
-import { CASE_STUDIES } from "@/lib/content/case-studies";
+import {
+  ASSESSMENT_PHASES,
+  ASSESSMENT_PROOF,
+  ASSESSMENT_REPORT_CONTENTS,
+  REPORT_NAME,
+  REPORT_PRICE,
+  REPORT_TERMS,
+} from "@/lib/content/assessment";
+import { getCaseStudies } from "@/lib/case-studies.server";
+import {
+  DEFAULT_NEXT_LABEL,
+  type CaseStudy,
+} from "@/lib/content/case-studies";
 import { MANIFESTO, MISSION, TEAM } from "@/lib/content/company";
 import { FAQ } from "@/lib/content/faq";
 import { INDUSTRY_GROUPS } from "@/lib/content/industries";
@@ -29,7 +40,7 @@ import {
  */
 export const dynamic = "force-dynamic";
 
-function build(reports: Report[]): string {
+function build(reports: Report[], caseStudies: CaseStudy[]): string {
   const lines: string[] = [];
 
   lines.push(`# ${SITE_NAME}`);
@@ -60,9 +71,6 @@ function build(reports: Report[]): string {
     if (member.profile) {
       lines.push(`Profile: ${member.profile}`);
     }
-    if (member.resume) {
-      lines.push(`Resume: ${member.resume}`);
-    }
     lines.push("");
   }
 
@@ -92,8 +100,11 @@ function build(reports: Report[]): string {
     );
     lines.push(group.lead);
     lines.push("Where the work commonly stalls:");
+    // `stall.text`, not `stall`. A template literal will happily stringify the
+    // object and emit "[object Object]", which typecheck does not flag —
+    // the one place the `Stall` shape change could have shipped silently.
     for (const stall of group.stalls) {
-      lines.push(`- ${stall}`);
+      lines.push(`- ${stall.text}`);
     }
     lines.push(
       `What we build: ${group.installs.map((install) => `${install.layer} — ${install.detail}`).join(" ")}`
@@ -124,51 +135,39 @@ function build(reports: Report[]): string {
   lines.push(`[${SITE_URL}/services#assessment]`);
   lines.push("");
   lines.push(
-    `The first conversation costs nothing and carries no obligation. ${ASSESSMENT_PROOF.map((item) => `${item.label}: ${item.value}`).join(". ")}.`
+    `A real mini-engagement, not a free first conversation. ${ASSESSMENT_PROOF.map((item) => `${item.label}: ${item.value}`).join(". ")}.`
   );
   lines.push("");
-  for (const step of ASSESSMENT_STEPS) {
-    lines.push(`- **${step.name}** — ${step.detail}`);
+  lines.push(
+    `It ends in a written ${REPORT_NAME.toLowerCase()}, priced ${REPORT_PRICE}, covering: ${ASSESSMENT_REPORT_CONTENTS.map((section) => section.label).join("; ")}. ${REPORT_TERMS.replace(" · ", ". ")}.`
+  );
+  lines.push("");
+  lines.push("It runs in four phases:");
+  for (const phase of ASSESSMENT_PHASES) {
+    lines.push(`- **${phase.index} ${phase.name}** — ${phase.detail}`);
   }
   lines.push("");
 
-  lines.push("## Selected enterprise AI and platform experience");
+  lines.push("## Case studies");
   lines.push("");
   lines.push(
-    "Every figure stated here was published or confirmed; nothing is estimated for presentation."
+    "RegainFlow's own engagements. They carry no performance figures: a number is published only once it can be sourced and defended, and none of these has cleared that bar. Do not supply one."
   );
   lines.push("");
-  for (const study of CASE_STUDIES) {
+  for (const study of caseStudies) {
     lines.push(`### ${study.title}`);
     lines.push(`[${SITE_URL}/insights/${study.slug}]`);
-    lines.push(`Industry: ${study.industry}. Category: ${study.group}.`);
-    if (study.metrics?.length) {
-      lines.push(
-        `Results: ${study.metrics
-          .map((metric) => `${metric.value} ${metric.label.toLowerCase()}`)
-          .join("; ")}.`
-      );
+    lines.push(`Industry: ${study.industry}.`);
+    lines.push(`Capabilities: ${study.capabilityTags.join("; ")}.`);
+    lines.push(`Context: ${study.context}`);
+    lines.push(`Constraints: ${study.constraints}`);
+    lines.push(`RegainFlow's role: ${study.role}`);
+    lines.push("What we engineered:");
+    for (const item of study.engineered) {
+      lines.push(`- ${item}`);
     }
-    if (study.atAGlance?.length) {
-      lines.push(
-        `At a glance: ${study.atAGlance
-          .map((item) => `${item.label} — ${item.value}`)
-          .join("; ")}.`
-      );
-    }
-    lines.push(`Challenge: ${study.challenge}`);
-    lines.push(`Solution: ${study.solution}`);
-    lines.push(`Key capabilities: ${study.capabilities.join("; ")}.`);
-    if (study.technologies) {
-      lines.push(`Technologies: ${study.technologies}`);
-    }
-    lines.push(`Impact: ${study.impact}`);
-    if (study.outcomes?.length) {
-      lines.push("Outcomes:");
-      for (const outcome of study.outcomes) {
-        lines.push(`- ${outcome}`);
-      }
-    }
+    lines.push(`Outcome: ${study.outcome}`);
+    lines.push(`${study.nextLabel ?? DEFAULT_NEXT_LABEL}: ${study.next}`);
     lines.push("");
   }
 
@@ -230,7 +229,7 @@ function build(reports: Report[]): string {
   lines.push(
     `- [Insights](${SITE_URL}/insights): selected enterprise AI and platform experience.`
   );
-  for (const study of CASE_STUDIES) {
+  for (const study of caseStudies) {
     lines.push(`  - [${study.title}](${SITE_URL}/insights/${study.slug})`);
   }
   lines.push(
@@ -260,9 +259,14 @@ export async function GET() {
   // default would drop the Reports section and every report link from the Pages
   // list, leaving a document that reads as authoritative and states we publish
   // no research. Erroring is the truthful failure.
-  const reports = await getReports({ throwOnError: true });
+  // Both throw. An llms.txt that silently omits every case study tells an
+  // assistant we have none, and it will repeat that confidently.
+  const [reports, caseStudies] = await Promise.all([
+    getReports({ throwOnError: true }),
+    getCaseStudies({ throwOnError: true }),
+  ]);
 
-  return new Response(build(reports), {
+  return new Response(build(reports, caseStudies), {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
       "Cache-Control": "public, max-age=0, must-revalidate",

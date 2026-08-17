@@ -12,7 +12,7 @@ import { ENGAGEMENT_PATH } from "@/lib/content/stages";
 export default function EngagementPath() {
   return (
     <section id="engagement" className="rf-section bg-rf-navy">
-      <div className="rf-shell py-14 md:py-18 lg:py-22">
+      <div className="rf-shell rf-band">
         <div className="rf-grid gap-y-8">
           <div className="col-span-full lg:col-span-6">
             <p className="rf-eyebrow">How an engagement runs</p>

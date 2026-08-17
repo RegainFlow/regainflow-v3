@@ -5,7 +5,9 @@ import { notFound } from "next/navigation";
 import AssessmentCallout from "@/components/AssessmentCallout";
 import CaseStudyCard from "@/components/CaseStudyCard";
 import DitherReveal from "@/components/DitherReveal";
+import Icon from "@/components/Icon";
 import PageHeader from "@/components/PageHeader";
+import { getCaseStudies } from "@/lib/case-studies.server";
 import { studiesForIndustry } from "@/lib/content/case-studies";
 import { INDUSTRY_GROUPS, groupBySlug } from "@/lib/content/industries";
 import { LAYERS } from "@/lib/content/layers";
@@ -18,9 +20,18 @@ import {
 
 type Params = { slug: string };
 
+/**
+ * The four groups still come from the repository, so the slugs are known at
+ * build time. The proof band's *content* does not, which is what makes the
+ * route dynamic below — but keeping this means an unknown slug still 404s
+ * rather than rendering an empty page.
+ */
 export function generateStaticParams(): Params[] {
   return INDUSTRY_GROUPS.map((group) => ({ slug: group.slug }));
 }
+
+/** The proof band reads the case studies table. */
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -60,7 +71,11 @@ export default async function IndustryPage({
 
   if (!group) notFound();
 
-  const studies = studiesForIndustry(group.proof);
+  // `group.proof` decides which studies *lead* this page and in what order —
+  // that stays in the repository, because it is an editorial call. Everything
+  // else on the page is every published study whose `industries` names this
+  // group, which is what lets a study publish onto this page without a commit.
+  const studies = studiesForIndustry(group, await getCaseStudies());
   const layers = LAYERS.map((layer) => ({
     ...layer,
     // Falls back to the generic line rather than rendering an empty row, so a
@@ -104,21 +119,25 @@ export default async function IndustryPage({
             </p>
           </div>
 
-          <ol className="mt-12 border-b border-rf-hairline md:mt-16">
-            {group.stalls.map((stall, i) => (
+          {/* `ul`, not `ol`. These are four symptoms a reader recognises
+              themselves in, and which one has nothing to do with order — the
+              `01`–`04` they used to carry implied a sequence that is not
+              there. The icon names the specific failure instead. */}
+          <ul className="mt-12 border-b border-rf-hairline md:mt-16">
+            {group.stalls.map((stall) => (
               <li
-                key={stall}
+                key={stall.text}
                 className="rf-grid gap-y-3 border-t border-rf-hairline py-7 md:py-8"
               >
-                <p className="rf-index col-span-full lg:col-span-2 lg:pt-1">
-                  {String(i + 1).padStart(2, "0")}
+                <p className="col-span-full lg:col-span-2 lg:pt-1">
+                  <Icon name={stall.icon} />
                 </p>
                 <h3 className="rf-h3 col-span-full max-w-[54ch] lg:col-span-9 lg:col-start-4">
-                  {stall}
+                  {stall.text}
                 </h3>
               </li>
             ))}
-          </ol>
+          </ul>
         </div>
       </section>
 
@@ -183,14 +202,15 @@ export default async function IndustryPage({
                 </h2>
               </div>
 
-              {/* The disclosure this band needs, and it stays. Some of these
-                  studies ran in aerospace and defense, and a reader who works
-                  out for themselves that the proof is transferable has already
-                  stopped believing the rest of the page. */}
+              {/* The one disclosure this band still needs: a study listed here
+                  may have run in a neighbouring sector, and a reader who works
+                  that out for themselves has already stopped believing the rest
+                  of the page. Nothing about figures — there are none — and
+                  nothing about anonymization, which is our rule to keep rather
+                  than a caveat to hand the reader. */}
               <p className="rf-body col-span-full max-w-[52ch] lg:col-span-6 lg:col-start-7 lg:pt-3">
-                Some of these ran in other sectors. Each is here because the
-                problem it solved is the problem this one brings us, and every
-                figure on it was published or confirmed.
+                Where a study ran in a neighbouring sector, it is here because
+                the problem it solved is the problem this one brings us.
               </p>
             </div>
 

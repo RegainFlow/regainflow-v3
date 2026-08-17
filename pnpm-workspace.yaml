@@ -1,5 +1,10 @@
 allowBuilds:
   # Arrives with posthog-js. Its postinstall only prints a funding notice.
   core-js: false
+  # Arrives with tsx, which runs the case study pipeline. Its postinstall only
+  # fetches the platform binary, and pnpm already resolves that as an optional
+  # dependency — tsx runs correctly without it. Left false to keep the "no
+  # native postinstalls" stance; unresolved, it fails every `pnpm <script>`.
+  esbuild: false
   sharp: false
   unrs-resolver: false

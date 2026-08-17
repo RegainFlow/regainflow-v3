@@ -49,8 +49,12 @@ export default function StageSummary() {
   }, []);
 
   return (
-    <section id="approach" className="rf-section">
-      <div className="rf-shell py-14 md:py-18 lg:py-22">
+    // Navy. The home page ran four Void sections back to back and this is the
+    // first of them that is a different *kind* of thing — the argument above it
+    // is a diagnosis, this is the offer. The ground change is what tells a
+    // scrolling reader that.
+    <section id="approach" className="rf-section bg-rf-navy">
+      <div className="rf-shell rf-band">
         <div className="rf-grid gap-y-5">
           <div className="col-span-full lg:col-span-7">
             {/* Deliberately not the `/services` heading — each route makes one

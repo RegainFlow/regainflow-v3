@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 
-import { CASE_STUDIES, type CaseStudy } from "@/lib/content/case-studies";
+// Type-only, and it has to stay that way. `lib/content/case-studies.ts` no
+// longer holds data — the studies come from Supabase through
+// `lib/case-studies.server.ts` — and a value import here would drag a
+// server-only module into one that does nothing but build strings.
+import type { CaseStudy } from "@/lib/content/case-studies";
 import { TEAM } from "@/lib/content/company";
 import { FAQ } from "@/lib/content/faq";
 import type { IndustryGroup } from "@/lib/content/industries";
@@ -76,7 +80,7 @@ export function pageMetadata({
   const fullTitle = `${title} | ${SITE_NAME}`;
   const card = {
     url: image?.url ?? "/opengraph-image",
-    alt: image?.alt ?? `${SITE_NAME} — AI transformation partner`,
+    alt: image?.alt ?? `${SITE_NAME} — AI engineering & transformation partner`,
     ...OG_CARD,
   };
 
@@ -133,7 +137,7 @@ export function organizationJsonLd() {
     logo: `${SITE_URL}/icon.png`,
     image: `${SITE_URL}/opengraph-image`,
     description:
-      "AI transformation partner for law enforcement, aerospace manufacturing, and federal organizations — AI portfolio direction, production engineering, and managed AI operations.",
+      "AI engineering and transformation partner for public agencies and complex organizations — AI portfolio direction, production engineering, and managed AI operations, through adoption and handoff.",
     areaServed: "US",
     address: {
       "@type": "PostalAddress",
@@ -161,7 +165,7 @@ export function organizationJsonLd() {
     })),
     hasOfferCatalog: {
       "@type": "OfferCatalog",
-      name: "AI transformation services",
+      name: "AI engineering and transformation services",
       itemListElement: STAGES.map((stage) => ({
         "@type": "Offer",
         itemOffered: {
@@ -241,8 +245,12 @@ export function breadcrumbJsonLd(
  * `CreativeWork` rather than `Article`: these are accounts of delivered work,
  * not dated editorial, and `Article` without a real `datePublished` invites a
  * rich-result warning for a field we cannot honestly fill. `about` carries the
- * group and `abstract` the executive line, both already authored in
+ * environment and `abstract` the executive line, both already authored in
  * `lib/content/case-studies.ts`.
+ *
+ * No `mentions`. That property restated each study's headline figures, and
+ * there are no figures on these studies — asserting one in structured data that
+ * the page does not display would be a rich-result violation even if we had it.
  */
 export function caseStudyJsonLd(study: CaseStudy) {
   return {
@@ -253,22 +261,10 @@ export function caseStudyJsonLd(study: CaseStudy) {
     headline: study.title,
     abstract: study.summary,
     description: study.summary,
-    about: study.group,
     // The environment the work ran in — the closest thing to a subject these
     // deliberately unnamed studies have.
-    keywords: [study.group, study.industry],
-    // Every figure here was published or confirmed (see the header comment in
-    // `lib/content/case-studies.ts`), which is what makes it safe to restate as
-    // structured data. `mentions` rather than a `QuantitativeValue`: these are
-    // stated results in prose form, not measured properties of the work.
-    ...(study.metrics?.length
-      ? {
-          mentions: study.metrics.map((metric) => ({
-            "@type": "Thing",
-            name: `${metric.value} ${metric.label.toLowerCase()}`,
-          })),
-        }
-      : {}),
+    about: study.industry,
+    keywords: [study.industry, ...study.capabilityTags],
     url: `${SITE_URL}/insights/${study.slug}`,
     inLanguage: "en-US",
     isPartOf: { "@id": `${SITE_URL}/#website` },
@@ -292,7 +288,7 @@ export function industryJsonLd(group: IndustryGroup) {
     "@context": "https://schema.org",
     "@type": "Service",
     "@id": `${SITE_URL}/industries/${group.slug}/#service`,
-    name: `AI transformation for ${group.name}`,
+    name: `AI engineering for ${group.name}`,
     description: group.lead,
     serviceType: group.industries.map((industry) => industry.name),
     url: `${SITE_URL}/industries/${group.slug}`,
@@ -403,19 +399,27 @@ export function faqJsonLd() {
   };
 }
 
-export function caseStudiesJsonLd() {
+/**
+ * Takes the studies rather than reading them.
+ *
+ * It read a module-level array until the studies moved into Supabase. Fetching
+ * here would make this async and pull the secret-key client into a module whose
+ * only job is building strings — and every caller already has the data, because
+ * it just rendered the list this describes.
+ */
+export function caseStudiesJsonLd(studies: CaseStudy[]) {
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: "Selected enterprise AI and platform experience",
-    itemListElement: CASE_STUDIES.map((study, index) => ({
+    name: "RegainFlow case studies",
+    itemListElement: studies.map((study, index) => ({
       "@type": "ListItem",
       position: index + 1,
       item: {
         "@type": "CreativeWork",
         name: study.title,
         abstract: study.summary,
-        about: study.group,
+        about: study.industry,
         url: `${SITE_URL}/insights/${study.slug}`,
       },
     })),

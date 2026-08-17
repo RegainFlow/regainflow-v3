@@ -1,5 +1,6 @@
+import AssessmentReport from "@/components/AssessmentReport";
 import { RF_EVENTS } from "@/lib/analytics/events";
-import { ASSESSMENT_CTA, ASSESSMENT_PROOF } from "@/lib/content/assessment";
+import { ASSESSMENT_CTA } from "@/lib/content/assessment";
 import { FREE_ASSESSMENT_HREF } from "@/lib/site";
 
 /**
@@ -23,7 +24,10 @@ import { FREE_ASSESSMENT_HREF } from "@/lib/site";
 export default function AssessmentCallout({ hook }: { hook: string }) {
   return (
     <section id="assessment" className="rf-section">
-      <div className="rf-shell py-14 md:py-20 lg:py-24">
+      {/* `rf-band-lead`: on an industry page this is the conversion, and the
+          only section of it. `FreeAssessment` carries the same weight on the
+          routes that render the full version. */}
+      <div className="rf-shell rf-band-lead">
         <div className="rf-grid gap-y-8">
           <div className="col-span-full lg:col-span-5">
             <p className="rf-eyebrow">Free assessment</p>
@@ -35,17 +39,19 @@ export default function AssessmentCallout({ hook }: { hook: string }) {
           <div className="col-span-full lg:col-span-6 lg:col-start-7">
             <p className="rf-body max-w-[52ch]">{hook}</p>
 
-            {/* The same three claims the full section leads with, from the same
-                constant, so the offer cannot say one thing here and another on
-                `/services`. */}
-            <dl className="mt-8 grid gap-6 sm:grid-cols-3">
-              {ASSESSMENT_PROOF.map((proof) => (
-                <div key={proof.label}>
-                  <dd className="rf-stat">{proof.value}</dd>
-                  <dt className="rf-utility mt-2">{proof.label}</dt>
-                </div>
-              ))}
-            </dl>
+            {/* The same panel the full section leads with, from the same
+                constants, so the offer cannot say one thing here and another on
+                `/services`. It replaced a $0/None/Zero stat row: this page's
+                reader has just finished a sector argument and the question in
+                front of them is what arrives, not what it costs — and the
+                panel answers both, with the price on the thing being priced.
+
+                `compact` drops the terms footer. The heading a line above
+                already says the offer costs nothing, and the walkthrough that
+                earns the full treatment is deliberately not on this page. */}
+            <div className="mt-8 max-w-[30rem]">
+              <AssessmentReport compact />
+            </div>
 
             <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
               <a

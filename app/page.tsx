@@ -7,6 +7,20 @@ import ProductionGap from "@/components/ProductionGap";
 import ProofStrip from "@/components/ProofStrip";
 import StageSummary from "@/components/StageSummary";
 
+/**
+ * **Required, and not obviously so.** `ProofStrip` reads the case studies
+ * table, but it does that inside the component rather than here — so without
+ * this flag Next happily prerenders the home page, and if the fetch is cold or
+ * failing at build time it bakes in a page with no proof section that never
+ * recovers. The build output says `○ /` and looks correct right up until you
+ * notice the section is missing.
+ *
+ * The most-visited route on the site is server-rendered per request as a
+ * result. That is the acknowledged cost of putting case studies in a table —
+ * see the migration, and `export const revalidate` if it needs walking back.
+ */
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   return (
     <>

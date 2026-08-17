@@ -110,6 +110,65 @@
     border-bottom: 1px solid var(--color-rf-hairline);
   }
 
+  /* --- Section rhythm ------------------------------------------------------
+     Three band heights, and the point of naming them is that a section has to
+     *choose* one.
+
+     Seven of ten sections shipped `py-14 md:py-18 lg:py-22` — byte-identical —
+     so the argument, the offer, the proof, and a two-line teaser all occupied
+     the same vertical weight. A reader scrolling fast got no signal about what
+     mattered, and the page read as one long uniform column no matter how good
+     the individual sections were. Vertical space is the cheapest hierarchy
+     there is and this was spending none of it.
+
+     `lead` is for the two or three sections a page genuinely stands on — the
+     argument that earns the offer, and the conversion. It stops meaning
+     anything the moment a fourth section takes it, so take it from something
+     else rather than adding it.
+
+     `tight` is for a section that exists to point somewhere: a summary whose
+     job is finished when the reader clicks through.
+
+     The middle step is deliberately the old default, so a section that has not
+     been considered yet looks exactly as it did.
+  ------------------------------------------------------------------------- */
+
+  .rf-band {
+    padding-block: 3.5rem;
+  }
+
+  .rf-band-lead {
+    padding-block: 4.5rem;
+  }
+
+  .rf-band-tight {
+    padding-block: 3rem;
+  }
+
+  @media (min-width: 768px) {
+    .rf-band {
+      padding-block: 4.5rem;
+    }
+    .rf-band-lead {
+      padding-block: 6rem;
+    }
+    .rf-band-tight {
+      padding-block: 3.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .rf-band {
+      padding-block: 5.5rem;
+    }
+    .rf-band-lead {
+      padding-block: 7.5rem;
+    }
+    .rf-band-tight {
+      padding-block: 4rem;
+    }
+  }
+
   /* --- Type ------------------------------------------------------------ */
 
   .rf-h1 {
@@ -176,6 +235,29 @@
     font-weight: 500;
     letter-spacing: 0.14em;
     color: var(--color-rf-flow-soft);
+  }
+
+  /* The icon counterpart to `.rf-index`, and it carries the same Flow Soft so
+     the two read as one register — a list that swaps its numbers for icons
+     should not change color as well as shape.
+
+     The two `stroke-*` declarations are the whole reason these read as house
+     icons rather than as a library someone installed. Lucide ships
+     `stroke-linecap: round` and `stroke-linejoin: round`; nothing else on this
+     site is round — not a border, not a card, not an isometric model, not the
+     hand-drawn chevron in `SiteNav`. Rounded terminals among all that look
+     borrowed at any size above about 14px. Deleting these two lines is the
+     single easiest way to make the whole set look wrong.
+
+     Sized in `rem` and `flex: none` because every call site sits in a flex row
+     beside body copy, where a percentage-sized icon collapses. */
+  .rf-icon {
+    flex: none;
+    width: 1.125rem;
+    height: 1.125rem;
+    color: var(--color-rf-flow-soft);
+    stroke-linecap: butt;
+    stroke-linejoin: miter;
   }
 
   .rf-wordmark {
@@ -665,6 +747,264 @@
 
   .rf-report-cover-lead {
     max-width: 24rem;
+  }
+
+  /* Case study artwork. 16:9 rather than the report cover's 17:22, because a
+     study's image is a scene rather than a document — and because a portrait
+     block at the top of a card pushes the title below the fold in a
+     three-across grid.
+
+     `cover`, not the report's `contain`: there is no title to crop off, and
+     letterboxing an arbitrary image inside a card reads as a mistake. The ratio
+     is declared here so nothing intrinsic has to travel with a URL pasted into
+     the table, and so a row of cards stays level whether or not each study has
+     art — the same reasoning as `.rf-report-cover`. */
+  .rf-case-cover {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border: 1px solid var(--color-rf-hairline);
+    background: var(--color-rf-navy);
+  }
+
+  .rf-case-cover img {
+    object-fit: cover;
+  }
+
+  /* On the study page the same frame runs wider and shallower — at 16:9 across
+     a full shell it would push the first section a screen down. */
+  .rf-case-hero {
+    aspect-ratio: 21 / 9;
+  }
+
+  /* --- Case study article --------------------------------------------------
+     A case study is the one place on this site someone reads for several
+     minutes rather than scanning. `.rf-body` is tuned for scanning — 15px, and
+     Slate against Void — which is right in a card and tiring in a long read.
+
+     Scoped to the article rather than changed globally: every other surface is
+     a page you skim, and lifting body type site-wide would be a different and
+     much larger decision.
+  ------------------------------------------------------------------------- */
+
+  .rf-article .rf-body {
+    /* ~16.5px at desktop, and it stays at the scanning size on small screens
+       where the measure is already short. */
+    font-size: 1rem;
+    line-height: 1.7;
+    /* Slate is 15px-in-a-card grey. Over five paragraphs it reads as disabled
+       text, so the article warms it toward Warm White without going all the
+       way — headings still have to win. */
+    color: #adb6c6;
+  }
+
+  .rf-article .rf-body > * + * {
+    margin-top: 1em;
+  }
+
+  @media (min-width: 768px) {
+    .rf-article .rf-body {
+      font-size: 1.0625rem;
+    }
+  }
+
+  /* Every prose block in the article. 68ch sits inside the 66–72 the direction
+     asks for, and it is a `max-width` so short columns are unaffected. */
+  .rf-article .rf-measure {
+    max-width: 68ch;
+  }
+
+  /* Breadcrumb. Mono utility register, so it reads as chrome rather than as
+     the first line of the article. */
+  .rf-crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .rf-crumbs li:not(:last-child)::after {
+    content: "/";
+    margin-left: 0.5rem;
+    color: var(--color-rf-line);
+  }
+
+  /* A semantic tag list, replacing the pipe-separated `.rf-mech` run. Chips
+     wrap as units, so a long tag breaks the line rather than the tag. */
+  .rf-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .rf-tag {
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--color-rf-hairline);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-rf-slate);
+  }
+
+  /* --- At a glance ---------------------------------------------------------
+     Scope facts, not results. Rendered like the assessment's proof row so the
+     register is consistent: mono label, display figure.
+  ------------------------------------------------------------------------- */
+
+  .rf-glance {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .rf-glance {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .rf-glance > div {
+    border-top: 1px solid var(--color-rf-hairline);
+    padding-top: 0.85rem;
+  }
+
+  .rf-glance dd {
+    font-size: clamp(1.5rem, 2.6vw, 2rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--color-rf-flow-soft);
+  }
+
+  /* --- Track map -----------------------------------------------------------
+     The signature of a study that ran in parallel tracks. Two columns that are
+     genuinely different work, not two of the same card — the divider between
+     them is the point, so it is a real rule rather than a gap.
+  ------------------------------------------------------------------------- */
+
+  .rf-tracks {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  @media (min-width: 900px) {
+    .rf-tracks {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0;
+    }
+
+    /* The rule only exists side by side. Stacked, the tracks are separated by
+       their own top borders and a vertical line would have nothing to divide. */
+    .rf-tracks > *:first-child {
+      padding-right: 2.75rem;
+      border-right: 1px solid var(--color-rf-hairline);
+    }
+
+    .rf-tracks > *:last-child {
+      padding-left: 2.75rem;
+    }
+  }
+
+  .rf-track-key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 1px solid var(--color-rf-flow);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-rf-flow-soft);
+  }
+
+  /* The one idea the track turned on. Set apart because it is the sentence a
+     reader should leave with if they read nothing else in the column. */
+  .rf-track-thesis {
+    padding-left: 1rem;
+    border-left: 2px solid var(--color-rf-flow);
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    color: var(--color-rf-warm);
+  }
+
+  /* --- Artifacts -----------------------------------------------------------
+     Sanitized diagrams, built from HTML and CSS so the text inside them stays
+     selectable, translatable, and readable by a screen reader. Nothing here is
+     an image of words.
+  ------------------------------------------------------------------------- */
+
+  .rf-artifact {
+    margin: 0;
+    border: 1px solid var(--color-rf-hairline);
+    background: var(--color-rf-navy);
+    padding: clamp(1.1rem, 2.5vw, 1.6rem);
+  }
+
+  .rf-artifact figcaption {
+    margin-top: 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--color-rf-hairline);
+  }
+
+  /* A left-to-right run that becomes top-to-bottom below `sm`. `wrap` rather
+     than a scroller: the direction asks for no horizontal overflow on mobile,
+     and a diagram you have to drag is a diagram nobody reads. */
+  .rf-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  @media (min-width: 640px) {
+    .rf-flow {
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: stretch;
+    }
+
+    /* The basis only means anything once the run is horizontal: it is the width
+       a node gets before the row wraps, so a short label does not collapse to
+       its text and a long one does not take the line. In the column layout
+       above, `flex-basis` would be a *height* — which is not what 8rem meant,
+       and is why this cannot sit in the unscoped rule below. */
+    .rf-flow-node {
+      flex: 1 1 8rem;
+    }
+  }
+
+  .rf-flow-node {
+    padding: 0.7rem 0.85rem;
+    border: 1px solid var(--color-rf-hairline);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-rf-warm);
+  }
+
+  /* The terminal node — where the run lands. Flow Blue edge, so the diagram
+     reads as having a direction without needing an arrowhead per gap. */
+  .rf-flow-node:last-child {
+    border-color: var(--color-rf-flow);
+    color: var(--color-rf-flow-soft);
+  }
+
+  /* A plain grid for the kit: these are contents, not a sequence, so nothing
+     about the layout should imply an order. */
+  .rf-kit {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 0.6rem;
+  }
+
+  .rf-kit li {
+    padding: 0.7rem 0.85rem;
+    border: 1px solid var(--color-rf-hairline);
+    font-size: 0.875rem;
+    color: var(--color-rf-warm);
   }
 
   /* The gate and the audio block are both bounded modules on the page rather
@@ -1618,6 +1958,65 @@
     .rf-layer-name {
       font-size: 1.3rem;
     }
+  }
+
+  /* --- The opportunity report ----------------------------------------------
+     The deliverable, drawn as a document. Hairline on Navy like `.rf-card`,
+     deliberately *without* extending it: every card on this site is a link, and
+     inheriting the hover border would promise a destination this has none of.
+  ------------------------------------------------------------------------- */
+
+  .rf-report {
+    margin: 0;
+    border: 1px solid var(--color-rf-hairline);
+    background: var(--color-rf-navy);
+  }
+
+  /* The title bar, ruled off like a real document header. `baseline` rather
+     than `center`: the label is 0.6875rem mono and the price is display-sized,
+     and centring them left the price sitting visibly low against the rule. */
+  .rf-report-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.35rem;
+    border-bottom: 1px solid var(--color-rf-hairline);
+  }
+
+  /* Smaller than `.rf-stat`, which is tuned for a row of three. One number on
+     its own at that size out-shouts the heading above the panel. */
+  .rf-report-price {
+    font-size: 1.75rem;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--color-rf-flow-soft);
+  }
+
+  .rf-report-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    padding: 1.35rem;
+  }
+
+  /* `start`, not `center`: two of the six labels wrap at narrow widths, and a
+     centred icon then floats to the middle of a two-line row. The 0.1em nudge
+     optically seats an 18px glyph against the cap height beside it. */
+  .rf-report-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+  }
+
+  .rf-report-row .rf-icon {
+    margin-top: 0.1em;
+  }
+
+  .rf-report-foot {
+    padding: 0.85rem 1.35rem;
+    border-top: 1px solid var(--color-rf-hairline);
   }
 
   /* --- Free assessment steps -----------------------------------------------

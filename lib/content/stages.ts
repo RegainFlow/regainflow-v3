@@ -93,16 +93,20 @@ export const ENGAGEMENT_PATH = [
       "A working conversation about what you are trying to move into production, what is already in flight, and where the real obstacle sits. No cost and no obligation.",
     output: "A clear read on what is worth doing",
   },
+  // "First production workflow", not "Pilot". The manifesto opens with "A pilot
+  // is not a result", so selling one as step two was the site contradicting
+  // itself in two places a reader can hold at once. The rename is also the more
+  // accurate description: this ships into the real environment.
   {
     step: "02",
-    name: "Pilot",
+    name: "First production workflow",
     detail:
-      "One team, one real workflow, defined sources, and a representative set of questions the system has to answer. Scoped together before it starts.",
+      "Start with the highest-value feasible workflow, deploy it in the real environment, and measure whether it earns expansion. One team, defined sources, and a representative set of questions the system has to answer — scoped together before it starts.",
     output: "A working system in one workflow",
   },
   {
     step: "03",
-    name: "Managed operations",
+    name: "Managed operations or transfer",
     detail:
       "Ongoing ownership of source synchronization, permissions, evaluation, freshness, usage, and the next workflows — for as long as it is useful. Scale it down or transfer it whenever you choose.",
     output: "A capability that keeps improving",

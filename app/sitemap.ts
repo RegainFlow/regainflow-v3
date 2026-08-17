@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-import { CASE_STUDIES } from "@/lib/content/case-studies";
+import { getCaseStudies } from "@/lib/case-studies.server";
 import { INDUSTRY_GROUPS } from "@/lib/content/industries";
 import { getReports } from "@/lib/reports.server";
 import { SITE_URL } from "@/lib/site";
@@ -27,16 +27,20 @@ const PRIORITY: Record<string, number> = {
   "/llm-info": 0.5,
 };
 
-/** The reports are read per request, so the sitemap is generated per request. */
+/** Reports and case studies are both read per request, so this is too. */
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // `throwOnError`, and this is the whole reason that option exists. The default
-  // `[]` would emit a perfectly valid sitemap that simply omits every report —
-  // a document asserting they do not exist, which is how you de-index a live
-  // report over a thirty-second Supabase blip. Failing the request is honest:
-  // a crawler retries a 500 and believes an empty sitemap.
-  const published = await getReports({ throwOnError: true });
+  // Both throw rather than degrading, and this is the whole reason that option
+  // exists. The default `[]` would emit a perfectly valid sitemap that simply
+  // omits every report and every case study — a document asserting they do not
+  // exist, which is how you de-index live pages over a thirty-second blip.
+  // Failing the request is honest: a crawler retries a 500 and believes an
+  // empty sitemap.
+  const [published, caseStudies] = await Promise.all([
+    getReports({ throwOnError: true }),
+    getCaseStudies({ throwOnError: true }),
+  ]);
 
   const lastModified = new Date();
 
@@ -60,7 +64,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   // Generated rather than listed, so a new study cannot ship unindexed.
-  const studies: MetadataRoute.Sitemap = CASE_STUDIES.map((study) => ({
+  const studies: MetadataRoute.Sitemap = caseStudies.map((study) => ({
     url: `${SITE_URL}/insights/${study.slug}`,
     lastModified,
     changeFrequency: "monthly",

@@ -3,22 +3,29 @@ import Link from "next/link";
 import AsciiField from "@/components/brand/AsciiField";
 import CaseStudyCard from "@/components/CaseStudyCard";
 import DitherReveal from "@/components/DitherReveal";
-import {
-  CASE_STUDIES,
-  HEADLINE_FIGURES,
-  HOME_SLUGS,
-} from "@/lib/content/case-studies";
+import { getCaseStudies } from "@/lib/case-studies.server";
 
-/** Two, not the three `/insights` leads with — this is a teaser, not the list. */
-/* Mapped over the slug list rather than filtered out of `CASE_STUDIES`, so the
-   order here is the one `HOME_SLUGS` declares. */
-const FEATURED = HOME_SLUGS.flatMap(
-  (slug) => CASE_STUDIES.find((study) => study.slug === slug) ?? [],
-);
+/**
+ * Proof on the home page without duplicating `/insights`.
+ *
+ * **This is what makes the home page dynamic.** The studies live in Supabase
+ * now, and the home page is the highest-traffic route on the site — that cost
+ * is stated here rather than only in the migration, because this component is
+ * where someone would discover it.
+ *
+ * `getCaseStudies()` degrades to `[]`, and the section returns `null` on an
+ * empty list rather than rendering an empty grid under a heading. A blip costs
+ * the proof band; it does not cost the home page.
+ */
+export default async function ProofStrip() {
+  // Featured rather than everything, and a hard three. The grid is three across
+  // at `lg`, so "every published study" made publishing the fourth a silent
+  // change to the home page and the tenth a wall of cards. Which three lead is
+  // an editorial decision, so it is a column rather than "the first by date".
+  const studies = await getCaseStudies({ featuredOnly: true, limit: 3 });
 
-/** Proof on the home page without duplicating `/insights`: totals, two
- *  examples, and a way through. */
-export default function ProofStrip() {
+  if (studies.length === 0) return null;
+
   return (
     <section className="rf-section relative isolate overflow-clip bg-rf-navy">
       {/* The wave, once more and almost imperceptibly. The hero carries it
@@ -26,32 +33,30 @@ export default function ProofStrip() {
           than a hero effect. */}
       <AsciiField className="rf-ascii-field rf-ascii-echo" animate={false} />
 
-      <div className="rf-shell relative z-10 py-14 md:py-16">
+      <div className="rf-shell relative z-10 rf-band">
         <div className="rf-grid gap-y-10">
-          <div className="col-span-full lg:col-span-5">
-            <p className="rf-eyebrow">Delivered</p>
+          <div className="col-span-full lg:col-span-6">
+            <p className="rf-eyebrow">Featured case studies</p>
             <h2 className="rf-h2 mt-5 max-w-[18ch]">
               Systems in production, not slideware.
             </h2>
-            <Link href="/insights#case-studies" className="rf-nav-link mt-6 inline-block">
-              All case studies &rarr;
-            </Link>
           </div>
 
-          <dl className="col-span-full grid gap-8 sm:grid-cols-3 lg:col-span-6 lg:col-start-7">
-            {HEADLINE_FIGURES.map((figure) => (
-              <div key={figure.label} className="border-t border-rf-hairline pt-4">
-                <dt className="rf-utility">{figure.label}</dt>
-                <dd className="rf-stat mt-3">{figure.value}</dd>
-              </div>
-            ))}
-          </dl>
+          {/* The totals that sat here — estimated value, hours reduced,
+              transformations delivered — are gone. They were career figures
+              presented as RegainFlow's, and none of them survives the rule that
+              a published number has to be one we can explain how we measured
+              and defend in a procurement conversation. */}
+          <p className="rf-body col-span-full max-w-[50ch] lg:col-span-5 lg:col-start-8 lg:pt-3">
+            Our own engagements. Each one says what the problem was, what we
+            owned, and what it produced.
+          </p>
         </div>
 
         {/* The same card `/insights` renders, rather than a second inline
             version that has to be kept in sync by hand. */}
-        <ul className="mt-12 grid gap-4 border-t border-rf-hairline pt-10 sm:grid-cols-2">
-          {FEATURED.map((study, i) => (
+        <ul className="mt-12 grid gap-4 border-t border-rf-hairline pt-10 sm:grid-cols-2 lg:grid-cols-3">
+          {studies.map((study, i) => (
             <li key={study.slug} className="h-full">
               <DitherReveal className="h-full" delay={i * 90}>
                 <CaseStudyCard study={study} surface="home_proof" />
@@ -59,6 +64,12 @@ export default function ProofStrip() {
             </li>
           ))}
         </ul>
+
+        <p className="mt-10">
+          <Link href="/insights#case-studies" className="rf-nav-link">
+            All case studies &rarr;
+          </Link>
+        </p>
       </div>
     </section>
   );
