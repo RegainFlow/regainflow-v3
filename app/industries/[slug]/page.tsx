@@ -71,11 +71,11 @@ export default async function IndustryPage({
 
   if (!group) notFound();
 
-  // `group.proof` still decides which studies lead this page and in what order —
-  // that stays in the repository. The table only supplies the content behind
-  // each slug, so a study whose `industries` names this group but which `proof`
-  // does not list appears nowhere. See the migration.
-  const studies = studiesForIndustry(group.proof, await getCaseStudies());
+  // `group.proof` decides which studies *lead* this page and in what order —
+  // that stays in the repository, because it is an editorial call. Everything
+  // else on the page is every published study whose `industries` names this
+  // group, which is what lets a study publish onto this page without a commit.
+  const studies = studiesForIndustry(group, await getCaseStudies());
   const layers = LAYERS.map((layer) => ({
     ...layer,
     // Falls back to the generic line rather than rendering an empty row, so a

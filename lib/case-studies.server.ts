@@ -6,6 +6,7 @@ import type {
   CaseStudy,
   CaseStudyCta,
   GlanceFact,
+  SectionHeadings,
   Stage,
   Track,
 } from "@/lib/content/case-studies";
@@ -34,7 +35,7 @@ const PUBLISHED = "published";
  * including one added for internal notes — into a page and its structured data.
  */
 const COLUMNS =
-  "slug, title, industry, eyebrow, summary, capability_tags, meta_title, meta_description, context, constraints, role, engineered, outcome, next_label, next_body, image_url, image_alt, cta, at_a_glance, deliverables, stages, tracks, artifacts, industries, sort_order";
+  "slug, title, industry, eyebrow, summary, capability_tags, meta_title, meta_description, context, constraints, role, engineered, outcome, next_label, next_body, image_url, image_alt, cta, at_a_glance, deliverables, stages, tracks, artifacts, section_headings, industries, sort_order";
 
 /** The row as PostgREST returns it. snake_case, and only what `COLUMNS` asks for. */
 interface CaseStudyRow {
@@ -65,6 +66,7 @@ interface CaseStudyRow {
   stages: Stage[] | null;
   tracks: Track[] | null;
   artifacts: Artifact[] | null;
+  section_headings: SectionHeadings | null;
   industries: string[] | null;
   sort_order: number;
 }
@@ -103,6 +105,7 @@ function toCaseStudy(row: CaseStudyRow): CaseStudy {
     ...(row.stages?.length ? { stages: row.stages } : {}),
     ...(row.tracks?.length ? { tracks: row.tracks } : {}),
     ...(row.artifacts?.length ? { artifacts: row.artifacts } : {}),
+    ...(row.section_headings ? { sectionHeadings: row.section_headings } : {}),
     ...(row.industries?.length ? { industries: row.industries } : {}),
   };
 }
@@ -119,16 +122,35 @@ function toCaseStudy(row: CaseStudyRow): CaseStudy {
  * emits a well-formed document that *asserts these studies do not exist*, and a
  * crawler believes it. A 500 is a retry; a confidently empty sitemap is a
  * de-index.
+ *
+ * `featuredOnly` and `limit` exist for the home page, which leads with a fixed
+ * few rather than everything — see `components/ProofStrip.tsx`. `featured` is
+ * deliberately **not** in `COLUMNS` and not on `CaseStudy`: it decides which
+ * rows come back, and nothing renders it, so a page has no reason to hold it.
  */
 export async function getCaseStudies(
-  { throwOnError = false }: { throwOnError?: boolean } = {},
+  {
+    throwOnError = false,
+    featuredOnly = false,
+    limit,
+  }: { throwOnError?: boolean; featuredOnly?: boolean; limit?: number } = {},
 ): Promise<CaseStudy[]> {
   try {
-    const { data, error } = await supabase()
+    // Built in stages rather than one chain, because `.order()` returns a
+    // transform builder that no longer offers `.eq()` — filters have to be
+    // applied while this is still a filter builder.
+    let filtered = supabase()
       .from("case_studies")
       .select(COLUMNS)
-      .eq("status", PUBLISHED)
-      .order("sort_order", { ascending: true });
+      .eq("status", PUBLISHED);
+
+    if (featuredOnly) filtered = filtered.eq("featured", true);
+
+    let shaped = filtered.order("sort_order", { ascending: true });
+
+    if (limit !== undefined) shaped = shaped.limit(limit);
+
+    const { data, error } = await shaped;
 
     if (error) throw new Error(error.message);
 

@@ -98,6 +98,20 @@ export interface CaseStudyCta {
   secondaryLabel: string;
 }
 
+/**
+ * Per-study overrides for the optional sections' headings.
+ *
+ * Every member is optional and spread over `DEFAULT_SECTION_HEADINGS`, so a
+ * study can rename one heading without restating the other two. A member must
+ * be **omitted** rather than set to `null` — a null would spread over the
+ * default and blank it.
+ */
+export interface SectionHeadings {
+  tracks?: { eyebrow?: string; title?: string; lead?: string };
+  artifacts?: { eyebrow?: string; title?: string };
+  deliverables?: { title?: string };
+}
+
 export interface CaseStudy {
   slug: string;
   title: string;
@@ -151,10 +165,16 @@ export interface CaseStudy {
   tracks?: Track[];
   artifacts?: Artifact[];
 
+  /** Renames the optional sections' headings. See `DEFAULT_SECTION_HEADINGS`. */
+  sectionHeadings?: SectionHeadings;
+
   /**
-   * `IndustryGroup` slugs this study is proof for. **Advisory** — filling it
-   * does not put the study on an industry page. `IndustryGroup.proof` is
-   * authoritative and lives in the repository; see the migration.
+   * `IndustryGroup` slugs this study is proof for, and **authoritative for
+   * whether the study appears on that page** — a study published by the
+   * pipeline reaches its industry page without a repository edit.
+   *
+   * `IndustryGroup.proof` still decides which studies *lead* a page and in what
+   * order; this decides who else is on it. See `studiesForIndustry()`.
    */
   industries?: string[];
 }
@@ -163,21 +183,67 @@ export interface CaseStudy {
 export const DEFAULT_NEXT_LABEL = "What changed next";
 
 /**
- * Every study that counts as proof for an industry group, in `proof` order.
+ * The headings the optional sections carry when a study does not name its own.
+ *
+ * These were literals in `app/insights/[slug]/page.tsx`. They read as house
+ * voice, and they are — but two of them also assumed the shape of the study
+ * that happened to be in front of us when they were written: "Two client
+ * contexts" is two, and "What the partner received" is a partner rather than a
+ * client. A study with three tracks and a direct client had to accept both.
+ *
+ * The defaults here are shape-neutral. The study that wants the original
+ * wording carries it in its own `section_headings`, which is the right place
+ * for a sentence that is true of one engagement.
+ */
+export const DEFAULT_SECTION_HEADINGS = {
+  tracks: {
+    eyebrow: "Parallel tracks",
+    title: "One engagement, more than one problem.",
+    lead: "Each track was built against its own environment. What they share is the method, not the material.",
+  },
+  artifacts: {
+    eyebrow: "Selected artifacts",
+    title: "Reconstructed, not screenshotted.",
+  },
+  deliverables: {
+    title: "What the client received",
+  },
+} as const;
+
+/**
+ * Every study that counts as proof for an industry group.
  *
  * Takes the fetched studies rather than reading a module-level array, which is
  * what the move to the table forced and is the better shape anyway: the caller
  * already has the data and this stays a pure function.
  *
- * Driven by `IndustryGroup.proof` because the industry page decides which
- * studies lead it and in what order. Returns an empty array for a group with no
- * proof, which is a real state rather than a bug — see `lib/content/industries.ts`.
+ * **Two sources, in this order.** `IndustryGroup.proof` is a curated override —
+ * the studies this page should lead with, in the order it should lead with
+ * them. Everything after is every published study whose `industries` claims the
+ * group, in the `sort_order` the caller already fetched them in.
+ *
+ * That second half is the change: a study published without a repository edit
+ * still reaches its industry page. `proof` survives because "which study leads
+ * this page" is an editorial decision a global `sort_order` cannot express, but
+ * a group with an empty `proof` is no longer a group with an empty band.
+ *
+ * Deduped by slug, so naming a study in `proof` *and* in its own `industries`
+ * lists it once. That overlap is the normal case rather than a mistake — it is
+ * the relationship being declared from both ends.
  */
 export function studiesForIndustry(
-  proof: string[],
+  group: { slug: string; proof: string[] },
   studies: CaseStudy[],
 ): CaseStudy[] {
-  return proof
+  const curated = group.proof
     .map((slug) => studies.find((study) => study.slug === slug))
     .filter((study): study is CaseStudy => study !== undefined);
+
+  const led = new Set(curated.map((study) => study.slug));
+
+  const claimed = studies.filter(
+    (study) => !led.has(study.slug) && study.industries?.includes(group.slug),
+  );
+
+  return [...curated, ...claimed];
 }

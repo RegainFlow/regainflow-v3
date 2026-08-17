@@ -18,7 +18,11 @@ import { getCaseStudies } from "@/lib/case-studies.server";
  * the proof band; it does not cost the home page.
  */
 export default async function ProofStrip() {
-  const studies = await getCaseStudies();
+  // Featured rather than everything, and a hard three. The grid is three across
+  // at `lg`, so "every published study" made publishing the fourth a silent
+  // change to the home page and the tenth a wall of cards. Which three lead is
+  // an editorial decision, so it is a column rather than "the first by date".
+  const studies = await getCaseStudies({ featuredOnly: true, limit: 3 });
 
   if (studies.length === 0) return null;
 

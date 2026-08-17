@@ -34,5 +34,9 @@ yarn-error.log*
 # supabase cli scratch
 supabase/.temp/
 
+# case study intake and previews. Unpublished client-adjacent prose and a
+# few hundred KB of generated art — none of it belongs in a diff.
+/.case-study/
+
 .vercel
 .env*

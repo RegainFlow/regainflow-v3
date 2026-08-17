@@ -31,7 +31,7 @@ insert into public.case_studies (
   meta_title, meta_description,
   context, constraints, role, engineered, outcome, next_label, next_body,
   cta, at_a_glance, stages, tracks, artifacts, deliverables,
-  industries, sort_order, status
+  section_headings, industries, sort_order, status, featured
 ) values (
   'ai-engineering-enablement',
   'From two client briefs to customer-ready Codex workshops',
@@ -163,7 +163,19 @@ insert into public.case_studies (
     'Recommendations for follow-up pilots'
   ],
 
-  '{}', 0, 'published'
+  -- This study's own wording, kept out of the defaults because it is true of
+  -- this engagement and not of case studies generally: it ran as exactly two
+  -- tracks, and the client was a consulting partner rather than an end client.
+  -- `DEFAULT_SECTION_HEADINGS` carries the shape-neutral versions.
+  '{
+    "tracks": {
+      "eyebrow": "Two client contexts",
+      "title": "One engagement, two different problems."
+    },
+    "deliverables": { "title": "What the partner received" }
+  }'::jsonb,
+
+  '{}', 0, 'published', true
 )
 on conflict (slug) do update set
   title = excluded.title, industry = excluded.industry, eyebrow = excluded.eyebrow,
@@ -175,7 +187,9 @@ on conflict (slug) do update set
   cta = excluded.cta, at_a_glance = excluded.at_a_glance, stages = excluded.stages,
   tracks = excluded.tracks, artifacts = excluded.artifacts,
   deliverables = excluded.deliverables, industries = excluded.industries,
-  sort_order = excluded.sort_order, status = excluded.status;
+  section_headings = excluded.section_headings,
+  sort_order = excluded.sort_order, status = excluded.status,
+  featured = excluded.featured;
 
 ------------------------------------------------------------------------------
 -- Government energy RAG platform
@@ -183,7 +197,7 @@ on conflict (slug) do update set
 insert into public.case_studies (
   slug, title, industry, summary, capability_tags,
   context, constraints, role, engineered, outcome, next_body,
-  industries, sort_order, status
+  industries, sort_order, status, featured
 ) values (
   'government-energy-rag-platform',
   'Government Energy RAG Platform',
@@ -206,7 +220,7 @@ insert into public.case_studies (
   ],
   'An internal knowledge assistant in the organization''s own environment, answering questions from its document estate on infrastructure its team already knows how to run.',
   'The system is evolving from single-turn question answering toward multi-step agentic workflows — moving from answering a question to carrying out the work the answer implies.',
-  array['federal-state-local'], 1, 'published'
+  array['federal-state-local'], 1, 'published', true
 )
 on conflict (slug) do update set
   title = excluded.title, industry = excluded.industry, summary = excluded.summary,
@@ -214,7 +228,8 @@ on conflict (slug) do update set
   constraints = excluded.constraints, role = excluded.role,
   engineered = excluded.engineered, outcome = excluded.outcome,
   next_body = excluded.next_body, industries = excluded.industries,
-  sort_order = excluded.sort_order, status = excluded.status;
+  sort_order = excluded.sort_order, status = excluded.status,
+  featured = excluded.featured;
 
 ------------------------------------------------------------------------------
 -- Aerospace manufacturing RAG evaluation
@@ -222,7 +237,7 @@ on conflict (slug) do update set
 insert into public.case_studies (
   slug, title, industry, summary, capability_tags,
   context, constraints, role, engineered, outcome, next_body,
-  industries, sort_order, status
+  industries, sort_order, status, featured
 ) values (
   'aerospace-rag-evaluation',
   'Aerospace Manufacturing RAG Evaluation and Delivery',
@@ -246,7 +261,7 @@ insert into public.case_studies (
   ],
   'The team could show which processing approach performed better and why, and made its architecture decisions on measured evidence. The critical milestone was met.',
   'The harness outlasts the engagement: it is the mechanism that tells the team whether the next change to processing or retrieval helped or hurt.',
-  array['defense-aerospace'], 2, 'published'
+  array['defense-aerospace'], 2, 'published', true
 )
 on conflict (slug) do update set
   title = excluded.title, industry = excluded.industry, summary = excluded.summary,
@@ -254,4 +269,5 @@ on conflict (slug) do update set
   constraints = excluded.constraints, role = excluded.role,
   engineered = excluded.engineered, outcome = excluded.outcome,
   next_body = excluded.next_body, industries = excluded.industries,
-  sort_order = excluded.sort_order, status = excluded.status;
+  sort_order = excluded.sort_order, status = excluded.status,
+  featured = excluded.featured;

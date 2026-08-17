@@ -8,7 +8,10 @@ import TrackMap from "@/components/case-study/TrackMap";
 import ClosingCTA from "@/components/ClosingCTA";
 import PageHeader from "@/components/PageHeader";
 import { getCaseStudy } from "@/lib/case-studies.server";
-import { DEFAULT_NEXT_LABEL } from "@/lib/content/case-studies";
+import {
+  DEFAULT_NEXT_LABEL,
+  DEFAULT_SECTION_HEADINGS,
+} from "@/lib/content/case-studies";
 import {
   breadcrumbJsonLd,
   caseStudyJsonLd,
@@ -96,6 +99,25 @@ export default async function CaseStudyPage({
     { label: "Outcome", body: study.outcome },
     { label: study.nextLabel ?? DEFAULT_NEXT_LABEL, body: study.next },
   ];
+
+  // Spread per section rather than over the whole object, so a study can rename
+  // one heading without restating the rest of its section. The pipeline omits
+  // empty members rather than writing null, which would spread over a default
+  // and blank it.
+  const headings = {
+    tracks: {
+      ...DEFAULT_SECTION_HEADINGS.tracks,
+      ...study.sectionHeadings?.tracks,
+    },
+    artifacts: {
+      ...DEFAULT_SECTION_HEADINGS.artifacts,
+      ...study.sectionHeadings?.artifacts,
+    },
+    deliverables: {
+      ...DEFAULT_SECTION_HEADINGS.deliverables,
+      ...study.sectionHeadings?.deliverables,
+    },
+  };
 
   return (
     <>
@@ -193,14 +215,13 @@ export default async function CaseStudyPage({
             <div className="rf-shell rf-band">
               <div className="rf-grid gap-y-6">
                 <div className="col-span-full lg:col-span-5">
-                  <p className="rf-eyebrow">Two client contexts</p>
+                  <p className="rf-eyebrow">{headings.tracks.eyebrow}</p>
                   <h2 className="rf-h2 mt-5 max-w-[20ch]">
-                    One engagement, two different problems.
+                    {headings.tracks.title}
                   </h2>
                 </div>
                 <p className="rf-body rf-measure col-span-full lg:col-span-6 lg:col-start-7 lg:pt-3">
-                  Each track was built against its own environment. What they
-                  share is the method, not the material.
+                  {headings.tracks.lead}
                 </p>
               </div>
 
@@ -249,9 +270,9 @@ export default async function CaseStudyPage({
         {study.artifacts?.length ? (
           <section className="rf-section">
             <div className="rf-shell rf-band-tight">
-              <p className="rf-eyebrow">Selected artifacts</p>
+              <p className="rf-eyebrow">{headings.artifacts.eyebrow}</p>
               <h2 className="rf-h2 mt-5 max-w-[22ch]">
-                Reconstructed, not screenshotted.
+                {headings.artifacts.title}
               </h2>
 
               <div className="mt-10 flex flex-col gap-4">
@@ -268,7 +289,7 @@ export default async function CaseStudyPage({
             <div className="rf-shell rf-band-tight">
               <div className="rf-grid gap-y-6">
                 <h2 className="rf-h2 col-span-full max-w-[20ch] lg:col-span-4">
-                  What the partner received
+                  {headings.deliverables.title}
                 </h2>
                 <ul className="col-span-full flex flex-col gap-3 lg:col-span-7 lg:col-start-6">
                   {study.deliverables.map((item) => (
