@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test \"scripts/**/*.test.mts\"",
     "report:cover": "node scripts/report-cover.mjs",
-    "case-study": "node --env-file=.env.local --import tsx scripts/case-study-pipeline.mts"
+    "case-study": "node --env-file=.env.local --import tsx scripts/case-study-pipeline.mts",
+    "case-study:prod": "node --env-file=.env --import tsx scripts/case-study-pipeline.mts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.2",
