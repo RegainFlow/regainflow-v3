@@ -38,12 +38,5 @@ supabase/.temp/
 # few hundred KB of generated art — none of it belongs in a diff.
 /.case-study/
 
-# Skills installed from the skills repo as directory junctions. The junction is
-# a local install; the source of truth is github.com/RegainFlow/skills, and
-# committing the resolved contents here would fork them silently.
-# `no-ai-slop` is deliberately NOT ignored — it is authored in this repo.
-/.claude/skills/publish-case-study/
-/.claude/skills/regainflow-brand-guidelines/
-
 .vercel
 .env*

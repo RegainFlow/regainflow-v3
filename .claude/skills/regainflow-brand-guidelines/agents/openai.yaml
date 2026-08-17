@@ -1,0 +1,9 @@
+interface:
+  display_name: "RegainFlow Brand Guidelines"
+  short_description: "Apply RegainFlow branding to professional collateral"
+  icon_small: "./assets/regainflow-app-icon-180.png"
+  icon_large: "./assets/regainflow-mark-1024.png"
+  brand_color: "#2F6BFF"
+  default_prompt: "Use $regainflow-brand-guidelines to apply the RegainFlow design system to this artifact."
+policy:
+  allow_implicit_invocation: true

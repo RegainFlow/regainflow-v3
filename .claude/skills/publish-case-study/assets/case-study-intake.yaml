@@ -1,0 +1,169 @@
+# RegainFlow case study intake
+#
+# Copy to .case-study/<slug>/intake.yaml and fill in. Field rules and lengths
+# are in references/case-study-schema.md.
+#
+#   pnpm case-study prepare .case-study/<slug>/intake.yaml
+#
+# Unknown keys are rejected rather than ignored — a typo'd field name would
+# otherwise publish a study silently missing whatever it was meant to set.
+
+# --- Identity ---------------------------------------------------------------
+
+# The URL, and the primary key. Kebab-case: lowercase, digits, single hyphens.
+# It cannot be changed later without abandoning the page at the old address.
+slug:
+
+# The h1 and the card heading. Reads as a claim, not a label.
+title:
+
+# Industry or environment — never the client. Short; it renders in a card's
+# utility register.
+industry:
+
+# Optional. Overrides the page eyebrow where a study wants more than its
+# industry: "Professional Services · AI Engineering Enablement".
+# eyebrow:
+
+# One executive-legible line. The card's only body copy, and the page lead.
+summary:
+
+# Visible chips on the card, and `keywords` in the structured data.
+capability_tags:
+  -
+
+# Optional search metadata, falling back to title / summary. They exist because
+# the audiences differ: an h1 earns attention from someone already reading, a
+# <title> has to win a result page. Max 70 / 165 characters.
+# meta_title:
+# meta_description:
+
+# --- The narrative spine ----------------------------------------------------
+# Every study answers these, in this order. A reader comparing two studies is
+# comparing the same answers.
+
+# Where the work started: the organization's situation, in their terms.
+context:
+
+# What made it hard. The constraints a reader should recognise.
+constraints:
+
+# RegainFlow's exact scope. Says plainly what we did and did not own.
+role:
+
+# What the work produced.
+outcome:
+
+# The closing beat.
+next_body:
+# Optional. Overrides the default "What changed next" heading.
+# next_label:
+
+# --- What was built ---------------------------------------------------------
+# Fill exactly ONE of `engineered` or `stages`. The page renders the staged
+# version when it is present, so filling both puts the same content on the page
+# twice under one heading.
+
+engineered:
+  -
+
+# A named process, in order. Renders numbered, because order is information.
+# stages:
+#   - name:
+#     detail:
+
+# --- The hero image ---------------------------------------------------------
+# Omit both and pass --skip-image to publish without art.
+
+# What the image shows. Required whenever there is an image — these are content
+# images, not decoration. Describe it; do not announce it ("Image of…").
+image_alt:
+
+# The subject only. The house preamble already fixes composition, palette, and
+# the no-text/no-logo rules — see references/case-study-schema.md.
+image_prompt:
+
+# --- Optional blocks --------------------------------------------------------
+# Any study may use these; none has to. A study that fills none of them looks
+# exactly like the three that predate the table.
+
+# Engagement scope, never impact. Counts what was delivered.
+# at_a_glance:
+#   - value: "2"
+#     label: Tailored workshop tracks
+
+# What the client actually received. Concrete and checkable.
+# deliverables:
+#   -
+
+# An engagement that ran in two or more parallel tracks. Not "two workshops" —
+# the shape of work split across contexts that had to be solved differently.
+# tracks:
+#   - key: A
+#     label:
+#     thesis:
+#     context:
+#       -
+#     demos:
+#       -
+
+# Sanitized diagrams. `kind` is a closed union: spine | branch-stack | kit.
+# Any other kind renders nothing, so it is rejected here.
+# artifacts:
+#   - kind: spine
+#     title:
+#     caption:
+#     nodes:
+#       -
+
+# Overrides the closing CTA's copy. All three together or none. Destinations
+# are not settable — they are the same on every page of the site.
+# cta:
+#   heading:
+#   body:
+#   secondaryLabel:
+
+# Renames the optional sections' headings, where the defaults mis-describe this
+# study. Omit any member to keep its default; never set one empty.
+# section_headings:
+#   tracks:
+#     eyebrow:
+#     title:
+#     lead:
+#   artifacts:
+#     eyebrow:
+#     title:
+#   deliverables:
+#     title:
+
+# --- Placement --------------------------------------------------------------
+
+# Industry group slugs this study is proof for. Authoritative: a study listed
+# here appears on that industry page with no code change. To make it *lead* the
+# page, edit INDUSTRY_GROUPS[].proof in the repository.
+# One or more of: public-safety, infrastructure-utilities, federal-state-local,
+# defense-aerospace
+industries:
+  -
+
+# Show on the home page, which leads with at most three. Editorial.
+featured: false
+
+# Listing order, ascending. Omit to land after the current last study.
+# sort_order:
+
+# --- Governance -------------------------------------------------------------
+# Checked, then dropped. None of this reaches the database.
+
+# Every name that must never appear publicly: clients, customers, platforms,
+# programs, projects. Matched case-insensitively and across hyphens and
+# underscores, in every field above INCLUDING the image prompt and the slug.
+# A hit stops the run; nothing is silently redacted.
+deny_terms:
+  -
+
+# Every figure in the copy, mapped to how it was measured. A number the scanner
+# reads as a claim — a percentage, a currency amount, a multiplier, a benefit
+# verb next to a digit — is rejected unless it appears here.
+# measurement_sources:
+#   "40%": Measured across six weeks of merge data, before and after.
