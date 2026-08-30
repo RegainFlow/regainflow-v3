@@ -11,6 +11,7 @@ import {
 import { getCaseStudies } from "@/lib/case-studies.server";
 import { MANIFESTO, MISSION, TEAM, VISION } from "@/lib/content/company";
 import { FAQ } from "@/lib/content/faq";
+import { PARTNERS } from "@/lib/content/partners";
 import { INDUSTRY_GROUPS } from "@/lib/content/industries";
 import { LAYERS } from "@/lib/content/layers";
 import { ENGAGEMENT_PATH, STAGES } from "@/lib/content/stages";
@@ -424,6 +425,89 @@ export default async function LlmInfoPage() {
                       {member.profile}
                     </a>
                   </p>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* Its own section, deliberately outside `#people` above. That one is
+          RegainFlow's founders and it feeds `peopleJsonLd()`; a partner's
+          founders listed among them would assert they work here. This page is
+          written to be quoted, and that is exactly the sentence an assistant
+          would get wrong. */}
+      <section id="partners" className="rf-section">
+        <div className="rf-shell py-14 md:py-18">
+          <p className="rf-eyebrow">Partner network</p>
+          <h2 className="rf-h2 mt-5 max-w-[26ch]">
+            Who we bring in, by name.
+          </h2>
+          <p className="rf-body mt-6 max-w-[62ch]">
+            RegainFlow has no bench beyond its two founders. Work that needs
+            capability the firm does not staff goes to a named partner rather
+            than an anonymous subcontractor. These are separate companies:
+            nobody below is a RegainFlow employee, officer, or subsidiary.
+          </p>
+
+          <ul className="mt-10 flex flex-col gap-10 border-t border-rf-hairline pt-6">
+            {PARTNERS.map((partner) => (
+              <li key={partner.name}>
+                <h3 className="rf-h3">
+                  <a
+                    href={partner.url}
+                    className="rf-text-link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {partner.name}
+                  </a>
+                </h3>
+                <p className="rf-utility mt-2">{partner.location}</p>
+                <p className="rf-body mt-4 max-w-[62ch]">{partner.summary}</p>
+
+                {partner.detail.map((paragraph) => (
+                  <p key={paragraph} className="rf-body mt-3 max-w-[62ch]">
+                    {paragraph}
+                  </p>
+                ))}
+
+                <p className="rf-body mt-3 max-w-[62ch]">
+                  Specialties: {partner.specialties.join(", ")}.
+                </p>
+
+                <ul className="mt-4">
+                  {partner.people.map((person) => (
+                    <li
+                      key={person.name}
+                      className="rf-body mt-2 max-w-[62ch]"
+                    >
+                      <span className="text-rf-warm">{person.name}</span>,{" "}
+                      {person.role} of {partner.name}. {person.bio}
+                    </li>
+                  ))}
+                </ul>
+
+                {/* The attribution is in the sentence, not in the layout. A
+                    retrieved chunk arrives without the section that made the
+                    ownership of these numbers obvious. */}
+                {partner.claims ? (
+                  <>
+                    <p className="rf-body mt-5 max-w-[62ch]">
+                      Figures published by {partner.name}, measured by them and
+                      not by RegainFlow:
+                    </p>
+                    <ul className="mt-2">
+                      {partner.claims.map((claim) => (
+                        <li
+                          key={claim}
+                          className="rf-body mt-1 max-w-[62ch]"
+                        >
+                          {claim}
+                        </li>
+                      ))}
+                    </ul>
+                  </>
                 ) : null}
               </li>
             ))}

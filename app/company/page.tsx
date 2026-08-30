@@ -13,6 +13,13 @@ import {
   TEAM,
   VISION,
 } from "@/lib/content/company";
+import {
+  PARTNERS,
+  PARTNERS_EYEBROW,
+  PARTNERS_HEADLINE,
+  PARTNERS_LEAD,
+  type PartnerPerson,
+} from "@/lib/content/partners";
 import { breadcrumbJsonLd, pageMetadata, serializeJsonLd } from "@/lib/seo";
 import {
   FREE_ASSESSMENT_CTA,
@@ -30,6 +37,22 @@ export const metadata: Metadata = pageMetadata({
     "RegainFlow is an AI engineering and transformation partner based in Orlando, Florida. Who we are, what we believe about AI in production, and how to reach us.",
   path: "/company",
 });
+
+/** The visible half of a partner URL. The protocol is noise in a link label. */
+function hostOf(url: string) {
+  return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+}
+
+/**
+ * Alt text for a partner's portrait.
+ *
+ * It names the firm rather than stopping at the role, because "Co-founder & CEO"
+ * beside a photograph on regainflow.com reads as a RegainFlow co-founder to
+ * anyone who cannot see which panel it sits in.
+ */
+function personAlt(person: PartnerPerson, firm: string) {
+  return `${person.name}, ${person.role} of ${firm}`;
+}
 
 export default function CompanyPage() {
   return (
@@ -142,6 +165,179 @@ export default function CompanyPage() {
                       </a>
                     </p>
                   ) : null}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* Void ground, like `#about` above it, with the partner raised into a
+          Navy panel rather than the section taking Navy itself. `#manifesto`
+          below is already Navy, and spending the ground change here would cost
+          the beat that tells a scrolling reader the manifesto has started.
+
+          The panel runs the full shell rather than sitting in the right six
+          columns, which is where this started. A partner entry carries a firm,
+          two people, four figures and two routes out — beside a three-line
+          headline that left the entire left half of the page empty for about
+          fifteen hundred pixels. Full width, split internally, uses it. */}
+      <section id="partners" className="rf-section">
+        <div className="rf-shell rf-band">
+          <div className="rf-grid gap-y-6">
+            <div className="col-span-full lg:col-span-5">
+              <p className="rf-eyebrow">{PARTNERS_EYEBROW}</p>
+              <h2 className="rf-h2 mt-5">{PARTNERS_HEADLINE}</h2>
+            </div>
+
+            {/* Beside the headline rather than under it. Stacked, the two of
+                them made a tall left column with nothing opposite. */}
+            <p className="rf-lead col-span-full max-w-[50ch] lg:col-span-6 lg:col-start-7 lg:pt-3">
+              {PARTNERS_LEAD}
+            </p>
+          </div>
+
+          <ul className="mt-12 flex flex-col gap-10">
+            {PARTNERS.map((partner) => (
+              /* Deliberately not `.rf-card`. That class warms its border to
+                 Slate on hover for any element, not only anchors, and every
+                 other call site is a card you can click — on a panel that is
+                 not a link it advertises a target that is not there. */
+              <li
+                key={partner.name}
+                className="border border-rf-hairline bg-rf-navy p-6 md:p-8"
+              >
+                <div className="rf-grid gap-y-10">
+                  {/* The identity rail. Their mark, their name, what they sell,
+                      and their people — everything that says which company you
+                      are reading about, kept together and away from our prose. */}
+                  <div className="col-span-full lg:col-span-4">
+                    {/* Empty `alt`: the name is rendered as text immediately
+                        below, and a mark that spells it out would read twice.
+
+                        `width`/`height` are the file's real pixels. They were
+                        180×28 — a lockup's proportions, guessed before the asset
+                        existed — and the mark is square, so `h-16 w-auto` left
+                        one axis resolving from CSS and the other from a ratio
+                        that did not match. That is the `next/image` warning
+                        about modifying one dimension but not the other. */}
+                    {partner.logo ? (
+                      <Image
+                        src={partner.logo}
+                        alt=""
+                        width={1944}
+                        height={1944}
+                        sizes="64px"
+                        className="h-16 w-auto"
+                        unoptimized={partner.logo.endsWith(".svg")}
+                      />
+                    ) : null}
+
+                    <h3 className="rf-h2 mt-6">{partner.name}</h3>
+                    <p className="rf-utility mt-3">{partner.location}</p>
+
+                    {/* No marker. Order carries nothing here, so not numbered,
+                        and the closed icon set holds nothing honest for "App &
+                        Web Development" — a list with no honest marker wants
+                        none. */}
+                    <ul className="rf-tags mt-6">
+                      {partner.specialties.map((specialty) => (
+                        <li key={specialty} className="rf-tag">
+                          {specialty}
+                        </li>
+                      ))}
+                    </ul>
+
+                    {/* Their founders, not ours. Nothing here reaches
+                        `peopleJsonLd()` — `lib/content/partners.ts` documents
+                        why that separation has to hold.
+
+                        Portrait above the text rather than beside it: the rail
+                        is four columns, and a face plus a 50ch bio side by side
+                        in that width leaves the bio about twenty characters
+                        wide. */}
+                    <ul className="mt-8 flex flex-col gap-8 border-t border-rf-hairline pt-8">
+                      {partner.people.map((person) => (
+                        <li key={person.name}>
+                          {person.image ? (
+                            <div className="rf-portrait w-32">
+                              <Image
+                                src={person.image}
+                                alt={personAlt(person, partner.name)}
+                                width={500}
+                                height={500}
+                                sizes="128px"
+                                unoptimized={person.image.endsWith(".svg")}
+                              />
+                            </div>
+                          ) : null}
+
+                          <h4 className="rf-body mt-4 text-rf-warm">
+                            {person.name}
+                          </h4>
+                          <p className="rf-utility mt-1">{person.role}</p>
+                          <p className="rf-body mt-3 max-w-[46ch]">
+                            {person.bio}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* What we have to say about them, and the two routes out. */}
+                  <div className="col-span-full lg:col-span-7 lg:col-start-6">
+                    <p className="rf-lead max-w-[54ch]">{partner.summary}</p>
+
+                    {partner.detail.map((paragraph) => (
+                      <p key={paragraph} className="rf-body mt-5 max-w-[62ch]">
+                        {paragraph}
+                      </p>
+                    ))}
+
+                    {/* Attribution is structural rather than repeated per line.
+                        These are the partner's numbers about the partner's own
+                        clients; unlabelled on this domain they become ours, and
+                        we cannot say how any of them was measured. */}
+                    {partner.claims ? (
+                      <div className="mt-10 border-t border-rf-hairline pt-6">
+                        <p className="rf-utility">
+                          Figures published by {partner.name}
+                        </p>
+                        <ul className="mt-4 flex flex-col gap-2">
+                          {partner.claims.map((claim) => (
+                            <li key={claim} className="rf-body max-w-[56ch]">
+                              {claim}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+
+                    {/* Both secondary. The page spends its one primary CTA in
+                        `#contact`, and a second mid-page would compete with the
+                        conversion this section is supposed to feed. */}
+                    <div className="mt-10 flex flex-col gap-4 border-t border-rf-hairline pt-6 sm:flex-row sm:items-center sm:gap-6">
+                      <Link
+                        href={CONTACT_PATH}
+                        className="rf-cta-secondary"
+                        data-rf-event={RF_EVENTS.contactClicked}
+                        data-rf-location="company_partners"
+                      >
+                        Ask about the partner network
+                      </Link>
+
+                      <a
+                        href={partner.url}
+                        className="rf-nav-link"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        data-rf-event={RF_EVENTS.partnerSiteOpened}
+                        data-rf-partner={partner.name}
+                      >
+                        {hostOf(partner.url)} &#8599;
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </li>
             ))}

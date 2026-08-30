@@ -37,7 +37,7 @@ lockfile that ships.
 | `/insights/[slug]`                                             | One case study in full: context, constraints, our role, what we engineered, outcome, what next  |
 | `/insights/reports`                                            | Published reports. Renders an empty state until the first is authored                           |
 | `/insights/reports/[slug]`                                     | One report: cover, findings, audio overview, and the email gate in front of the PDF             |
-| `/company`                                                     | Who we are, manifesto, contact                                                                  |
+| `/company`                                                     | Who we are, the partner network, manifesto, contact                                             |
 | `/contact`                                                     | The contact form. The canonical contact route — every contact CTA points here                   |
 | `/contact/thanks`                                              | Post-submission confirmation. `noindex`, reachable only by submitting                           |
 | `/robots.txt`, `/sitemap.xml`, `/llms.txt`, `/opengraph-image` | Generated                                                                                       |

@@ -53,6 +53,16 @@ export const RF_EVENTS = {
    * the site can observe.
    */
   capabilityStatementOpened: "capability_statement_opened",
+  /**
+   * A partner's own site, from the partner network on `/company`. Carries
+   * `partner` — which firm.
+   *
+   * Outside the `cta_` family for the same reason as the line above it: it
+   * converts nothing here, and counting it as a CTA would inflate the numbers
+   * that decide whether the page works. What it measures is whether naming a
+   * partner sends readers away or gives them a reason to trust the bench.
+   */
+  partnerSiteOpened: "partner_site_opened",
   /** A report card, from the listing or from a report page. */
   reportOpened: "report_opened",
   /**
@@ -110,6 +120,13 @@ export type RfLocation =
   | "industry_assessment"
   | "company_contact"
   | "company_details"
+  /**
+   * The partner network section on `/company`. Its own value rather than
+   * `company_contact`, because the question worth answering is whether a
+   * reader who came for the partner goes on to contact us or leaves for the
+   * partner's own site — and otherwise those two are the same click count.
+   */
+  | "company_partners"
   /** The closing shelf of the footer, on every route. */
   | "footer"
   /** `/contact` — the form's own page. */

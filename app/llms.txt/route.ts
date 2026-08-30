@@ -13,6 +13,7 @@ import {
 } from "@/lib/content/case-studies";
 import { MANIFESTO, MISSION, TEAM } from "@/lib/content/company";
 import { FAQ } from "@/lib/content/faq";
+import { PARTNERS } from "@/lib/content/partners";
 import { INDUSTRY_GROUPS } from "@/lib/content/industries";
 import { LAYERS } from "@/lib/content/layers";
 import { reportDate, type Report } from "@/lib/content/reports";
@@ -204,6 +205,34 @@ function build(reports: Report[], caseStudies: CaseStudy[]): string {
   }
   lines.push("");
 
+  // Generated, like the manifesto above it, so an assistant quotes what the
+  // site says rather than a second copy that drifted. The attribution on the
+  // figures is stated in the line rather than implied by layout: a retrieved
+  // chunk arrives without the panel that made the ownership obvious.
+  lines.push("## Partner network");
+  lines.push("");
+  lines.push(
+    "RegainFlow has no bench beyond its two founders. Work that needs capability the firm does not staff goes to a named partner rather than an anonymous subcontractor."
+  );
+  lines.push("");
+  for (const partner of PARTNERS) {
+    lines.push(`### ${partner.name}`);
+    lines.push(`${partner.summary} Based in ${partner.location}. ${partner.url}`);
+    lines.push(`Specialties: ${partner.specialties.join(", ")}.`);
+    for (const paragraph of partner.detail) {
+      lines.push(paragraph);
+    }
+    for (const person of partner.people) {
+      lines.push(`- **${person.name}**, ${person.role} of ${partner.name}. ${person.bio}`);
+    }
+    if (partner.claims) {
+      lines.push(`Figures published by ${partner.name}, not measured by RegainFlow:`);
+      for (const claim of partner.claims) {
+        lines.push(`- ${claim}`);
+      }
+    }
+    lines.push("");
+  }
   lines.push("## Common questions");
   lines.push("");
   for (const item of FAQ) {
@@ -241,7 +270,7 @@ function build(reports: Report[], caseStudies: CaseStudy[]): string {
     );
   }
   lines.push(
-    `- [Company](${SITE_URL}/company): the founders, manifesto, contact.`
+    `- [Company](${SITE_URL}/company): the founders, the partner network, manifesto, contact.`
   );
   lines.push(
     `- [Contact](${SITE_URL}${CONTACT_PATH}): the contact form, the booking link, and the email address.`

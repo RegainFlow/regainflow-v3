@@ -245,6 +245,15 @@ export const NAV: NavGroup[] = [
         href: "/company#about",
         hint: "Who you would be working with",
       },
+      // An anchor rather than a route. The section is short enough to live on
+      // `/company`, and a fifth top-level group is not available anyway — see
+      // `components/SiteNav.tsx` on why four groups plus the CTA already force
+      // the `lg` breakpoint.
+      {
+        label: "Partner network",
+        href: "/company#partners",
+        hint: "Who we bring in, and why",
+      },
       {
         label: "Manifesto",
         href: "/company#manifesto",
