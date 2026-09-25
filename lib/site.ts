@@ -42,19 +42,14 @@ export const GOV_CAPABILITY_PDF = "/files/RegainFlow_Capability_Statement_2026.p
 export const GOV_PAST_PERFORMANCE_PDF = "/files/RegainFlow_Past_Performance_2026.pdf";
 
 /**
- * Page one of each gov PDF as a PNG, written by `pnpm gov:pdf` next to the
- * files above. This is the preview a reader sees before downloading — an
- * image, not an embedded PDF, because a phone renders an embedded PDF as one
- * page or as nothing. Dimensions are the rendered file's, for layout only.
+ * Page one of the capability statement as a PNG, written by `pnpm gov:pdf`.
+ * This is the preview the gov page shows beside past performance — an image,
+ * not an embedded PDF, because a phone renders an embedded PDF as one page or
+ * as nothing. Dimensions are the rendered file's, for layout only.
  */
 export const GOV_PREVIEWS = {
   capabilityStatement: {
     src: "/files/previews/capability-statement.png",
-    width: 1200,
-    height: 1552,
-  },
-  pastPerformance: {
-    src: "/files/previews/past-performance.png",
     width: 1200,
     height: 1552,
   },
@@ -310,7 +305,7 @@ export const NAV: NavGroup[] = [
       // and past performance side by side, and the PDF is one click from it.
       {
         label: "Capability statement ↗",
-        href: `${GOV_SITE_URL}/capability-statement`,
+        href: GOV_SITE_URL,
         hint: "Capability statement and past performance",
         secondary: true,
         external: true,

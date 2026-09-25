@@ -83,19 +83,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  // The subdomain's pages. Cross-host entries are accepted when both hosts sit
+  // The subdomain's one page. Cross-host entries are accepted when both hosts sit
   // under one Search Console domain property, which is how regainflow.com is
   // verified; `gov.regainflow.com/sitemap.xml` is this same file.
   const gov: MetadataRoute.Sitemap = [
-    "",
-    "/capability-statement",
-    "/past-performance",
-  ].map((path) => ({
-    url: `${GOV_SITE_URL}${path}`,
-    lastModified,
-    changeFrequency: "monthly",
-    priority: 0.7,
-  }));
+    { url: GOV_SITE_URL, lastModified, changeFrequency: "monthly", priority: 0.7 },
+  ];
 
   return [...pages, ...industries, ...reports, ...studies, ...gov];
 }

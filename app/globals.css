@@ -3130,6 +3130,58 @@
     background: var(--color-rf-flow);
   }
 
+  /* The company data bar: identifiers, NAICS, location, points of contact. */
+  .rf-gov-facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 1.25rem 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-rf-hairline);
+  }
+
+  /* Desktop: one row, same weighting as the printed sheet. */
+  @media (min-width: 1024px) {
+    .rf-gov-facts {
+      grid-template-columns: 0.9fr 0.6fr 1.3fr 0.9fr 1.7fr 1.7fr;
+    }
+  }
+
+  .rf-gov-facts dt,
+  .rf-doc-facts dt {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-rf-slate);
+  }
+
+  .rf-gov-facts dd {
+    margin-top: 0.35rem;
+    font-size: 0.9375rem;
+    color: var(--color-rf-warm);
+  }
+
+  /* Past performance entries, stacked with a rule between them. */
+  .rf-pp + .rf-pp {
+    margin-top: 2.25rem;
+    padding-top: 2.25rem;
+    border-top: 1px solid var(--color-rf-hairline);
+  }
+
+  .rf-pp .rf-doc-facts {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.9rem 2.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .rf-doc-codes-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 2rem;
+    }
+  }
+
   .rf-doc-codes {
     display: flex;
     flex-direction: column;
@@ -3155,13 +3207,6 @@
     gap: 1.1rem;
   }
 
-  .rf-doc-facts dt {
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--color-rf-slate);
-  }
 
   .rf-doc-facts dd {
     margin-top: 0.3rem;
@@ -3170,10 +3215,10 @@
   }
 }
 
-/* Print, which is also how the past performance PDF is made (`pnpm gov:pdf`).
-   The palette is inverted by redefining the tokens rather than restyling each
-   class — every surface already reads them — so the document comes out on
-   paper with the same hierarchy. The chrome and the view switch drop out. */
+/* Print, which is also how the past performance PDF is made (`pnpm gov:pdf`
+   prints `app/gov/page.tsx`). The palette is set to paper by redefining the
+   tokens rather than restyling each class, and everything that is not past
+   performance drops out, so the file is the past performance sheet alone. */
 @media print {
   :root,
   .rf-gov[data-theme] {
@@ -3189,7 +3234,7 @@
 
   /* Zero page margin, with the margin rebuilt as padding: Chrome leaves an
      `@page` margin unpainted, which renders as a dark frame around the sheet
-     in the PDF and in the preview image made from it. */
+     in the PDF and in any preview image made from it. */
   @page {
     size: letter;
     margin: 0;
@@ -3199,7 +3244,10 @@
     background: #ffffff;
   }
 
+  /* One page, by scaling the whole sheet rather than keeping a second layout.
+     `pnpm gov:pdf` fails if it spills to a second page. */
   body {
+    zoom: 0.6;
     padding: 0.5in;
     background: #ffffff;
     print-color-adjust: exact;
@@ -3207,118 +3255,17 @@
   }
 
   .rf-gov-chrome,
-  .rf-doc-preview-band,
+  .rf-print-hide,
   .rf-skip-link {
     display: none !important;
-  }
-
-  .rf-wordmark-3d {
-    text-shadow: none;
   }
 
   .rf-print-only {
     display: block;
   }
 
-  /* A letter page is ~720px wide, under `lg`, so the grid would print as one
-     long column. Restore the desktop split for the spans these pages use. */
-  .rf-grid > .lg\:col-span-4,
-  .rf-grid > .md\:col-span-4 {
-    grid-column: span 4 / span 4;
-  }
-
-  .rf-grid > .lg\:col-span-5 {
-    grid-column: span 5 / span 5;
-  }
-
-  .rf-grid > .md\:col-span-6 {
-    grid-column: span 6 / span 6;
-  }
-
-  .rf-grid > .lg\:col-span-7 {
-    grid-column: span 7 / span 7;
-  }
-
-  .rf-grid > .lg\:col-span-8 {
-    grid-column: span 8 / span 8;
-  }
-
-  h1,
-  h2,
-  h3,
-  .rf-eyebrow,
-  .rf-utility {
-    break-after: avoid;
-  }
-
-  li,
-  .rf-doc-facts,
-  .rf-tags {
-    break-inside: avoid;
-  }
-
-  .rf-h1 {
-    font-size: 2.1rem;
-  }
-
-  /* One page. The past performance sheet is a one-pager like the capability
-     statement, and scaling the whole document is what gets it there without a
-     second layout to maintain. `pnpm gov:pdf` fails if it spills to a second
-     page, so a new entry cannot quietly break this. */
-  body {
-    zoom: 0.58;
-  }
-
-  .rf-shell.py-12,
-  .rf-shell .py-12 {
-    padding-block: 0.9rem;
-  }
-
-  .rf-doc-entry .mt-8,
-  .rf-doc-entry .mt-10 {
-    margin-top: 0.75rem;
-  }
-
-  /* Past performance as a 2×2 sheet. Each entry drops its own two-column
-     split and stacks — facts over narrative — inside its quarter. */
-  .rf-pp-list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 1.75rem;
-  }
-
-  .rf-pp-list .rf-doc-entry .rf-grid > * {
-    grid-column: 1 / -1;
-  }
-
-  .rf-pp-list .rf-doc-entry .rf-grid {
-    row-gap: 0.6rem;
-  }
-
-  /* The chips repeat the narrative. On screen they help a skim; on a
-     one-page sheet they cost the space the narrative needs. */
-  .rf-pp-list .rf-tags {
-    display: none;
-  }
-
-  .rf-pp-list .rf-doc-facts {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 0.4rem 1.5rem;
-  }
-
-  .rf-doc-entry .rf-logo-tile-md {
-    height: 2.75rem;
-    width: 8rem;
-    padding: 0.4rem 0.7rem;
-  }
-
-  .rf-doc-entry .rf-h2 {
-    font-size: 1.6rem;
-  }
-
-  .rf-doc-entry .mt-6 {
-    margin-top: 0.75rem;
+  .rf-wordmark-3d {
+    text-shadow: none;
   }
 
   .rf-shell {
@@ -3326,4 +3273,42 @@
     padding-inline: 0;
   }
 
+  .rf-shell.py-10,
+  .rf-shell.py-12 {
+    padding-block: 1rem;
+  }
+
+  /* One row. Weighted so the two email addresses — the widest values — get
+     the room and cannot run into each other. */
+  .rf-gov-facts {
+    grid-template-columns: 0.9fr 0.6fr 1.3fr 0.9fr 1.7fr 1.7fr;
+    gap: 1rem 1.25rem;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  /* Past performance as a 2×2 sheet. */
+  .rf-pp-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem 2rem;
+    margin-top: 1rem;
+  }
+
+  /* Every cell ruled the same, so the two columns start level. The screen
+     rule only rules entries after the first, hence the sibling selector. */
+  .rf-pp,
+  .rf-pp + .rf-pp {
+    break-inside: avoid;
+    margin-top: 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-rf-hairline);
+  }
+
+  h1,
+  h2,
+  h3,
+  .rf-utility {
+    break-after: avoid;
+  }
 }

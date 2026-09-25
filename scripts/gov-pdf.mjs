@@ -1,10 +1,11 @@
 /**
- * Prints the past performance page to `public/files/…pdf` — the file behind the
- * page's Download PDF button. One page, and the script fails if it is not.
+ * Prints the gov page to `public/files/…pdf` — the past performance PDF behind
+ * the page's download button. The print stylesheet reduces the page to the past
+ * performance sheet. One page, and the script fails if it is not.
  *
- * Then renders page one of both gov PDFs — this one and the capability
- * statement — to `public/files/previews/*.png`, the previews each document page
- * shows before anyone downloads. Rerun it whenever either PDF changes.
+ * Then renders page one of the capability statement to
+ * `public/files/previews/capability-statement.png`, the preview the page shows
+ * beside past performance. Rerun it whenever either PDF changes.
  *
  * The PDF is generated from the page, not maintained beside it, so the two
  * cannot disagree. The print stylesheet in `app/globals.css` does the layout.
@@ -49,13 +50,13 @@ if (!browser) {
   process.exit(1);
 }
 
-const url = `${base}/gov/past-performance`;
+const url = `${base}/gov`;
 const res = await fetch(url);
 if (!res.ok) {
   console.error(`${url} returned ${res.status}. Is the server running?`);
   process.exit(1);
 }
-if ((await res.text()).includes("Draft — dev only")) {
+if ((await res.text()).includes("Draft, dev only")) {
   console.error("The page is rendering drafts, so this is a dev server. Use `pnpm start`.");
   process.exit(1);
 }
@@ -82,10 +83,7 @@ if (pages !== 1) {
 const previews = resolve("public/files/previews");
 mkdirSync(previews, { recursive: true });
 
-for (const [name, source] of [
-  ["past-performance", out],
-  ["capability-statement", CAPABILITY_PDF],
-]) {
+for (const [name, source] of [["capability-statement", CAPABILITY_PDF]]) {
   const data = await load(source);
   const natural = pngSize((await firstPage(data, 1)).image);
   const { image } = await firstPage(data, PREVIEW_WIDTH / natural.width);

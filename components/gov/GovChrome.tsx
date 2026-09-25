@@ -3,23 +3,16 @@ import Link from "next/link";
 import GovThemeToggle from "@/components/gov/GovThemeToggle";
 import { RF_EVENTS } from "@/lib/analytics/events";
 import { GOV_IDENTIFIERS, NAICS_CODES } from "@/lib/content/gov";
-import { CONTACT_PATH, LOCATION, SITE_URL } from "@/lib/site";
+import { CONTACT_EMAIL, LOCATION, SITE_URL } from "@/lib/site";
 
 /**
  * gov.regainflow.com's header and footer.
  *
- * Lean on purpose. The reader is a contracting officer or a prime's capture
- * lead who came for two documents, so the marketing nav and its dropdowns are
- * gone. The way back to the main site is one link, not four menus.
- *
- * Paths here have no `/gov` prefix — see `lib/gov-routing.ts` for why they
- * resolve on every host.
+ * Lean on purpose. The subdomain is one page for a contracting officer, so
+ * there is no navigation to speak of: the name, a theme switch, and a direct
+ * email. Contact is a `mailto:` here, unlike the main site — a government
+ * reader wants a named inbox, not a marketing form.
  */
-const GOV_NAV = [
-  { label: "Capability statement", href: "/capability-statement" },
-  { label: "Past performance", href: "/past-performance" },
-];
-
 export function GovHeader() {
   return (
     <header className="rf-gov-chrome sticky top-0 z-50 border-b border-rf-hairline bg-rf-void/90 backdrop-blur-[2px]">
@@ -29,33 +22,18 @@ export function GovHeader() {
           <span className="rf-utility hidden sm:inline">Government</span>
         </Link>
 
-        <nav aria-label="Government" className="flex items-center gap-4 md:gap-8">
-          {GOV_NAV.map((item) => (
-            <Link key={item.href} href={item.href} className="rf-nav-link hidden md:inline">
-              {item.label}
-            </Link>
-          ))}
+        <div className="flex items-center gap-4">
           <GovThemeToggle />
           <a
-            href={`${SITE_URL}${CONTACT_PATH}`}
+            href={`mailto:${CONTACT_EMAIL}`}
             className="rf-cta-primary rf-cta-compact"
             data-rf-event={RF_EVENTS.contactClicked}
             data-rf-location="gov"
           >
             Contact
           </a>
-        </nav>
+        </div>
       </div>
-
-      {/* The two documents stay one tap away on a phone, where the inline links
-          above are hidden. */}
-      <nav aria-label="Government documents" className="rf-shell flex gap-6 pb-3 md:hidden">
-        {GOV_NAV.map((item) => (
-          <Link key={item.href} href={item.href} className="rf-nav-link">
-            {item.label}
-          </Link>
-        ))}
-      </nav>
     </header>
   );
 }

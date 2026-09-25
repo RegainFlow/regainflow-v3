@@ -1,11 +1,11 @@
 /**
- * gov.regainflow.com — the capability statement and past performance, as data.
+ * gov.regainflow.com — company data and past performance, as data.
  *
- * The capability statement copy mirrors the PDF at `GOV_CAPABILITY_PDF`
- * (`RegainFlow_Capability_Statement_2026.pdf`). The PDF is still the document
- * of record, so when one changes the other has to follow, in the same commit.
- * The past performance PDF is generated *from* the page (`pnpm gov:pdf`), so it
- * cannot drift the same way.
+ * Written for a contracting officer, so it holds facts and nothing else: no
+ * positioning, no taglines, no claims a reader cannot check. The capability
+ * statement is not restated here — the page shows the PDF itself
+ * (`GOV_CAPABILITY_PDF`). The past performance PDF is generated from the page
+ * (`pnpm gov:pdf`), so the two cannot drift.
  *
  * ## Drafts
  *
@@ -23,69 +23,12 @@
  */
 export const GOV_THEME_KEY = "rf-gov-theme";
 
-export const GOV_TAGLINE = "AI transformation, from ambition to operation.";
-
 export const GOV_IDENTIFIERS = [
   { label: "UEI", value: "XD3FZFEHMCD7" },
   { label: "CAGE", value: "20BV9" },
 ] as const;
 
-export const GOV_FOCUS = {
-  label: "Government and public safety",
-  statement:
-    "Trusted AI knowledge systems for public safety and mission-driven agencies.",
-};
-
-export const GOV_OVERVIEW =
-  "RegainFlow turns fragmented policies, documents, and operational knowledge into secure systems grounded in the source record. Senior engineers work from discovery through production, then leave the agency equipped to run what was built.";
-
-export interface Capability {
-  index: string;
-  name: string;
-  points: string[];
-}
-
-export const CORE_CAPABILITIES: Capability[] = [
-  {
-    index: "01",
-    name: "Information retrieval and knowledge intelligence",
-    points: [
-      "Policies, SOPs, general orders, training, and bulletins",
-      "Accurate, cited answers drawn from large and complex document sets",
-      "Answers respect existing permissions, with a full audit trail",
-      "Built-in safeguards against wrong or unsupported answers",
-    ],
-  },
-  {
-    index: "02",
-    name: "Secure platform engineering",
-    points: [
-      "Full-stack apps, APIs, portals, and internal tools",
-      "Access control aligned to agency roles and structure",
-      "Reliable cloud operations with continuous updates and monitoring",
-      "Built to operate in restricted and air-gapped environments",
-    ],
-  },
-  {
-    index: "03",
-    name: "Forward-deployed engineers & fractional CDAO",
-    points: [
-      "Discovery and mission workflow mapping",
-      "Prototypes built for production, not for the demo",
-      "Embedded data and AI leadership, on a fractional basis",
-      "Your team enabled to own and run what was built",
-    ],
-  },
-];
-
-export const WHY_REGAINFLOW = "Senior engineers. One accountable path.";
-
-export const DIFFERENTIATORS = [
-  "Credentialed operators: active TS/SCI clearance holders, with Security+, PenTest+, CEH, and Cisco CCNA certifications.",
-  "Fortune 100 delivery experience, with enterprise AI shipped inside Pratt & Whitney and government services environments.",
-  "Compliance-ready practice across SOC 2 Type II environments, Vanta, and STIG hardening.",
-  "Transferable ownership through documentation, runbooks, and working sessions with agency staff.",
-];
+export const GOV_LOCATION = "Orlando, Florida";
 
 export interface Code {
   code: string;
@@ -99,18 +42,6 @@ export const NAICS_CODES: Code[] = [
   { code: "541330", title: "Engineering Services" },
   { code: "541690", title: "Other Scientific and Technical Consulting" },
   { code: "541990", title: "All Other Professional and Technical Services" },
-];
-
-export const UNSPSC_CODES: Code[] = [
-  { code: "81111900", title: "Information retrieval systems" },
-  { code: "43232309", title: "Information retrieval or search software" },
-  { code: "81111705", title: "Systems architecture" },
-  { code: "81111500", title: "Software or hardware engineering" },
-  { code: "81111508", title: "Application implementation services" },
-  { code: "43232403", title: "Enterprise application integration software" },
-  { code: "81112200", title: "Software maintenance and support" },
-  { code: "81141902", title: "Application or technology research and development" },
-  { code: "80101507", title: "Information technology consultation services" },
 ];
 
 export interface PointOfContact {
@@ -190,11 +121,13 @@ export interface PastPerformance {
   draft?: boolean;
 }
 
-export const PAST_PERFORMANCE_TITLE =
-  "Mission work, delivered by the engineers who lead RegainFlow.";
-
-export const PAST_PERFORMANCE_LEAD =
-  "RegainFlow's contracts, and the programs its founders delivered before it. Each entry names who did the work.";
+/**
+ * One sentence, stating what the list contains. Company contracts and prior
+ * individual experience sit in one list at the owner's direction; this line and
+ * each entry's "Performed by" are what keep that distinction visible.
+ */
+export const PAST_PERFORMANCE_NOTE =
+  "Includes RegainFlow subcontracts and prior experience of RegainFlow principals. Each entry identifies who performed the work.";
 
 export const PAST_PERFORMANCE: PastPerformance[] = [
   {
@@ -206,7 +139,7 @@ export const PAST_PERFORMANCE: PastPerformance[] = [
     role: "Subcontractor to Link Technologies",
     period: "Apr 2026 – Present",
     overview:
-      "RegainFlow leads solution architecture and technical delivery for a secure, on-premises AI knowledge platform supporting MSTS. The work spans the full retrieval-augmented generation lifecycle, from document ingestion and retrieval through self-hosted LLM inference, application integration, and production deployment.",
+      "RegainFlow leads solution architecture and technical delivery. The work spans the full retrieval-augmented generation lifecycle, from document ingestion and retrieval through self-hosted LLM inference, application integration, and production deployment.",
     work: [
       "Architected the document ingestion pipeline, retrieval layer, and self-hosted LLM inference on on-premises servers.",
       "Integrated the platform with the customer's .NET applications and hardened it to their cybersecurity requirements.",
@@ -233,7 +166,7 @@ export const PAST_PERFORMANCE: PastPerformance[] = [
     role: "Subcontractor to Innovien Solutions",
     // TODO(gov): period of performance and scope detail.
     overview:
-      "Enterprise AI and retrieval-augmented generation delivery supporting an aerospace manufacturing environment.",
+      "Delivery supporting an aerospace manufacturing environment.",
     work: [],
     capabilities: ["Retrieval-augmented generation", "Enterprise AI"],
     naics: ["541511", "541512"],
@@ -245,7 +178,7 @@ export const PAST_PERFORMANCE: PastPerformance[] = [
     deliveredBy: "William J. Baltus, CTO",
     // TODO(gov): title and period, from the résumé.
     overview:
-      "Diagnostics and load-shed system for the Mustang LM 400 bus, detecting power discrepancies in any component or switch.",
+      "Detects power discrepancies in any component or switch on the bus.",
     work: [
       "Built the diagnostics and load-shed logic for power discrepancies across components and switches.",
       "Stringent unit testing with GMock across object-oriented Python and C++.",
@@ -261,7 +194,7 @@ export const PAST_PERFORMANCE: PastPerformance[] = [
     deliveredBy: "Leonardo J. Ramirez, CEO",
     role: "Captain",
     overview:
-      "Served to Captain across three specialties, ending in Cyber Warfare running defensive operations at the national level.",
+      "Served to Captain across three specialties.",
     work: [
       "Engineer officer.",
       "Signal officer supporting Space and Missile Defense.",
