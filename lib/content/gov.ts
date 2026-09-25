@@ -92,115 +92,80 @@ export const LOGOS = {
 
 /* --- Past performance ---------------------------------------------------- */
 
+/**
+ * One engagement. The copy is the owner's, verbatim: `summary` is the
+ * capability-sheet one-liner (and the only text on the printed sheet),
+ * `detail` the expanded website version behind "Full description".
+ */
 export interface PastPerformance {
-  /** The program or customer as a contracting officer would look it up. */
+  /** As a contracting officer would look it up, e.g. `Lockheed Martin Space`. */
   customer: string;
-  /** Spelled out, where `customer` is an acronym. */
-  customerFull?: string;
+  /** The program or capability, e.g. `Mustang / LM400 Space Bus`. */
+  program: string;
   logo?: Logo;
-  /** One line, the thing that was delivered. */
-  title: string;
-  /**
-   * Who delivered it. `RegainFlow` for company contracts; a founder's name for
-   * work they led before RegainFlow. Past performance here is the people's
-   * record, so this is what keeps the two kinds honest side by side.
-   */
-  deliveredBy: string;
-  /** `Subcontractor to …`, a rank, a position. Omitted rather than guessed. */
+  /** `Subcontractor to …`, officer specialties. Omitted rather than guessed. */
   role?: string;
-  /** Free text, e.g. `Apr 2026 – Present`. Omitted rather than guessed. */
-  period?: string;
-  /** One paragraph: what the engagement is and RegainFlow's part in it. */
-  overview: string;
-  /** What we did, one line each. */
-  work: string[];
-  /** Rendered as `.rf-tag` chips. */
-  capabilities: string[];
-  /** NAICS codes from `NAICS_CODES` the work maps to. Omitted for service. */
-  naics?: string[];
+  summary: string;
+  detail: string[];
   draft?: boolean;
 }
 
-/**
- * One sentence, stating what the list contains. Company contracts and prior
- * individual experience sit in one list at the owner's direction; this line and
- * each entry's "Performed by" are what keep that distinction visible.
- */
-export const PAST_PERFORMANCE_NOTE =
-  "Includes RegainFlow subcontracts and prior experience of RegainFlow principals. Each entry identifies who performed the work.";
-
 export const PAST_PERFORMANCE: PastPerformance[] = [
   {
-    customer: "MSTS",
-    customerFull: "Mission Support and Test Services",
+    customer: "Mission Support and Test Services (MSTS)",
+    program: "Enterprise AI Knowledge Platform",
     logo: LOGOS.msts,
-    deliveredBy: "RegainFlow",
-    title: "Secure, on-premises AI knowledge platform",
     role: "Subcontractor to Link Technologies",
-    period: "Apr 2026 – Present",
-    overview:
-      "RegainFlow leads solution architecture and technical delivery. The work spans the full retrieval-augmented generation lifecycle, from document ingestion and retrieval through self-hosted LLM inference, application integration, and production deployment.",
-    work: [
-      "Architected the document ingestion pipeline, retrieval layer, and self-hosted LLM inference on on-premises servers.",
-      "Integrated the platform with the customer's .NET applications and hardened it to their cybersecurity requirements.",
-      "Built the measurement layer: response time, question classification, user feedback loops, and automated evaluation against a baseline question-and-answer set using an LLM as judge.",
-      "Lead Agile delivery, including PI planning and customer demonstrations.",
-      "Validate business value with customer stakeholders and business process analysts, translating operational needs into production capability.",
+    summary:
+      "Architecting and delivering a secure, on-premises RAG platform for enterprise knowledge retrieval, self-hosted inference, and automated evaluation.",
+    detail: [
+      "RegainFlow leads solution architecture and technical delivery for a secure, on-premises AI knowledge platform supporting MSTS. The solution spans the full RAG lifecycle—from document ingestion and retrieval through self-hosted LLM inference, application integration, and production deployment.",
+      "Scope includes .NET integration, cybersecurity hardening, retrieval and response evaluation, response-time and usage metrics, user feedback loops, and automated evaluation against baseline question-and-answer sets. We also lead customer demonstrations and Agile planning while working directly with stakeholders and business process analysts to validate business value and translate operational needs into production capabilities.",
     ],
-    capabilities: [
-      "Retrieval-augmented generation",
-      "Self-hosted LLM inference",
-      "On-premises deployment",
-      ".NET integration",
-      "Security hardening",
-      "Automated evaluation",
-      "Agile / PI planning",
+  },
+  {
+    customer: "Lockheed Martin Space",
+    program: "Enterprise AI Search & AI Hub",
+    logo: LOGOS.lockheedMartin,
+    summary:
+      "Architected enterprise RAG, search, and agentic AI platforms supporting 1M+ records, secure self-hosted AI, and deployment in sensitive and air-gapped environments.",
+    detail: [
+      "Designed and delivered enterprise AI search, RAG, and agentic AI capabilities across Lockheed Martin Space. Work progressed from Savant, an enterprise search and RAG platform supporting 1M+ records, to architecture of the Space division’s centralized AI Hub for governed, reusable agent workflows. Developed self-hosted AI capabilities, hybrid retrieval and reranking, MCP and A2A integrations, granular access controls, and a document ingestion pipeline processing 16,000+ documents per hour. Solutions were designed for sensitive environments, including classified and air-gapped deployments.",
     ],
-    naics: ["541511", "541512", "541690"],
+  },
+  {
+    customer: "Lockheed Martin Space",
+    program: "Mustang / LM400 Space Bus",
+    logo: LOGOS.lockheedMartin,
+    summary:
+      "Developed and verified Class B flight software for the LM400 space bus, including spacecraft power diagnostics and automated load-shedding capabilities.",
+    detail: [
+      "Developed and verified Class B flight software supporting Lockheed Martin’s LM400 space bus. Work included spacecraft power diagnostics and load-shedding functionality, object-oriented development in C++ and Python on NASA cFS, and rigorous unit, integration, and hardware-in-the-loop testing. Supported system modeling and design in Cameo through Critical Design Review while delivering within an Agile spacecraft software program.",
+    ],
   },
   {
     customer: "Pratt & Whitney",
+    program: "Enterprise AI & Engineering Knowledge",
     logo: LOGOS.prattWhitney,
-    deliveredBy: "RegainFlow",
-    title: "Enterprise AI and retrieval-augmented generation",
     role: "Subcontractor to Innovien Solutions",
-    // TODO(gov): period of performance and scope detail.
-    overview:
-      "Delivery supporting an aerospace manufacturing environment.",
-    work: [],
-    capabilities: ["Retrieval-augmented generation", "Enterprise AI"],
-    naics: ["541511", "541512"],
-  },
-  {
-    customer: "Lockheed Martin",
-    logo: LOGOS.lockheedMartin,
-    title: "Mustang LM 400 bus: diagnostics and load shed",
-    deliveredBy: "William J. Baltus, CTO",
-    // TODO(gov): title and period, from the résumé.
-    overview:
-      "Detects power discrepancies in any component or switch on the bus.",
-    work: [
-      "Built the diagnostics and load-shed logic for power discrepancies across components and switches.",
-      "Stringent unit testing with GMock across object-oriented Python and C++.",
-      "Modeled and designed the system in Cameo for the critical design review (CDR).",
+    summary:
+      "Architecting enterprise RAG and AI capabilities that transform complex aerospace engineering documentation into trusted, searchable knowledge for engineering and business workflows.",
+    detail: [
+      "Supporting the architecture and development of enterprise AI and RAG capabilities that transform complex aerospace engineering documentation and enterprise data into trusted, searchable knowledge. The solution supports engineering and business workflows through document intelligence, hybrid lexical and semantic retrieval, reranking, grounded generation, and source traceability.",
+      "Work spans the full RAG lifecycle, from ingestion and structured extraction through retrieval and response generation, with evaluation methodologies measuring retrieval relevance and answer quality. The platform is designed around production enterprise requirements including secure deployment, access controls, observability, repeatable ingestion, and integration with existing engineering workflows.",
     ],
-    capabilities: ["C++", "Python", "GMock", "Cameo / MBSE", "Critical design review"],
-    naics: ["541330", "541511"],
   },
   {
     customer: "U.S. Army",
+    program: "Engineering, Communications & Cyber Operations",
     logo: LOGOS.usArmy,
-    title: "Engineer, Signal, and Cyber Warfare officer",
-    deliveredBy: "Leonardo J. Ramirez, CEO",
-    role: "Captain",
-    overview:
-      "Served to Captain across three specialties.",
-    work: [
-      "Engineer officer.",
-      "Signal officer supporting Space and Missile Defense.",
-      "Cyber Warfare officer running defensive cyber operations at the national level.",
+    role: "Engineer Officer | Signal Officer | Cyber Warfare Officer",
+    summary:
+      "Led engineering, secure communications, and cybersecurity capabilities supporting mission-critical Army operations and space/missile-defense environments.",
+    detail: [
+      "Led engineering, secure communications, and cybersecurity capabilities supporting mission-critical Army operations and space/missile-defense environments. Engineering responsibilities included project planning, cost estimation, feasibility analysis, technical documentation, design development, and BIM-supported infrastructure projects.",
+      "Managed classified and unclassified communications supporting a 500-Soldier organization, including tactical satellite communications, command-and-control systems, and more than 50 connected mission platforms. Later led and developed cyber personnel, provided technical mentorship and cybersecurity training, and supported allied partners in implementing cybersecurity concepts and practices.",
     ],
-    capabilities: ["Defensive cyber operations", "Space and missile defense", "Signal", "Leadership"],
   },
 ];
 

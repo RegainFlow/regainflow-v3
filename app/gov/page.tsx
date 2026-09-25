@@ -8,7 +8,6 @@ import {
   GOV_LOCATION,
   NAICS_CODES,
   PAST_PERFORMANCE,
-  PAST_PERFORMANCE_NOTE,
   POINTS_OF_CONTACT,
   isVisible,
 } from "@/lib/content/gov";
@@ -19,18 +18,15 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-const naicsTitle = (code: string) =>
-  NAICS_CODES.find((n) => n.code === code)?.title ?? "";
-
 /**
  * gov.regainflow.com — one page, laid out the way a contracting officer reads
  * a vendor: identifiers first, then past performance, with the capability
  * statement beside it as the actual PDF. Nothing to click through to.
  *
  * Also the source of the past performance PDF: `pnpm gov:pdf` prints this
- * page. The print stylesheet drops the capability statement column and the
- * reference section (`.rf-print-hide`) and sets the entries as a one-page 2×2
- * sheet, so the printed file is the past performance alone.
+ * page. The print stylesheet drops the capability statement column, the full
+ * descriptions, and the NAICS list (`.rf-print-hide`), so the printed file is
+ * company data plus the past performance one-liners, on one page.
  */
 export default function GovPage() {
   const entries = PAST_PERFORMANCE.filter(isVisible);
@@ -90,71 +86,35 @@ export default function GovPage() {
 
       <section className="rf-section">
         <div className="rf-shell rf-grid gap-y-12 py-10 md:py-12">
-          {/* Past performance, left. */}
+          {/* Past performance, left. The one-liner is the scope; the expanded
+              description is one click away and never printed. */}
           <div className="col-span-full lg:col-span-7">
             <h2 className="rf-h2">Past performance</h2>
-            <p className="rf-body mt-3 max-w-[60ch]">{PAST_PERFORMANCE_NOTE}</p>
 
             <div className="rf-pp-list mt-8">
               {entries.map((pp) => (
-                <article key={pp.customer} className="rf-pp">
-                  <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+                <article key={`${pp.customer}-${pp.program}`} className="rf-pp">
+                  <div className="flex items-start gap-5">
                     {pp.logo ? <LogoTile logo={pp.logo} name={pp.customer} size="sm" /> : null}
-                    <div>
-                      <h3 className="rf-h3">{pp.customer}</h3>
-                      {pp.customerFull ? (
-                        <p className="rf-body text-sm">{pp.customerFull}</p>
-                      ) : null}
+                    <div className="min-w-0">
+                      <h3 className="rf-h3">
+                        {pp.customer} <span className="text-rf-slate">— {pp.program}</span>
+                      </h3>
+                      {pp.role ? <p className="rf-utility mt-2">{pp.role}</p> : null}
+                      {pp.draft ? <span className="rf-tag mt-2 inline-block">Draft, dev only</span> : null}
                     </div>
-                    {pp.draft ? <span className="rf-tag">Draft, dev only</span> : null}
                   </div>
 
-                  <dl className="rf-doc-facts mt-5">
-                    <div>
-                      <dt>Performed by</dt>
-                      <dd>{pp.deliveredBy}</dd>
-                    </div>
-                    {pp.role ? (
-                      <div>
-                        <dt>Role</dt>
-                        <dd>{pp.role}</dd>
-                      </div>
-                    ) : null}
-                    {pp.period ? (
-                      <div>
-                        <dt>Period of performance</dt>
-                        <dd>{pp.period}</dd>
-                      </div>
-                    ) : null}
-                    {pp.naics?.length ? (
-                      <div>
-                        <dt>NAICS</dt>
-                        <dd>
-                          {pp.naics.map((code) => (
-                            <span key={code} className="block">
-                              <span className="font-mono">{code}</span>{" "}
-                              <span className="text-rf-slate">{naicsTitle(code)}</span>
-                            </span>
-                          ))}
-                        </dd>
-                      </div>
-                    ) : null}
-                  </dl>
+                  <p className="rf-body mt-4">{pp.summary}</p>
 
-                  <p className="rf-utility mt-5">Scope</p>
-                  <p className="rf-body mt-2">
-                    <span className="text-rf-warm">{pp.title}.</span> {pp.overview}
-                  </p>
-
-                  {pp.work.length > 0 ? (
-                    <ul className="rf-doc-list mt-4">
-                      {pp.work.map((line) => (
-                        <li key={line} className="rf-body">
-                          {line}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
+                  <details className="rf-pp-more rf-print-hide mt-3">
+                    <summary>Full description</summary>
+                    {pp.detail.map((para) => (
+                      <p key={para.slice(0, 40)} className="rf-body mt-3">
+                        {para}
+                      </p>
+                    ))}
+                  </details>
                 </article>
               ))}
             </div>

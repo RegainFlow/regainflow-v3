@@ -3109,27 +3109,6 @@
     padding: 0.45rem 0.7rem;
   }
 
-  .rf-doc-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .rf-doc-list li {
-    position: relative;
-    padding-left: 1.25rem;
-  }
-
-  .rf-doc-list li::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0.7em;
-    width: 0.5rem;
-    height: 1px;
-    background: var(--color-rf-flow);
-  }
-
   /* The company data bar: identifiers, NAICS, location, points of contact. */
   .rf-gov-facts {
     display: grid;
@@ -3146,8 +3125,7 @@
     }
   }
 
-  .rf-gov-facts dt,
-  .rf-doc-facts dt {
+  .rf-gov-facts dt {
     font-family: var(--font-mono);
     font-size: 0.6875rem;
     letter-spacing: 0.12em;
@@ -3168,10 +3146,30 @@
     border-top: 1px solid var(--color-rf-hairline);
   }
 
-  .rf-pp .rf-doc-facts {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 0.9rem 2.25rem;
+  .rf-pp-more summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    list-style: none;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-rf-flow-soft);
+  }
+
+  .rf-pp-more summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .rf-pp-more summary::after {
+    content: "+";
+    font-size: 0.875rem;
+  }
+
+  .rf-pp-more[open] summary::after {
+    content: "−";
   }
 
   @media (min-width: 768px) {
@@ -3201,18 +3199,7 @@
     color: var(--color-rf-warm);
   }
 
-  .rf-doc-facts {
-    display: flex;
-    flex-direction: column;
-    gap: 1.1rem;
-  }
 
-
-  .rf-doc-facts dd {
-    margin-top: 0.3rem;
-    font-size: 0.9375rem;
-    color: var(--color-rf-warm);
-  }
 }
 
 /* Print, which is also how the past performance PDF is made (`pnpm gov:pdf`
@@ -3247,7 +3234,7 @@
   /* One page, by scaling the whole sheet rather than keeping a second layout.
      `pnpm gov:pdf` fails if it spills to a second page. */
   body {
-    zoom: 0.6;
+    zoom: 0.82;
     padding: 0.5in;
     background: #ffffff;
     print-color-adjust: exact;
@@ -3287,21 +3274,16 @@
     border-top: 0;
   }
 
-  /* Past performance as a 2×2 sheet. */
+  /* One-liners only, so a plain list fits the page. */
   .rf-pp-list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.25rem 2rem;
     margin-top: 1rem;
   }
 
-  /* Every cell ruled the same, so the two columns start level. The screen
-     rule only rules entries after the first, hence the sibling selector. */
   .rf-pp,
   .rf-pp + .rf-pp {
     break-inside: avoid;
     margin-top: 0;
-    padding-top: 1rem;
+    padding-block: 0.9rem;
     border-top: 1px solid var(--color-rf-hairline);
   }
 
