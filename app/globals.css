@@ -3048,7 +3048,7 @@
   }
 
   /* The PDF preview: page one of the actual file, rendered to an image by
-     `pnpm gov:pdf`, so it looks the same on a phone as on a desktop — an
+     `pnpm gov:preview`, so it looks the same on a phone as on a desktop — an
      embedded PDF does not. Framed as a sheet of paper on either palette. */
   .rf-doc-preview {
     display: block;
@@ -3202,10 +3202,9 @@
 
 }
 
-/* Print, which is also how the past performance PDF is made (`pnpm gov:pdf`
-   prints `app/gov/page.tsx`). The palette is set to paper by redefining the
-   tokens rather than restyling each class, and everything that is not past
-   performance drops out, so the file is the past performance sheet alone. */
+/* Printing the gov page. The palette is set to paper by redefining the tokens
+   rather than restyling each class, and everything but company data and the
+   past performance one-liners drops out, so the page prints as one sheet. */
 @media print {
   :root,
   .rf-gov[data-theme] {
@@ -3231,8 +3230,7 @@
     background: #ffffff;
   }
 
-  /* One page, by scaling the whole sheet rather than keeping a second layout.
-     `pnpm gov:pdf` fails if it spills to a second page. */
+  /* One page, by scaling the whole sheet rather than keeping a second layout. */
   body {
     zoom: 0.82;
     padding: 0.5in;

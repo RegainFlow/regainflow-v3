@@ -11,7 +11,7 @@ import {
   POINTS_OF_CONTACT,
   isVisible,
 } from "@/lib/content/gov";
-import { GOV_CAPABILITY_PDF, GOV_PAST_PERFORMANCE_PDF, GOV_PREVIEWS } from "@/lib/site";
+import { GOV_CAPABILITY_PDF, GOV_PREVIEWS } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: { absolute: "RegainFlow | Capability Statement & Past Performance" },
@@ -23,10 +23,9 @@ export const metadata: Metadata = {
  * a vendor: identifiers first, then past performance, with the capability
  * statement beside it as the actual PDF. Nothing to click through to.
  *
- * Also the source of the past performance PDF: `pnpm gov:pdf` prints this
- * page. The print stylesheet drops the capability statement column, the full
- * descriptions, and the NAICS list (`.rf-print-hide`), so the printed file is
- * company data plus the past performance one-liners, on one page.
+ * Printing the page (`.rf-print-hide` in `globals.css`) drops the capability
+ * statement column, the full descriptions, and the NAICS list, leaving company
+ * data and the past performance one-liners on one sheet.
  */
 export default function GovPage() {
   const entries = PAST_PERFORMANCE.filter(isVisible);
@@ -145,28 +144,16 @@ export default function GovPage() {
                 />
               </a>
 
-              <div className="mt-6 flex flex-col gap-3">
-                <a
-                  href={GOV_CAPABILITY_PDF}
-                  download="RegainFlow_Capability_Statement_2026.pdf"
-                  className="rf-cta-primary justify-center"
-                  data-rf-event={RF_EVENTS.govPdfDownloaded}
-                  data-rf-document="capability_statement"
-                  data-rf-location="gov"
-                >
-                  Download capability statement (PDF)
-                </a>
-                <a
-                  href={GOV_PAST_PERFORMANCE_PDF}
-                  download="RegainFlow_Past_Performance_2026.pdf"
-                  className="rf-cta-secondary justify-center"
-                  data-rf-event={RF_EVENTS.govPdfDownloaded}
-                  data-rf-document="past_performance"
-                  data-rf-location="gov"
-                >
-                  Download past performance (PDF)
-                </a>
-              </div>
+              <a
+                href={GOV_CAPABILITY_PDF}
+                download="RegainFlow_Capability_Statement_2026.pdf"
+                className="rf-cta-primary mt-6 w-full justify-center"
+                data-rf-event={RF_EVENTS.govPdfDownloaded}
+                data-rf-document="capability_statement"
+                data-rf-location="gov"
+              >
+                Download capability statement (PDF)
+              </a>
             </div>
           </aside>
         </div>

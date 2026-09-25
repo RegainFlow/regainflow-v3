@@ -4,8 +4,7 @@
  * Written for a contracting officer, so it holds facts and nothing else: no
  * positioning, no taglines, no claims a reader cannot check. The capability
  * statement is not restated here — the page shows the PDF itself
- * (`GOV_CAPABILITY_PDF`). The past performance PDF is generated from the page
- * (`pnpm gov:pdf`), so the two cannot drift.
+ * (`GOV_CAPABILITY_PDF`).
  *
  * ## Drafts
  *
@@ -94,7 +93,7 @@ export const LOGOS = {
 
 /**
  * One engagement. The copy is the owner's, verbatim: `summary` is the
- * capability-sheet one-liner (and the only text on the printed sheet),
+ * capability-sheet one-liner (and the only text when the page is printed),
  * `detail` the expanded website version behind "Full description".
  */
 export interface PastPerformance {

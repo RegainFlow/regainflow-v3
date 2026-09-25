@@ -64,13 +64,13 @@ export const RF_EVENTS = {
    */
   partnerSiteOpened: "partner_site_opened",
   /**
-   * A gov.regainflow.com document PDF — the capability statement or past
-   * performance, named in `document`. Separate from `capabilityStatementOpened`
+   * The capability statement PDF, downloaded from gov.regainflow.com (named
+   * in `document`). Separate from `capabilityStatementOpened`
    * because this reader has already read the page; the download is a second,
    * stronger decision.
    */
   govPdfDownloaded: "gov_pdf_downloaded",
-  /** The inline PDF view on a gov document, chosen over the web view. */
+  /** The capability statement preview on the gov page, opened full size. */
   govPdfViewed: "gov_pdf_viewed",
   /** A report card, from the listing or from a report page. */
   reportOpened: "report_opened",

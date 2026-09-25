@@ -29,20 +29,17 @@ export const CAPABILITY_STATEMENT_HREF =
 export const GOV_SITE_URL = "https://gov.regainflow.com";
 
 /**
- * The gov documents' PDFs, served from this origin.
+ * The capability statement PDF, served from this origin.
  *
  * Same-origin on purpose: a browser ignores `download` on a cross-origin link
- * and just opens the file, so the Download button would not download. The
- * capability statement is still the Supabase file above — `next.config.ts`
- * rewrites `/files/*` onto the `site` bucket rather than keeping a second copy.
- * The past performance PDF is generated from its own page (`pnpm gov:pdf`) and
- * committed under `public/files`, which the same path serves.
+ * and just opens the file, so the Download button would not download. It is
+ * still the Supabase file above — `next.config.ts` rewrites `/files/*` onto the
+ * `site` bucket rather than keeping a second copy.
  */
 export const GOV_CAPABILITY_PDF = "/files/RegainFlow_Capability_Statement_2026.pdf";
-export const GOV_PAST_PERFORMANCE_PDF = "/files/RegainFlow_Past_Performance_2026.pdf";
 
 /**
- * Page one of the capability statement as a PNG, written by `pnpm gov:pdf`.
+ * Page one of the capability statement as a PNG, written by `pnpm gov:preview`.
  * This is the preview the gov page shows beside past performance — an image,
  * not an embedded PDF, because a phone renders an embedded PDF as one page or
  * as nothing. Dimensions are the rendered file's, for layout only.
