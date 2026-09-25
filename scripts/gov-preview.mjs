@@ -16,8 +16,8 @@ import { firstPage, load, pngSize } from "./lib/cover.mjs";
 const CAPABILITY_PDF =
   "https://qsnaxtjoyqycpbmmghff.supabase.co/storage/v1/object/public/site/RegainFlow_Capability_Statement_2026.pdf";
 
-/** Wide enough to stay sharp at the preview's largest rendered size, 2x. */
-const PREVIEW_WIDTH = 1200;
+/** The preview renders up to ~740px wide; this keeps it sharp at 2x and up. */
+const PREVIEW_WIDTH = 1800;
 
 const data = await load(CAPABILITY_PDF);
 const natural = pngSize((await firstPage(data, 1)).image);

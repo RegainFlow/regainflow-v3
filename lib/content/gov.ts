@@ -29,6 +29,29 @@ export const GOV_IDENTIFIERS = [
 
 export const GOV_LOCATION = "Orlando, Florida";
 
+/**
+ * Socioeconomic status, as a contracting officer searches for it.
+ *
+ * **`certification` stays empty until a certificate exists.** Being
+ * veteran-owned is not the same as being SBA-certified: VOSB and SDVOSB are
+ * certified through SBA VetCert, and a misstated certification or status in a
+ * federal context carries penalties (15 U.S.C. 632(w)). There is also no SBA
+ * "minority-owned" certification — the federal routes are SDB (represented in
+ * SAM.gov) and SBA 8(a); an MBE comes from NMSDC or a state. Name the real
+ * program and issuer here, or leave it out.
+ */
+export interface Classification {
+  label: string;
+  abbreviation?: string;
+  /** e.g. `SBA VetCert`. Rendered as "Certified: …" only when set. */
+  certification?: string;
+}
+
+export const BUSINESS_CLASSIFICATIONS: Classification[] = [
+  { label: "Veteran-Owned Small Business", abbreviation: "VOSB" },
+  { label: "Minority-Owned Small Business" },
+];
+
 export interface Code {
   code: string;
   title: string;

@@ -47,8 +47,8 @@ export const GOV_CAPABILITY_PDF = "/files/RegainFlow_Capability_Statement_2026.p
 export const GOV_PREVIEWS = {
   capabilityStatement: {
     src: "/files/previews/capability-statement.png",
-    width: 1200,
-    height: 1552,
+    width: 1800,
+    height: 2329,
   },
 };
 

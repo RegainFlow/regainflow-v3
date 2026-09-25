@@ -4,6 +4,7 @@ import Image from "next/image";
 import LogoTile from "@/components/gov/LogoTile";
 import { RF_EVENTS } from "@/lib/analytics/events";
 import {
+  BUSINESS_CLASSIFICATIONS,
   GOV_IDENTIFIERS,
   GOV_LOCATION,
   NAICS_CODES,
@@ -25,7 +26,8 @@ export const metadata: Metadata = {
  *
  * Printing the page (`.rf-print-hide` in `globals.css`) drops the capability
  * statement column, the full descriptions, and the NAICS list, leaving company
- * data and the past performance one-liners on one sheet.
+ * data, the past performance one-liners, and business classifications on one
+ * sheet.
  */
 export default function GovPage() {
   const entries = PAST_PERFORMANCE.filter(isVisible);
@@ -87,7 +89,7 @@ export default function GovPage() {
         <div className="rf-shell rf-grid gap-y-12 py-10 md:py-12">
           {/* Past performance, left. The one-liner is the scope; the expanded
               description is one click away and never printed. */}
-          <div className="col-span-full lg:col-span-7">
+          <div className="col-span-full lg:col-span-5">
             <h2 className="rf-h2">Past performance</h2>
 
             <div className="rf-pp-list mt-8">
@@ -119,10 +121,13 @@ export default function GovPage() {
             </div>
           </div>
 
-          {/* Capability statement, right: the PDF itself, as an image so it
-              renders on any device. Sticky, so it stays beside the list. */}
-          <aside className="rf-print-hide col-span-full lg:col-span-5">
-            <div className="lg:sticky lg:top-28">
+          {/* Capability statement, right, and the wider column: the PDF itself,
+              as an image so it renders on any device, sized to be read in
+              place rather than downloaded. Not sticky — at this size it is
+              taller than most screens, and a pinned sheet would hide its own
+              bottom half. */}
+          <aside className="rf-print-hide col-span-full lg:col-span-7">
+            <div>
               <h2 className="rf-h2">Capability statement</h2>
               <a
                 href={GOV_CAPABILITY_PDF}
@@ -139,7 +144,7 @@ export default function GovPage() {
                   alt="RegainFlow capability statement, page one"
                   width={GOV_PREVIEWS.capabilityStatement.width}
                   height={GOV_PREVIEWS.capabilityStatement.height}
-                  sizes="(min-width: 1024px) 36vw, 92vw"
+                  sizes="(min-width: 1280px) 740px, (min-width: 1024px) 56vw, 92vw"
                   priority
                 />
               </a>
@@ -159,17 +164,38 @@ export default function GovPage() {
         </div>
       </section>
 
-      <section className="rf-section rf-print-hide">
-        <div className="rf-shell py-10 md:py-12">
-          <h2 className="rf-h3">NAICS codes</h2>
-          <dl className="rf-doc-codes rf-doc-codes-2 mt-5">
-            {NAICS_CODES.map((c) => (
-              <div key={c.code}>
-                <dt>{c.code}</dt>
-                <dd className="rf-body">{c.title}</dd>
-              </div>
-            ))}
-          </dl>
+      <section className="rf-section">
+        <div className="rf-shell rf-grid gap-y-10 py-10 md:py-12">
+          <div className="col-span-full lg:col-span-5">
+            <h2 className="rf-h3">Business classifications</h2>
+            <ul className="mt-5 flex flex-col gap-4">
+              {BUSINESS_CLASSIFICATIONS.map((c) => (
+                <li key={c.label}>
+                  <p className="text-rf-warm">
+                    {c.label}
+                    {c.abbreviation ? (
+                      <span className="text-rf-slate"> ({c.abbreviation})</span>
+                    ) : null}
+                  </p>
+                  {c.certification ? (
+                    <p className="rf-utility mt-1">Certified: {c.certification}</p>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="rf-print-hide col-span-full lg:col-span-7">
+            <h2 className="rf-h3">NAICS codes</h2>
+            <dl className="rf-doc-codes rf-doc-codes-2 mt-5">
+              {NAICS_CODES.map((c) => (
+                <div key={c.code}>
+                  <dt>{c.code}</dt>
+                  <dd className="rf-body">{c.title}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
         </div>
       </section>
     </>
