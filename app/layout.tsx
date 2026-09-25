@@ -2,8 +2,6 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
 
-import SiteFooter from "@/components/SiteFooter";
-import SiteHeader from "@/components/SiteHeader";
 import { organizationJsonLd, serializeJsonLd, websiteJsonLd } from "@/lib/seo";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 
@@ -105,13 +103,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           Skip to content
         </a>
 
-        <SiteHeader />
-
-        {/* One `main` for the whole site, so the skip link resolves on every
-            route. Pages compose sections only. */}
-        <main id="main">{children}</main>
-
-        <SiteFooter />
+        {/* Chrome lives one level down, per route group: `(site)` carries the
+            marketing header and footer, `gov` its own lean pair for
+            gov.regainflow.com. Each group renders the one `main#main`, so the
+            skip link above resolves on every route. */}
+        {children}
 
         {/* Static, RegainFlow-authored structured data. `serializeJsonLd`
             escapes `<` so no copy change can close the tag early. The site node

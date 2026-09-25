@@ -21,6 +21,45 @@ export const FREE_ASSESSMENT_HREF =
 export const CAPABILITY_STATEMENT_HREF =
   "https://qsnaxtjoyqycpbmmghff.supabase.co/storage/v1/object/public/site/RegainFlow_Capability_Statement_2026.pdf";
 
+/**
+ * The government-buyer subdomain. `proxy.ts` maps its root onto `app/gov`, so a
+ * contracting officer reads the capability statement and past performance as
+ * pages before deciding whether to download either.
+ */
+export const GOV_SITE_URL = "https://gov.regainflow.com";
+
+/**
+ * The gov documents' PDFs, served from this origin.
+ *
+ * Same-origin on purpose: a browser ignores `download` on a cross-origin link
+ * and just opens the file, so the Download button would not download. The
+ * capability statement is still the Supabase file above — `next.config.ts`
+ * rewrites `/files/*` onto the `site` bucket rather than keeping a second copy.
+ * The past performance PDF is generated from its own page (`pnpm gov:pdf`) and
+ * committed under `public/files`, which the same path serves.
+ */
+export const GOV_CAPABILITY_PDF = "/files/RegainFlow_Capability_Statement_2026.pdf";
+export const GOV_PAST_PERFORMANCE_PDF = "/files/RegainFlow_Past_Performance_2026.pdf";
+
+/**
+ * Page one of each gov PDF as a PNG, written by `pnpm gov:pdf` next to the
+ * files above. This is the preview a reader sees before downloading — an
+ * image, not an embedded PDF, because a phone renders an embedded PDF as one
+ * page or as nothing. Dimensions are the rendered file's, for layout only.
+ */
+export const GOV_PREVIEWS = {
+  capabilityStatement: {
+    src: "/files/previews/capability-statement.png",
+    width: 1200,
+    height: 1552,
+  },
+  pastPerformance: {
+    src: "/files/previews/past-performance.png",
+    width: 1200,
+    height: 1552,
+  },
+};
+
 /** The canonical contact route. Every contact CTA on the site points here. */
 export const CONTACT_PATH = "/contact";
 
@@ -267,10 +306,12 @@ export const NAV: NavGroup[] = [
         href: CONTACT_PATH,
         hint: "Tell us what you are building",
       },
+      // The gov subdomain rather than the raw PDF: the page shows the statement
+      // and past performance side by side, and the PDF is one click from it.
       {
         label: "Capability statement ↗",
-        href: CAPABILITY_STATEMENT_HREF,
-        hint: "The one-page overview, as a PDF",
+        href: `${GOV_SITE_URL}/capability-statement`,
+        hint: "Capability statement and past performance",
         secondary: true,
         external: true,
         event: RF_EVENTS.capabilityStatementOpened,

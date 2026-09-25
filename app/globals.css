@@ -2993,3 +2993,337 @@
     animation: none;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   gov.regainflow.com — `app/gov` and `components/gov`.
+--------------------------------------------------------------------------- */
+
+@layer components {
+  /* The gov subdomain's palette. Light by default — the reader is comparing
+     this against a stack of other vendors' PDFs, most of them on paper — with
+     the site's own dark palette one toggle away (`GovThemeToggle`).
+
+     It works by redefining the eight tokens on the wrapper rather than
+     restyling classes: every `rf-*` class and `bg-rf-*` utility reads the
+     variables, so the whole component set follows without a second copy. */
+  .rf-gov {
+    min-height: 100vh;
+    background: var(--color-rf-void);
+    color: var(--color-rf-warm);
+  }
+
+  .rf-gov[data-theme="light"] {
+    --color-rf-void: #f6f7fa;
+    --color-rf-navy: #ffffff;
+    --color-rf-hairline: #d8dde6;
+    --color-rf-warm: #0a1222;
+    --color-rf-slate: #4b5568;
+    --color-rf-flow: #2f6bff;
+    --color-rf-flow-soft: #1d4fd8;
+    --color-rf-line: #8b96aa;
+    color-scheme: light;
+  }
+
+  .rf-gov[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  .rf-theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid var(--color-rf-hairline);
+    color: var(--color-rf-slate);
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+
+  @media (hover: hover) {
+    .rf-theme-toggle:hover {
+      color: var(--color-rf-warm);
+      border-color: var(--color-rf-slate);
+    }
+  }
+
+  /* The PDF preview: page one of the actual file, rendered to an image by
+     `pnpm gov:pdf`, so it looks the same on a phone as on a desktop — an
+     embedded PDF does not. Framed as a sheet of paper on either palette. */
+  .rf-doc-preview {
+    display: block;
+    background: #ffffff;
+    border: 1px solid var(--color-rf-hairline);
+    box-shadow:
+      0 1px 2px rgb(10 18 34 / 0.08),
+      0 12px 32px -12px rgb(10 18 34 / 0.28);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .rf-doc-preview img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  @media (hover: hover) {
+    .rf-doc-preview:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 1px 2px rgb(10 18 34 / 0.08),
+        0 18px 40px -12px rgb(10 18 34 / 0.34);
+    }
+  }
+
+  .rf-print-only {
+    display: none;
+  }
+
+  /* Customer and employer marks — `components/gov/LogoTile.tsx`. White, and
+     warm white rather than pure, so the tile sits in the palette instead of
+     punching a hole in it. */
+  .rf-logo-tile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 1px solid var(--color-rf-hairline);
+  }
+
+  .rf-logo-tile img {
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+  }
+
+  .rf-logo-tile-md {
+    height: 4rem;
+    width: 11rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .rf-logo-tile-sm {
+    height: 2.5rem;
+    width: 7.5rem;
+    padding: 0.45rem 0.7rem;
+  }
+
+  .rf-doc-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .rf-doc-list li {
+    position: relative;
+    padding-left: 1.25rem;
+  }
+
+  .rf-doc-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.7em;
+    width: 0.5rem;
+    height: 1px;
+    background: var(--color-rf-flow);
+  }
+
+  .rf-doc-codes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .rf-doc-codes div {
+    display: grid;
+    grid-template-columns: 5.5rem 1fr;
+    gap: 1rem;
+    align-items: baseline;
+  }
+
+  .rf-doc-codes dt {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--color-rf-warm);
+  }
+
+  .rf-doc-facts {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+
+  .rf-doc-facts dt {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-rf-slate);
+  }
+
+  .rf-doc-facts dd {
+    margin-top: 0.3rem;
+    font-size: 0.9375rem;
+    color: var(--color-rf-warm);
+  }
+}
+
+/* Print, which is also how the past performance PDF is made (`pnpm gov:pdf`).
+   The palette is inverted by redefining the tokens rather than restyling each
+   class — every surface already reads them — so the document comes out on
+   paper with the same hierarchy. The chrome and the view switch drop out. */
+@media print {
+  :root,
+  .rf-gov[data-theme] {
+    --color-rf-void: #ffffff;
+    --color-rf-navy: #ffffff;
+    --color-rf-hairline: #d3d9e3;
+    --color-rf-warm: #050912;
+    --color-rf-slate: #3d485c;
+    --color-rf-flow: #2f6bff;
+    --color-rf-flow-soft: #2f6bff;
+    --color-rf-line: #8b96aa;
+  }
+
+  /* Zero page margin, with the margin rebuilt as padding: Chrome leaves an
+     `@page` margin unpainted, which renders as a dark frame around the sheet
+     in the PDF and in the preview image made from it. */
+  @page {
+    size: letter;
+    margin: 0;
+  }
+
+  html {
+    background: #ffffff;
+  }
+
+  body {
+    padding: 0.5in;
+    background: #ffffff;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .rf-gov-chrome,
+  .rf-doc-preview-band,
+  .rf-skip-link {
+    display: none !important;
+  }
+
+  .rf-wordmark-3d {
+    text-shadow: none;
+  }
+
+  .rf-print-only {
+    display: block;
+  }
+
+  /* A letter page is ~720px wide, under `lg`, so the grid would print as one
+     long column. Restore the desktop split for the spans these pages use. */
+  .rf-grid > .lg\:col-span-4,
+  .rf-grid > .md\:col-span-4 {
+    grid-column: span 4 / span 4;
+  }
+
+  .rf-grid > .lg\:col-span-5 {
+    grid-column: span 5 / span 5;
+  }
+
+  .rf-grid > .md\:col-span-6 {
+    grid-column: span 6 / span 6;
+  }
+
+  .rf-grid > .lg\:col-span-7 {
+    grid-column: span 7 / span 7;
+  }
+
+  .rf-grid > .lg\:col-span-8 {
+    grid-column: span 8 / span 8;
+  }
+
+  h1,
+  h2,
+  h3,
+  .rf-eyebrow,
+  .rf-utility {
+    break-after: avoid;
+  }
+
+  li,
+  .rf-doc-facts,
+  .rf-tags {
+    break-inside: avoid;
+  }
+
+  .rf-h1 {
+    font-size: 2.1rem;
+  }
+
+  /* One page. The past performance sheet is a one-pager like the capability
+     statement, and scaling the whole document is what gets it there without a
+     second layout to maintain. `pnpm gov:pdf` fails if it spills to a second
+     page, so a new entry cannot quietly break this. */
+  body {
+    zoom: 0.58;
+  }
+
+  .rf-shell.py-12,
+  .rf-shell .py-12 {
+    padding-block: 0.9rem;
+  }
+
+  .rf-doc-entry .mt-8,
+  .rf-doc-entry .mt-10 {
+    margin-top: 0.75rem;
+  }
+
+  /* Past performance as a 2×2 sheet. Each entry drops its own two-column
+     split and stacks — facts over narrative — inside its quarter. */
+  .rf-pp-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1.75rem;
+  }
+
+  .rf-pp-list .rf-doc-entry .rf-grid > * {
+    grid-column: 1 / -1;
+  }
+
+  .rf-pp-list .rf-doc-entry .rf-grid {
+    row-gap: 0.6rem;
+  }
+
+  /* The chips repeat the narrative. On screen they help a skim; on a
+     one-page sheet they cost the space the narrative needs. */
+  .rf-pp-list .rf-tags {
+    display: none;
+  }
+
+  .rf-pp-list .rf-doc-facts {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.5rem;
+  }
+
+  .rf-doc-entry .rf-logo-tile-md {
+    height: 2.75rem;
+    width: 8rem;
+    padding: 0.4rem 0.7rem;
+  }
+
+  .rf-doc-entry .rf-h2 {
+    font-size: 1.6rem;
+  }
+
+  .rf-doc-entry .mt-6 {
+    margin-top: 0.75rem;
+  }
+
+  .rf-shell {
+    max-width: none;
+    padding-inline: 0;
+  }
+
+}

@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 import { getCaseStudies } from "@/lib/case-studies.server";
 import { INDUSTRY_GROUPS } from "@/lib/content/industries";
 import { getReports } from "@/lib/reports.server";
-import { SITE_URL } from "@/lib/site";
+import { GOV_SITE_URL, SITE_URL } from "@/lib/site";
 
 const PRIORITY: Record<string, number> = {
   "/": 1,
@@ -83,5 +83,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...pages, ...industries, ...reports, ...studies];
+  // The subdomain's pages. Cross-host entries are accepted when both hosts sit
+  // under one Search Console domain property, which is how regainflow.com is
+  // verified; `gov.regainflow.com/sitemap.xml` is this same file.
+  const gov: MetadataRoute.Sitemap = [
+    "",
+    "/capability-statement",
+    "/past-performance",
+  ].map((path) => ({
+    url: `${GOV_SITE_URL}${path}`,
+    lastModified,
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
+  return [...pages, ...industries, ...reports, ...studies, ...gov];
 }
