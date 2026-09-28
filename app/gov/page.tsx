@@ -10,6 +10,7 @@ import {
   NAICS_CODES,
   PAST_PERFORMANCE,
   POINTS_OF_CONTACT,
+  PSC_CODES,
   isVisible,
 } from "@/lib/content/gov";
 import { GOV_CAPABILITY_PDF, GOV_PREVIEWS } from "@/lib/site";
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
  * statement beside it as the actual PDF. Nothing to click through to.
  *
  * Printing the page (`.rf-print-hide` in `globals.css`) drops the capability
- * statement column, the full descriptions, and the NAICS list, leaving company
+ * statement column, the full descriptions, and the NAICS and PSC lists, leaving company
  * data, the past performance one-liners, and business classifications on one
  * sheet.
  */
@@ -106,15 +107,27 @@ export default function GovPage() {
                     </div>
                   </div>
 
-                  <p className="rf-body mt-4">{pp.summary}</p>
+                  {/* A labelled segment leads with its program in bold, as the
+                      capability statement does. */}
+                  {pp.segments.map((seg) => (
+                    <p key={seg.summary.slice(0, 40)} className="rf-body mt-4">
+                      {seg.label ? <strong className="text-rf-warm">{seg.label}. </strong> : null}
+                      {seg.summary}
+                    </p>
+                  ))}
 
                   <details className="rf-pp-more rf-print-hide mt-3">
                     <summary>Full description</summary>
-                    {pp.detail.map((para) => (
-                      <p key={para.slice(0, 40)} className="rf-body mt-3">
-                        {para}
-                      </p>
-                    ))}
+                    {pp.segments.map((seg) =>
+                      seg.detail.map((para, i) => (
+                        <p key={para.slice(0, 40)} className="rf-body mt-3">
+                          {seg.label && i === 0 ? (
+                            <strong className="text-rf-warm">{seg.label}. </strong>
+                          ) : null}
+                          {para}
+                        </p>
+                      )),
+                    )}
                   </details>
                 </article>
               ))}
@@ -151,7 +164,7 @@ export default function GovPage() {
 
               <a
                 href={GOV_CAPABILITY_PDF}
-                download="RegainFlow_Capability_Statement_2026.pdf"
+                download={GOV_CAPABILITY_PDF.split("/").pop()}
                 className="rf-cta-primary mt-6 w-full justify-center"
                 data-rf-event={RF_EVENTS.govPdfDownloaded}
                 data-rf-document="capability_statement"
@@ -189,6 +202,16 @@ export default function GovPage() {
             <h2 className="rf-h3">NAICS codes</h2>
             <dl className="rf-doc-codes rf-doc-codes-2 mt-5">
               {NAICS_CODES.map((c) => (
+                <div key={c.code}>
+                  <dt>{c.code}</dt>
+                  <dd className="rf-body">{c.title}</dd>
+                </div>
+              ))}
+            </dl>
+
+            <h2 className="rf-h3 mt-10">PSC codes</h2>
+            <dl className="rf-doc-codes rf-doc-codes-2 mt-5">
+              {PSC_CODES.map((c) => (
                 <div key={c.code}>
                   <dt>{c.code}</dt>
                   <dd className="rf-body">{c.title}</dd>

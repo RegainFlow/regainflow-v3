@@ -2,8 +2,7 @@ import Link from "next/link";
 
 import GovThemeToggle from "@/components/gov/GovThemeToggle";
 import { RF_EVENTS } from "@/lib/analytics/events";
-import { GOV_IDENTIFIERS, NAICS_CODES } from "@/lib/content/gov";
-import { CONTACT_EMAIL, LOCATION, SITE_URL } from "@/lib/site";
+import { CONTACT_EMAIL, SITE_URL } from "@/lib/site";
 
 /**
  * gov.regainflow.com's header and footer.
@@ -38,33 +37,17 @@ export function GovHeader() {
   );
 }
 
+/**
+ * Just the sign-off. The identifiers, NAICS, and location already open the
+ * page in the facts bar; repeating them here only made the page longer.
+ */
 export function GovFooter() {
   const year = new Date().getFullYear();
 
   return (
     <footer className="rf-gov-chrome bg-rf-void">
-      <div className="rf-shell py-12 md:py-16">
-        <div className="rf-grid gap-y-8 border-t border-rf-hairline pt-10">
-          <div className="col-span-full lg:col-span-5">
-            <span className="rf-wordmark rf-wordmark-3d">RegainFlow</span>
-            <p className="rf-body mt-4">{LOCATION}</p>
-          </div>
-
-          <dl className="col-span-full grid grid-cols-2 gap-6 sm:grid-cols-3 lg:col-span-7">
-            {GOV_IDENTIFIERS.map((id) => (
-              <div key={id.label}>
-                <dt className="rf-utility">{id.label}</dt>
-                <dd className="rf-body mt-2 font-mono text-rf-warm">{id.value}</dd>
-              </div>
-            ))}
-            <div>
-              <dt className="rf-utility">Primary NAICS</dt>
-              <dd className="rf-body mt-2 font-mono text-rf-warm">{NAICS_CODES[0].code}</dd>
-            </div>
-          </dl>
-        </div>
-
-        <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-rf-hairline pt-6">
+      <div className="rf-shell py-10 md:py-12">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-t border-rf-hairline pt-6">
           <p className="rf-utility">&copy; {year} RegainFlow</p>
           <a href={SITE_URL} className="rf-nav-link">
             regainflow.com &#8599;

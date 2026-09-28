@@ -15,11 +15,11 @@ export const FREE_ASSESSMENT_HREF =
  * defense, or law-enforcement buyer asks for by name, so it gets a real route
  * out of the nav rather than living only in an email attachment.
  *
- * The year is in the filename, which makes replacing it a one-line change here
+ * The edition date is in the filename, which makes replacing it a one-line change here
  * and leaves the superseded edition reachable for anyone holding the old link.
  */
 export const CAPABILITY_STATEMENT_HREF =
-  "https://qsnaxtjoyqycpbmmghff.supabase.co/storage/v1/object/public/site/RegainFlow_Capability_Statement_2026.pdf";
+  "https://qsnaxtjoyqycpbmmghff.supabase.co/storage/v1/object/public/site/RegainFlow_Capability_Statement_Federal_09_26.pdf";
 
 /**
  * The government-buyer subdomain. `proxy.ts` maps its root onto `app/gov`, so a
@@ -36,17 +36,18 @@ export const GOV_SITE_URL = "https://gov.regainflow.com";
  * still the Supabase file above — `next.config.ts` rewrites `/files/*` onto the
  * `site` bucket rather than keeping a second copy.
  */
-export const GOV_CAPABILITY_PDF = "/files/RegainFlow_Capability_Statement_2026.pdf";
+export const GOV_CAPABILITY_PDF = "/files/RegainFlow_Capability_Statement_Federal_09_26.pdf";
 
 /**
  * Page one of the capability statement as a PNG, written by `pnpm gov:preview`.
  * This is the preview the gov page shows beside past performance — an image,
  * not an embedded PDF, because a phone renders an embedded PDF as one page or
- * as nothing. Dimensions are the rendered file's, for layout only.
+ * as nothing. Dimensions are the rendered file's, for layout only. Named after
+ * its PDF, so a new edition is a new URL and no cache serves the old one.
  */
 export const GOV_PREVIEWS = {
   capabilityStatement: {
-    src: "/files/previews/capability-statement.png",
+    src: "/files/previews/RegainFlow_Capability_Statement_Federal_09_26.png",
     width: 1800,
     height: 2329,
   },

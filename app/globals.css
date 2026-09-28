@@ -3082,12 +3082,11 @@
   /* Customer and employer marks — `components/gov/LogoTile.tsx`. White, and
      warm white rather than pure, so the tile sits in the palette instead of
      punching a hole in it. */
+  /* No ground or border: the marks are transparent files and sit on the page. */
   .rf-logo-tile {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: #ffffff;
-    border: 1px solid var(--color-rf-hairline);
   }
 
   .rf-logo-tile img {
