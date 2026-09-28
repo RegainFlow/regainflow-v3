@@ -164,6 +164,12 @@ export interface NavLink {
    * not; an item that is gets a name here rather than an inline string.
    */
   event?: RfEvent;
+  /**
+   * Accents the item in its panel and shows this text as a small badge beside
+   * the label, e.g. `Gov ↗`. For the one route in a group that deserves to be
+   * found first.
+   */
+  featured?: string;
 }
 
 export interface NavGroup {
@@ -236,14 +242,23 @@ export const NAV: NavGroup[] = [
         hint: "Power, water and wastewater, public works",
       },
       {
-        label: "Federal, State & Local Government",
-        href: "/industries/federal-state-local",
-        hint: "Federal, state, and local agencies, records, risk",
-      },
-      {
         label: "Defense & Aerospace",
         href: "/industries/defense-aerospace",
         hint: "Aerospace, defense, federal contractors",
+      },
+      // Straight to gov.regainflow.com rather than the industry page: a reader
+      // choosing "government" from this menu is usually procuring, and wants
+      // the capability statement and past performance, not the pitch. The
+      // industry page still exists and links to gov from its own callout.
+      // Last, so the featured treatment closes the panel rather than breaking
+      // up the sector list.
+      {
+        label: "Federal, State & Local Government",
+        href: GOV_SITE_URL,
+        hint: "Capability statement, codes, and past performance",
+        external: true,
+        event: RF_EVENTS.capabilityStatementOpened,
+        featured: "Gov ↗",
       },
       // No free-assessment item here. It sits under Services and as the header's
       // primary CTA, and a third copy in this panel made the offer read as the
@@ -299,16 +314,8 @@ export const NAV: NavGroup[] = [
         href: CONTACT_PATH,
         hint: "Tell us what you are building",
       },
-      // The gov subdomain rather than the raw PDF: the page shows the statement
-      // and past performance side by side, and the PDF is one click from it.
-      {
-        label: "Capability statement ↗",
-        href: GOV_SITE_URL,
-        hint: "Capability statement and past performance",
-        secondary: true,
-        external: true,
-        event: RF_EVENTS.capabilityStatementOpened,
-      },
+      // No gov item here. gov.regainflow.com is the featured last item under
+      // Industries, which is where a government buyer self-selects.
     ],
   },
 ];

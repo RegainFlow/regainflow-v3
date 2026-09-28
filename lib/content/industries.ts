@@ -68,11 +68,14 @@ export interface IndustryGroup {
   /** Sector-specific free-assessment hook. */
   assessmentHook: string;
   industries: Industry[];
+  /** Buyers here procure through government, so the page links to gov.regainflow.com. */
+  gov?: boolean;
 }
 
 export const INDUSTRY_GROUPS: IndustryGroup[] = [
   {
     slug: "public-safety",
+    gov: true,
     name: "Public Safety",
     hint: "Law enforcement, fire & EMS, corrections, dispatch",
     lead: "Public safety agencies generate more record than anyone has time to read — CAD logs, incident reports, body camera transcripts, inspection histories. We build the systems that make that record searchable and answerable, and we build them so every answer traces back to the document it came from.",
@@ -207,6 +210,7 @@ export const INDUSTRY_GROUPS: IndustryGroup[] = [
   },
   {
     slug: "federal-state-local",
+    gov: true,
     name: "Federal, State & Local Government",
     hint: "Federal, state, and local agencies, records, risk",
     lead: "Federal, state, and local departments carry modernization scope on top of the job they already have. We take one of those programs end to end, from the assessment through the build to the handoff, so it does not become another system that needs a champion to survive.",
@@ -275,6 +279,7 @@ export const INDUSTRY_GROUPS: IndustryGroup[] = [
   },
   {
     slug: "defense-aerospace",
+    gov: true,
     name: "Defense & Aerospace",
     hint: "Aerospace, defense, federal contractors",
     // No longer claims the site's case studies as this career's work. The
