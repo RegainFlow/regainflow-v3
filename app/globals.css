@@ -351,21 +351,6 @@
     transition: background-color 0.2s ease;
   }
 
-  /* The line under a CTA pair, for a term of the offer rather than a second
-     call to action. The mono utility register, so it reads as a footnote to the
-     button instead of competing with the lead above it — and deliberately not a
-     badge on the button itself, since the control set in `docs/DESIGN.md` §3 is
-     closed and a decorated primary would need a rule of its own everywhere. */
-  .rf-cta-note {
-    margin-top: 1.25rem;
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    font-weight: 400;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--color-rf-slate);
-  }
-
   /* A short route stub that extends on interaction. */
   .rf-cta-primary::before {
     content: "";
@@ -1380,6 +1365,26 @@
     transition:
       border-color 0.18s ease,
       background-color 0.18s ease;
+  }
+
+  /* `NavLink.featured`: the route in a panel that should be found first. A
+     standing Flow rule and a faint Flow wash, so it reads as marked even
+     before hover. */
+  .rf-menu-item-featured {
+    border-left-color: var(--color-rf-flow);
+    background: rgb(47 107 255 / 0.08);
+  }
+
+  .rf-menu-badge {
+    margin-left: auto;
+    padding: 0.1rem 0.45rem;
+    border: 1px solid var(--color-rf-flow);
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--color-rf-flow-soft);
   }
 
   .rf-menu-item-head {
@@ -2991,5 +2996,314 @@
 
   .rf-menu-panel[data-open="true"] li {
     animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   gov.regainflow.com — `app/gov` and `components/gov`.
+--------------------------------------------------------------------------- */
+
+@layer components {
+  /* The gov subdomain's palette. Light by default — the reader is comparing
+     this against a stack of other vendors' PDFs, most of them on paper — with
+     the site's own dark palette one toggle away (`GovThemeToggle`).
+
+     It works by redefining the eight tokens on the wrapper rather than
+     restyling classes: every `rf-*` class and `bg-rf-*` utility reads the
+     variables, so the whole component set follows without a second copy. */
+  .rf-gov {
+    min-height: 100vh;
+    background: var(--color-rf-void);
+    color: var(--color-rf-warm);
+  }
+
+  .rf-gov[data-theme="light"] {
+    --color-rf-void: #f6f7fa;
+    --color-rf-navy: #ffffff;
+    --color-rf-hairline: #d8dde6;
+    --color-rf-warm: #0a1222;
+    --color-rf-slate: #4b5568;
+    --color-rf-flow: #2f6bff;
+    --color-rf-flow-soft: #1d4fd8;
+    --color-rf-line: #8b96aa;
+    color-scheme: light;
+  }
+
+  .rf-gov[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  .rf-theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid var(--color-rf-hairline);
+    color: var(--color-rf-slate);
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+
+  @media (hover: hover) {
+    .rf-theme-toggle:hover {
+      color: var(--color-rf-warm);
+      border-color: var(--color-rf-slate);
+    }
+  }
+
+  /* The PDF preview: page one of the actual file, rendered to an image by
+     `pnpm gov:preview`, so it looks the same on a phone as on a desktop — an
+     embedded PDF does not. Framed as a sheet of paper on either palette. */
+  .rf-doc-preview {
+    display: block;
+    background: #ffffff;
+    border: 1px solid var(--color-rf-hairline);
+    box-shadow:
+      0 1px 2px rgb(10 18 34 / 0.08),
+      0 12px 32px -12px rgb(10 18 34 / 0.28);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .rf-doc-preview img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  @media (hover: hover) {
+    .rf-doc-preview:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 1px 2px rgb(10 18 34 / 0.08),
+        0 18px 40px -12px rgb(10 18 34 / 0.34);
+    }
+  }
+
+  .rf-print-only {
+    display: none;
+  }
+
+  /* Customer and employer marks — `components/gov/LogoTile.tsx`. No ground or
+     border: the marks are transparent files and sit on the page. */
+  .rf-logo-tile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .rf-logo-tile img {
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+  }
+
+  .rf-logo-tile-md {
+    height: 4rem;
+    width: 11rem;
+    padding: 0.75rem 1rem;
+  }
+
+  /* The industry pages' row of marks — `components/GovCallout.tsx`. One light
+     panel for all four rather than a tile each: the main site is dark only,
+     and the marks keep their own (dark) colours. */
+  .rf-logo-wall {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    place-items: center;
+    gap: 1.5rem 1rem;
+    padding: 1.75rem 1.25rem;
+    background: #f6f7fa;
+    border: 1px solid var(--color-rf-hairline);
+  }
+
+  .rf-logo-tile-sm {
+    height: 3.25rem;
+    width: 9.75rem;
+    padding: 0.55rem 0.85rem;
+  }
+
+  /* The company data bar: identifiers, NAICS, location, points of contact. */
+  .rf-gov-facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 1.25rem 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-rf-hairline);
+  }
+
+  /* Desktop: one row, same weighting as the printed sheet. */
+  @media (min-width: 1024px) {
+    .rf-gov-facts {
+      grid-template-columns: 0.9fr 0.6fr 1.3fr 0.9fr 1.7fr 1.7fr;
+    }
+  }
+
+  .rf-gov-facts dt {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-rf-slate);
+  }
+
+  .rf-gov-facts dd {
+    margin-top: 0.35rem;
+    font-size: 0.9375rem;
+    color: var(--color-rf-warm);
+  }
+
+  /* Past performance entries, stacked with a rule between them. */
+  .rf-pp + .rf-pp {
+    margin-top: 2.25rem;
+    padding-top: 2.25rem;
+    border-top: 1px solid var(--color-rf-hairline);
+  }
+
+  .rf-pp-more summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    list-style: none;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-rf-flow-soft);
+  }
+
+  .rf-pp-more summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .rf-pp-more summary::after {
+    content: "+";
+    font-size: 0.875rem;
+  }
+
+  .rf-pp-more[open] summary::after {
+    content: "−";
+  }
+
+  @media (min-width: 768px) {
+    .rf-doc-codes-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 2rem;
+    }
+  }
+
+  .rf-doc-codes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .rf-doc-codes div {
+    display: grid;
+    grid-template-columns: 5.5rem 1fr;
+    gap: 1rem;
+    align-items: baseline;
+  }
+
+  .rf-doc-codes dt {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--color-rf-warm);
+  }
+
+
+}
+
+/* Printing the gov page. The palette is set to paper by redefining the tokens
+   rather than restyling each class, and everything but company data and the
+   past performance one-liners drops out, so the page prints as one sheet. */
+@media print {
+  :root,
+  .rf-gov[data-theme] {
+    --color-rf-void: #ffffff;
+    --color-rf-navy: #ffffff;
+    --color-rf-hairline: #d3d9e3;
+    --color-rf-warm: #050912;
+    --color-rf-slate: #3d485c;
+    --color-rf-flow: #2f6bff;
+    --color-rf-flow-soft: #2f6bff;
+    --color-rf-line: #8b96aa;
+  }
+
+  /* Zero page margin, with the margin rebuilt as padding: Chrome leaves an
+     `@page` margin unpainted, which renders as a dark frame around the sheet
+     in the PDF and in any preview image made from it. */
+  @page {
+    size: letter;
+    margin: 0;
+  }
+
+  html {
+    background: #ffffff;
+  }
+
+  /* One page, by scaling the whole sheet rather than keeping a second layout. */
+  body {
+    zoom: 0.82;
+    padding: 0.5in;
+    background: #ffffff;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .rf-gov-chrome,
+  .rf-print-hide,
+  .rf-skip-link {
+    display: none !important;
+  }
+
+  .rf-print-only {
+    display: block;
+  }
+
+  .rf-wordmark-3d {
+    text-shadow: none;
+  }
+
+  .rf-shell {
+    max-width: none;
+    padding-inline: 0;
+  }
+
+  .rf-shell.py-10,
+  .rf-shell.py-12 {
+    padding-block: 1rem;
+  }
+
+  /* One row. Weighted so the two email addresses — the widest values — get
+     the room and cannot run into each other. */
+  .rf-gov-facts {
+    grid-template-columns: 0.9fr 0.6fr 1.3fr 0.9fr 1.7fr 1.7fr;
+    gap: 1rem 1.25rem;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  /* One-liners only, so a plain list fits the page. */
+  .rf-pp-list {
+    margin-top: 1rem;
+  }
+
+  .rf-pp,
+  .rf-pp + .rf-pp {
+    break-inside: avoid;
+    margin-top: 0;
+    padding-block: 0.9rem;
+    border-top: 1px solid var(--color-rf-hairline);
+  }
+
+  h1,
+  h2,
+  h3,
+  .rf-utility {
+    break-after: avoid;
   }
 }

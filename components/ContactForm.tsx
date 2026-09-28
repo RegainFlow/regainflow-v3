@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 
-import { submitContact } from "@/app/contact/actions";
+import { submitContact } from "@/app/(site)/contact/actions";
 import { HONEYPOT, IDLE, LIMITS } from "@/lib/forms";
 
 /**

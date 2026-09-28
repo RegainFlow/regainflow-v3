@@ -103,6 +103,15 @@ const nextConfig: NextConfig = {
         source: "/relay/:path*",
         destination: "https://us.i.posthog.com/:path*",
       },
+      // The gov documents' PDFs, same-origin so `download` works and the inline
+      // viewer is not a cross-origin frame. An `afterFiles` rewrite, so a PDF
+      // committed under `public/files` wins and anything else falls through to
+      // the `site` bucket — see `GOV_CAPABILITY_PDF` in `lib/site.ts`.
+      {
+        source: "/files/:file",
+        destination:
+          "https://qsnaxtjoyqycpbmmghff.supabase.co/storage/v1/object/public/site/:file",
+      },
     ];
   },
 
@@ -118,6 +127,14 @@ const nextConfig: NextConfig = {
    * this only affects a hand-typed or badly-copied inbound URL.
    */
   skipTrailingSlashRedirect: true,
+
+  /**
+   * `gov.localhost` is how the subdomain is exercised in development — browsers
+   * resolve any `*.localhost` to loopback, and `proxy.ts` treats a `gov.` host
+   * the same everywhere. Without this Next blocks the dev assets it serves to
+   * a second origin.
+   */
+  allowedDevOrigins: ["gov.localhost"],
 };
 
 export default nextConfig;

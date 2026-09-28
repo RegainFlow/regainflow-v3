@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import AssessmentCallout from "@/components/AssessmentCallout";
 import CaseStudyCard from "@/components/CaseStudyCard";
 import DitherReveal from "@/components/DitherReveal";
+import GovCallout from "@/components/GovCallout";
 import Icon from "@/components/Icon";
 import PageHeader from "@/components/PageHeader";
 import { getCaseStudies } from "@/lib/case-studies.server";
@@ -232,6 +233,8 @@ export default async function IndustryPage({
           </div>
         </section>
       ) : null}
+
+      {group.gov ? <GovCallout location={`industry_${group.slug}`} /> : null}
 
       <AssessmentCallout hook={group.assessmentHook} />
 

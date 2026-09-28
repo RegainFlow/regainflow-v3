@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useSyncExternalStore } from "react";
 
-import { captureReader } from "@/app/insights/reports/actions";
+import { captureReader } from "@/app/(site)/insights/reports/actions";
 import { RF_EVENTS } from "@/lib/analytics/events";
 import { identify, track } from "@/lib/analytics/track";
 import type { Report } from "@/lib/content/reports";

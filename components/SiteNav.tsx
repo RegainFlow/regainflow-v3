@@ -15,7 +15,7 @@ import {
 import { createPortal } from "react-dom";
 
 import NavItemLink from "@/components/NavItemLink";
-import { NAV, type NavGroup } from "@/lib/site";
+import { NAV, type NavGroup, type NavLink } from "@/lib/site";
 
 /** Never fires — `useClient` below only needs the server/client split, not
  *  updates. Defined out here so the subscription is stable across renders. */
@@ -29,6 +29,11 @@ function useClient() {
     () => true,
     () => false,
   );
+}
+
+/** A featured item (`NavLink.featured`) is accented so it stands out in its panel. */
+function menuItemClass(item: NavLink) {
+  return item.featured ? "rf-menu-item rf-menu-item-featured" : "rf-menu-item";
 }
 
 /** True for the group whose route we are currently on. */
@@ -107,12 +112,13 @@ function DesktopGroup({
             // Items arrive in reading order rather than all at once.
             style={{ "--rf-stagger": `${i * 40}ms` } as CSSProperties}
           >
-            <NavItemLink item={item} className="rf-menu-item" onClick={onClose}>
+            <NavItemLink item={item} className={menuItemClass(item)} onClick={onClose}>
               <span className="rf-menu-item-head">
                 {item.index ? (
                   <span className="rf-menu-index">{item.index}</span>
                 ) : null}
                 <span className="rf-menu-label">{item.label}</span>
+{item.featured ? <span className="rf-menu-badge">{item.featured}</span> : null}
               </span>
               <span className="rf-menu-hint">{item.hint}</span>
             </NavItemLink>
@@ -344,7 +350,7 @@ export default function SiteNav({ cta }: { cta: ReactNode }) {
                         <li key={item.href}>
                           <NavItemLink
                             item={item}
-                            className="rf-menu-item"
+                            className={menuItemClass(item)}
                             onClick={dismissMobile}
                           >
                             <span className="rf-menu-item-head">
@@ -354,6 +360,7 @@ export default function SiteNav({ cta }: { cta: ReactNode }) {
                                 </span>
                               ) : null}
                               <span className="rf-menu-label">{item.label}</span>
+{item.featured ? <span className="rf-menu-badge">{item.featured}</span> : null}
                             </span>
                             <span className="rf-menu-hint">{item.hint}</span>
                           </NavItemLink>

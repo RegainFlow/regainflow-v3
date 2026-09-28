@@ -63,6 +63,15 @@ export const RF_EVENTS = {
    * partner sends readers away or gives them a reason to trust the bench.
    */
   partnerSiteOpened: "partner_site_opened",
+  /**
+   * The capability statement PDF, downloaded from gov.regainflow.com (named
+   * in `document`). Separate from `capabilityStatementOpened`
+   * because this reader has already read the page; the download is a second,
+   * stronger decision.
+   */
+  govPdfDownloaded: "gov_pdf_downloaded",
+  /** The capability statement preview on the gov page, opened full size. */
+  govPdfViewed: "gov_pdf_viewed",
   /** A report card, from the listing or from a report page. */
   reportOpened: "report_opened",
   /**
@@ -134,7 +143,9 @@ export type RfLocation =
   /** The email gate on a report page. */
   | "report_gate"
   /** A report page, outside the gate. */
-  | "report";
+  | "report"
+  /** Any page on gov.regainflow.com. */
+  | "gov";
 
 /**
  * Which surface a case study card was opened from.
