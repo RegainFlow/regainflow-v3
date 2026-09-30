@@ -28,6 +28,10 @@ export const CAPABILITY_STATEMENT_HREF =
  */
 export const GOV_SITE_URL = "https://gov.regainflow.com";
 
+/** The subdomain's meta description, shared by its layout and its JSON-LD. */
+export const GOV_DESCRIPTION =
+  "RegainFlow's capability statement and past performance for federal, state, local, and public-safety buyers. UEI XD3FZFEHMCD7, CAGE 20BV9.";
+
 /**
  * The capability statement PDF, served from this origin.
  *
@@ -281,6 +285,11 @@ export const NAV: NavGroup[] = [
         href: "/insights/reports",
         hint: "Written research, with an audio version",
       },
+      {
+        label: "Blog",
+        href: "/insights/blog",
+        hint: "Shorter notes from the work",
+      },
     ],
   },
   {
@@ -335,6 +344,7 @@ export const ROUTES = [
   "/industries",
   "/insights",
   "/insights/reports",
+  "/insights/blog",
   "/company",
   CONTACT_PATH,
 ] as const;

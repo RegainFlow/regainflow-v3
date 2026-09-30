@@ -38,5 +38,9 @@ supabase/.temp/
 # few hundred KB of generated art — none of it belongs in a diff.
 /.case-study/
 
+# Blog intake, drafts, source images and previews (`pnpm blog`). Drafts can
+# carry client-adjacent notes and deny lists, and the images are large.
+/.blog/
+
 .vercel
 .env*

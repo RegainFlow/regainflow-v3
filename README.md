@@ -37,6 +37,13 @@ lockfile that ships.
 | `/insights/[slug]`                                             | One case study in full: context, constraints, our role, what we engineered, outcome, what next  |
 | `/insights/reports`                                            | Published reports. Renders an empty state until the first is authored                           |
 | `/insights/reports/[slug]`                                     | One report: cover, findings, audio overview, and the email gate in front of the PDF             |
+| `/insights/blog`                                               | Blog hub: "Start here", newsletter signup, topic clusters, latest posts. Pages at `/insights/blog/page/[n]` |
+| `/insights/blog/[slug]`                                        | One post. Template in `components/BlogPostView.tsx`, laid out to `docs/blogs_seo/`             |
+| `/insights/blog/topics/[topic]`, `/insights/blog/authors/[slug]` | Topic hubs (pillar first) and author pages                                                   |
+| `/insights/blog/preview/[slug]?token=…`                        | Draft preview for `pnpm blog stage`. `noindex`; 404 without `BLOG_PREVIEW_TOKEN`                |
+| `/insights/blog/feed.xml`                                      | RSS 2.0, the twenty newest posts                                                                |
+| `/newsletter/*`                                                | Double opt-in: check-email, confirm (a button, never on GET), confirmed. All `noindex`          |
+| `/indexnow.txt`                                                | The IndexNow key from `INDEXNOW_KEY`; 404 when unset                                            |
 | `/company`                                                     | Who we are, the partner network, manifesto, contact                                             |
 | `/contact`                                                     | The contact form. The canonical contact route — every contact CTA points here                   |
 | `/contact/thanks`                                              | Post-submission confirmation. `noindex`, reachable only by submitting                           |
@@ -409,6 +416,46 @@ measure a PNG by hand in a table editor.
 One gotcha worth keeping: pdfjs rejects a plain `Uint8Array` when handing data to its worker
 ("Cannot transfer object of unsupported type"). The script converts to a Node `Buffer`.
 
+### Publishing a blog post
+
+**Ask Claude to write or publish it.** `.claude/skills/publish-blog-post/` is the front door: it
+interviews for the first-hand angle, asks for photos and screenshots, drafts, edits, and runs
+the pipeline. Under it:
+
+```bash
+pnpm blog list                                   # published posts by topic
+pnpm blog prepare .blog/<slug>/intake.yaml       # validate, measure images, write a preview folder
+pnpm blog stage   .blog/<slug>/preview           # upload images, write a draft under preview--<slug>
+pnpm blog publish .blog/<slug>/preview           # a separate, deliberate act
+pnpm blog unpublish <slug>                       # takes it down, keeps the row
+```
+
+`pnpm blog` targets `.env.local`; `pnpm blog:prod` targets `.env`, which is production. Run
+`bootstrap` once per environment to create the `blog` storage bucket. `.blog/` is gitignored.
+
+`prepare` enforces what `docs/blogs_seo/` asks of a post (`scripts/blog/guards.mts`): real
+author and topic, heading order, alt text and clearance on every image, figures and footnotes
+that parse, links only to published posts, no deny-listed names, takeaways not repeated in the
+body. Snippet lengths, unsourced numbers and thin internal linking are warnings for the person
+approving. Writes go through `publish_blog_post` (a SECURITY DEFINER function), as the case
+studies do; the secret key still has `select` only on the table.
+
+Staging writes to `preview--<slug>`, so a refresh of a live post is reviewed at
+`/insights/blog/preview/<slug>?token=…` without touching the live row. `--replace
+--substantive` moves the visible "Updated" date; `--replace` alone does not.
+
+`supabase/seed/blog-posts.sql` holds sample posts with placeholder images, inserted as
+`published`. **Never run it against production.**
+
+### Newsletter
+
+`components/NewsletterSignup.tsx` sits at the end of every post and on the blog index. It is
+double opt-in: the action writes a `pending` row to `newsletter_subscribers` and mails a
+confirmation link through Resend; the link opens a page whose button confirms (mail gateways
+fetch every link, so a GET must not). Confirmation adds the address to Resend's contacts, in
+`RESEND_SEGMENT_ID` when set, and Resend handles sending and unsubscribes from there. The
+table is the record of consent.
+
 ### Database migrations
 
 Schema lives in `supabase/migrations/`, applied with the Supabase CLI (a devDependency, so
@@ -509,8 +556,8 @@ Deliberately absent:
 - Rate and retainer figures, named success measures, and per-project promises.
   The engagement path describes the shape of the commitment and nothing more
   specific, because anything more would be committing before we have seen the work.
-- A blog and a podcast. Both were placeholders and are now off the site and out of
-  the navigation; they come back when there is something to publish.
+- A podcast. It was a placeholder and is off the site and out of the navigation. (The
+  blog is back, at `/insights/blog`, with a publishing pipeline behind it.)
 
 ### Industries
 

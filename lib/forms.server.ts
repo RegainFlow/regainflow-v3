@@ -71,3 +71,19 @@ export async function isRateLimited(
     return false;
   }
 }
+
+/**
+ * The origin this request arrived on, for links mailed back to the submitter.
+ * A confirmation link sent from a preview deployment or `localhost` has to
+ * point there, not at production, or it confirms against a different
+ * database. Falls back to the canonical site when the headers say nothing.
+ */
+export async function requestOrigin(fallback: string): Promise<string> {
+  const list = await headers();
+  const host = list.get("x-forwarded-host") ?? list.get("host");
+  if (!host) return fallback;
+
+  const local = /^(localhost|127\.0\.0\.1|[\w-]+\.localhost)(:\d+)?$/.test(host);
+  const proto = list.get("x-forwarded-proto") ?? (local ? "http" : "https");
+  return `${proto}://${host}`;
+}

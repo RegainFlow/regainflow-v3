@@ -5,14 +5,16 @@ import type { Metadata } from "next";
 // `lib/case-studies.server.ts` — and a value import here would drag a
 // server-only module into one that does nothing but build strings.
 import type { CaseStudy } from "@/lib/content/case-studies";
-import { TEAM } from "@/lib/content/company";
+import { TEAM, type TeamMember } from "@/lib/content/company";
 import { FAQ } from "@/lib/content/faq";
 import type { IndustryGroup } from "@/lib/content/industries";
 import type { Report } from "@/lib/content/reports";
+import type { BlogPost } from "@/lib/content/blog";
 import { STAGES } from "@/lib/content/stages";
 import {
   CONTACT_EMAIL,
   FREE_ASSESSMENT_HREF,
+  GOV_SITE_URL,
   PROFILES,
   SITE_NAME,
   SITE_URL,
@@ -66,16 +68,41 @@ export function pageMetadata({
   description,
   path,
   image,
+  segmentCard = false,
+  article,
+  feed = false,
 }: {
   title: string;
   description: string;
   path: string;
   /**
-   * For routes that generate their own card. Defaults to the site card — pass
-   * this only where an `opengraph-image` file exists for that segment, or the
-   * tags will point at an image that is never generated.
+   * A card at a stable URL — the blog's `card.png` route, or a cover image.
+   * Defaults to the site card.
    */
   image?: { url: string; alt: string };
+  /**
+   * The segment has its own `opengraph-image.tsx`. Its URL cannot be written
+   * here: in a production build Next serves a dynamic segment's card at
+   * `opengraph-image-<hash>`, so the literal `/opengraph-image` this helper
+   * used to be given 404'd for every report and case study. Leaving `images`
+   * unset lets the file convention emit the real URL — the convention only
+   * stands back when a page declares images itself.
+   */
+  segmentCard?: boolean;
+  /**
+   * A dated article. Switches `og:type` to `article` and adds the published,
+   * modified, author and section tags — what LinkedIn and Slack read to show a
+   * byline and date on the unfurl.
+   */
+  article?: {
+    publishedTime: string;
+    modifiedTime: string;
+    authors: string[];
+    section?: string;
+    tags?: string[];
+  };
+  /** Advertise the blog's RSS feed (`<link rel="alternate">`) from this page. */
+  feed?: boolean;
 }): Metadata {
   const fullTitle = `${title} | ${SITE_NAME}`;
   const card = {
@@ -83,25 +110,40 @@ export function pageMetadata({
     alt: image?.alt ?? `${SITE_NAME} — AI engineering & transformation partner`,
     ...OG_CARD,
   };
+  const images = segmentCard ? {} : { images: [card] };
 
   return {
     title,
     description,
-    alternates: { canonical: path },
+    alternates: {
+      canonical: path,
+      ...(feed
+        ? { types: { "application/rss+xml": `${SITE_URL}/insights/blog/feed.xml` } }
+        : {}),
+    },
     openGraph: {
       title: fullTitle,
       description,
       siteName: SITE_NAME,
       url: `${SITE_URL}${path}`,
-      type: "website",
       locale: "en_US",
-      images: [card],
+      ...(article
+        ? {
+            type: "article" as const,
+            publishedTime: article.publishedTime,
+            modifiedTime: article.modifiedTime,
+            authors: article.authors,
+            ...(article.section ? { section: article.section } : {}),
+            ...(article.tags?.length ? { tags: article.tags } : {}),
+          }
+        : { type: "website" as const }),
+      ...images,
     },
     twitter: {
       card: "summary_large_image",
       title: fullTitle,
       description,
-      images: [card],
+      ...images,
     },
   };
 }
@@ -114,7 +156,7 @@ export function pageMetadata({
  * any future author byline all resolve to the same entity instead of describing
  * three lookalikes.
  */
-function personId(name: string): string {
+export function personId(name: string): string {
   const slug = name
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
@@ -199,27 +241,28 @@ export function websiteJsonLd() {
   };
 }
 
+type Crumb = { name: string; path: string };
+
 /**
- * `parent` is only passed by the case study pages, which sit a level below
- * `/insights`. Every other call stays a two-crumb trail.
+ * `parent` is passed by pages that sit below a top-level route. One crumb for
+ * the case studies and the reports index; an array, outermost first, for the
+ * blog posts, which sit two levels down (Insights › Blog). Every other call
+ * stays a two-crumb trail.
  */
 export function breadcrumbJsonLd(
   name: string,
   path: string,
-  parent?: { name: string; path: string }
+  parent?: Crumb | Crumb[]
 ) {
+  const parents = parent ? (Array.isArray(parent) ? parent : [parent]) : [];
   const trail = [
     { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-    ...(parent
-      ? [
-          {
-            "@type": "ListItem",
-            position: 2,
-            name: parent.name,
-            item: `${SITE_URL}${parent.path}`,
-          },
-        ]
-      : []),
+    ...parents.map((crumb, i) => ({
+      "@type": "ListItem",
+      position: i + 2,
+      name: crumb.name,
+      item: `${SITE_URL}${crumb.path}`,
+    })),
   ];
 
   return {
@@ -347,6 +390,157 @@ export function reportJsonLd(report: Report) {
           },
         }
       : {}),
+  };
+}
+
+/**
+ * A blog post. `BlogPosting`, with every field matching something visible on
+ * the page — Google's rule for structured data, and the reason `dateModified`
+ * is the hand-set "Updated" date rather than the row's `updated_at`.
+ *
+ * The author is a founder's `Person` node by the same `@id` `peopleJsonLd`
+ * uses, so the byline, the author page and `/llm-info` all resolve to one
+ * entity. Carries name and url as well as the `@id`, because the full node is
+ * not on this page. Any other byline is the organization.
+ */
+export function blogPostingJsonLd(
+  post: BlogPost,
+  {
+    image,
+    author,
+    topic,
+  }: {
+    image: string;
+    author?: TeamMember;
+    topic?: { slug: string; name: string };
+  },
+) {
+  const url = `${SITE_URL}/insights/blog/${post.slug}`;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "@id": `${url}/#post`,
+    headline: post.title,
+    description: post.summary,
+    datePublished: post.published,
+    dateModified: post.updatedOn ?? post.published,
+    url,
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    inLanguage: "en-US",
+    image: image.startsWith("http") ? image : `${SITE_URL}${image}`,
+    wordCount: post.wordCount,
+    ...(topic
+      ? {
+          articleSection: topic.name,
+          isPartOf: [
+            { "@id": `${SITE_URL}/#website` },
+            {
+              "@type": "CollectionPage",
+              "@id": `${SITE_URL}/insights/blog/topics/${topic.slug}`,
+              name: topic.name,
+            },
+          ],
+        }
+      : { isPartOf: { "@id": `${SITE_URL}/#website` } }),
+    ...(post.tags.length > 0 ? { keywords: post.tags.join(", ") } : {}),
+    author: author
+      ? {
+          "@type": "Person",
+          "@id": personId(author.name),
+          name: author.name,
+          jobTitle: author.role,
+          url: `${SITE_URL}/insights/blog/authors/${author.slug}`,
+        }
+      : { "@id": `${SITE_URL}/#organization` },
+    publisher: { "@id": `${SITE_URL}/#organization` },
+  };
+}
+
+/**
+ * An author page: `ProfilePage` whose main entity is the founder's `Person`
+ * node, stated in full here because this is the page about them.
+ */
+export function authorProfileJsonLd(member: TeamMember, postCount: number) {
+  const url = `${SITE_URL}/insights/blog/authors/${member.slug}`;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "@id": url,
+    url,
+    name: `${member.name} — ${SITE_NAME}`,
+    isPartOf: { "@id": `${SITE_URL}/#website` },
+    mainEntity: {
+      "@type": "Person",
+      "@id": personId(member.name),
+      name: member.name,
+      jobTitle: member.role,
+      description: member.bio,
+      image: `${SITE_URL}${member.image}`,
+      worksFor: { "@id": `${SITE_URL}/#organization` },
+      ...(member.profile ? { sameAs: [member.profile] } : {}),
+      agentInteractionStatistic: {
+        "@type": "InteractionCounter",
+        interactionType: "https://schema.org/WriteAction",
+        userInteractionCount: postCount,
+      },
+    },
+  };
+}
+
+/** A topic hub: a curated `CollectionPage` listing its posts in order. */
+export function topicCollectionJsonLd(
+  topic: { slug: string; name: string; intro: string },
+  posts: { slug: string; title: string }[],
+) {
+  const url = `${SITE_URL}/insights/blog/topics/${topic.slug}`;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": url,
+    url,
+    name: topic.name,
+    description: topic.intro,
+    isPartOf: { "@id": `${SITE_URL}/#website` },
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: posts.map((post, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        url: `${SITE_URL}/insights/blog/${post.slug}`,
+        name: post.title,
+      })),
+    },
+  };
+}
+
+/**
+ * The gov subdomain's one page. Tied to the same organization node as the main
+ * site, so a crawler reading `gov.regainflow.com` on its own still resolves the
+ * publisher to RegainFlow rather than to an unnamed second entity.
+ */
+export function govPageJsonLd({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
+  const url = `${GOV_SITE_URL}/`;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": `${url}#webpage`,
+    name: title,
+    description,
+    url,
+    inLanguage: "en-US",
+    isPartOf: { "@id": `${SITE_URL}/#website` },
+    about: { "@id": `${SITE_URL}/#organization` },
+    publisher: { "@id": `${SITE_URL}/#organization` },
   };
 }
 

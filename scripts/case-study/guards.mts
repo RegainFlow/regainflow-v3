@@ -129,7 +129,7 @@ export function scanDenyTerms(
  * multiplier, an order-of-magnitude word, or a benefit verb sitting next to a
  * number.
  */
-const CLAIM_PATTERNS: { label: string; pattern: RegExp }[] = [
+export const CLAIM_PATTERNS: { label: string; pattern: RegExp }[] = [
   { label: "percentage", pattern: /\d+(?:\.\d+)?\s*%|%\s*\d/g },
   {
     label: "currency",

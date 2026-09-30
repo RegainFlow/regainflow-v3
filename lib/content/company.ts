@@ -20,6 +20,12 @@ export const VISION =
   "To be the most trusted AI engineering and transformation partner for public agencies and complex organizations — known for turning fragmented AI ambition into secure, scalable systems their own teams can operate.";
 
 export interface TeamMember {
+  /**
+   * The URL segment for the author page, `/insights/blog/authors/[slug]`, and
+   * the value `blog_posts.author` holds. Changing one orphans every post
+   * bylined to it, so it is set once and left alone.
+   */
+  slug: string;
   name: string;
   role: string;
   /**
@@ -54,6 +60,7 @@ export interface TeamMember {
 
 export const TEAM: TeamMember[] = [
   {
+    slug: "leo-ramirez",
     name: "Leonardo J. Ramirez",
     role: "Co-founder & CEO",
     bio: "Staff full-stack engineer and AI/ML technical lead before he was a founder. Builds AI systems inside environments that do not hand you clean data, a clear brief, or spare time — law enforcement, aerospace, defense, and complex enterprise.",
@@ -66,6 +73,7 @@ export const TEAM: TeamMember[] = [
     profile: "https://www.linkedin.com/in/leonardo-j-ramirez/",
   },
   {
+    slug: "will-baltus",
     name: "William J. Baltus",
     role: "Co-founder & CTO",
     bio: "Engineering leadership across data, platform, and applied AI. Focused on the layer most AI work skips: making a deployed system dependable, observable, and affordable enough to keep.",
@@ -78,6 +86,11 @@ export const TEAM: TeamMember[] = [
     profile: "https://www.linkedin.com/in/william-baltus/",
   },
 ];
+
+/** A founder by their author slug, or `undefined` for anything else. */
+export function authorBySlug(slug: string): TeamMember | undefined {
+  return TEAM.find((member) => member.slug === slug);
+}
 
 /**
  * What clients are actually buying, beyond the deliverable.

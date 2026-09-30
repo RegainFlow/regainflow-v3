@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import BlogCard from "@/components/BlogCard";
 import CaseStudyCard from "@/components/CaseStudyCard";
 import ClosingCTA from "@/components/ClosingCTA";
 import DitherReveal from "@/components/DitherReveal";
 import PageHeader from "@/components/PageHeader";
 import ReportCard from "@/components/ReportCard";
+import { getPosts } from "@/lib/blog.server";
 import { getCaseStudies } from "@/lib/case-studies.server";
 import { getReports } from "@/lib/reports.server";
 import {
@@ -32,9 +34,10 @@ export default async function InsightsPage() {
   // Both degrade to `[]` rather than throwing, which hides the band that failed
   // and leaves the rest of the page standing. That is the right default for a
   // page a human is looking at; `app/sitemap.ts` opts out of it deliberately.
-  const [studies, reports] = await Promise.all([
+  const [studies, reports, posts] = await Promise.all([
     getCaseStudies(),
     getReports(),
+    getPosts({ limit: 3 }),
   ]);
 
   return (
@@ -122,6 +125,41 @@ export default async function InsightsPage() {
                 </Link>
               </p>
             ) : null}
+          </div>
+        </section>
+      ) : null}
+
+      {/* Back on Void, so it reads as a separate band from the reports. Absent
+          until the first post is published, like the reports band. */}
+      {posts.length > 0 ? (
+        <section id="blog" className="rf-section">
+          <div className="rf-shell rf-band">
+            <div className="rf-grid gap-y-6">
+              <div className="col-span-full lg:col-span-5">
+                <p className="rf-eyebrow">Blog</p>
+                <h2 className="rf-h2 mt-5 max-w-[20ch]">Notes from the work.</h2>
+              </div>
+              <p className="rf-body col-span-full max-w-[52ch] lg:col-span-6 lg:col-start-7 lg:pt-3">
+                Shorter than a report. What we keep seeing when AI meets a real
+                operating environment.
+              </p>
+            </div>
+
+            <ul className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {posts.map((post, i) => (
+                <li key={post.slug} className="h-full">
+                  <DitherReveal className="h-full" delay={(i % 3) * 90}>
+                    <BlogCard post={post} surface="insights" />
+                  </DitherReveal>
+                </li>
+              ))}
+            </ul>
+
+            <p className="mt-10">
+              <Link href="/insights/blog" className="rf-nav-link">
+                All posts &rarr;
+              </Link>
+            </p>
           </div>
         </section>
       ) : null}

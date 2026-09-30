@@ -35,6 +35,13 @@ const nextConfig: NextConfig = {
         hostname: "qsnaxtjoyqycpbmmghff.supabase.co",
         pathname: "/storage/v1/object/public/**",
       },
+      // The still behind a blog post's video facade (`components/BlogVideo.tsx`).
+      // Only the thumbnail path: the player itself is an iframe, not an image.
+      {
+        protocol: "https",
+        hostname: "i.ytimg.com",
+        pathname: "/vi/**",
+      },
     ],
   },
 

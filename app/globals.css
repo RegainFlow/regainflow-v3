@@ -833,6 +833,861 @@
     color: var(--color-rf-slate);
   }
 
+  /* --- Blog post ------------------------------------------------------------
+     The long-read template, built to `docs/blogs_seo/blog_ui_ux.md`. Summary
+     of the rules it encodes (DESIGN.md "Articles" has the reasoning):
+
+     - Body 18px on phones, 19px from md, line height 1.6, measure 65ch.
+     - Dark body text is #bcc4d0 on Void: 11.0:1. In the light reading mode it
+       is #2b3445 on #f6f7fa: 11.7:1. Secondary text (Slate) is 6.7:1 dark and
+       7.0:1 light. Links (Flow Soft) are 7.4:1 dark and 6.2:1 light, and are
+       underlined, so colour is never the only cue.
+     - One sticky element: the site header. The TOC rail is sticky only at lg,
+       beside the column rather than over it.
+  ------------------------------------------------------------------------- */
+
+  .rf-read {
+    background: var(--color-rf-void);
+    color: var(--color-rf-warm);
+  }
+
+  /* Only on `/insights/blog/preview/…`. Loud on purpose: a reviewer must not
+     mistake a draft for the live page, or screenshot one as if it were. */
+  .rf-draft-banner {
+    padding: 0.75rem 1rem;
+    background: var(--color-rf-flow);
+    color: #fff;
+    text-align: center;
+  }
+
+  .rf-post-head {
+    padding-block: clamp(2rem, 5vw, 4rem) clamp(1rem, 2vw, 1.5rem);
+  }
+
+  .rf-post-title {
+    margin-top: 1.5rem;
+    max-width: 22ch;
+  }
+
+  .rf-post-deck {
+    margin-top: 1.25rem;
+    max-width: 60ch;
+    font-size: clamp(1.0625rem, 1.3vw, 1.25rem);
+    line-height: 1.5;
+    color: var(--color-rf-slate);
+  }
+
+  .rf-byline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.25rem;
+    margin-top: 2rem;
+  }
+
+  .rf-byline-portrait {
+    position: relative;
+    flex: none;
+    width: 44px;
+    height: 44px;
+    overflow: hidden;
+    border: 1px solid var(--color-rf-hairline);
+    background: var(--color-rf-navy);
+  }
+
+  .rf-byline-portrait img {
+    object-fit: cover;
+  }
+
+  .rf-byline-text {
+    min-width: 0;
+    flex: 1 1 16rem;
+  }
+
+  .rf-byline-name {
+    font-weight: 500;
+    color: var(--color-rf-warm);
+  }
+
+  .rf-byline-name a {
+    text-decoration: underline;
+    text-decoration-color: var(--color-rf-line);
+    text-underline-offset: 0.2em;
+  }
+
+  .rf-byline-role {
+    margin-left: 0.6rem;
+    font-weight: 400;
+    color: var(--color-rf-slate);
+  }
+
+  .rf-byline-dates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
+    margin-top: 0.35rem;
+  }
+
+  .rf-byline-controls {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  /* 44px tall: these are the only controls on the page a thumb has to hit. */
+  .rf-read-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding-inline: 0.9rem;
+    border: 1px solid var(--color-rf-hairline);
+    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-rf-slate);
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .rf-read-control:active {
+    border-color: var(--color-rf-flow);
+  }
+
+  @media (hover: hover) {
+    .rf-read-control:hover {
+      color: var(--color-rf-warm);
+      border-color: var(--color-rf-slate);
+    }
+  }
+
+  /* Body column and, from lg, the TOC rail to its left. */
+  .rf-post-layout {
+    display: grid;
+    gap: 2.5rem;
+    padding-block: clamp(2rem, 4vw, 3rem) clamp(3rem, 6vw, 5rem);
+  }
+
+  .rf-post-main {
+    min-width: 0;
+    max-width: 44rem;
+  }
+
+  .rf-post-rail {
+    display: none;
+  }
+
+  /* Two columns only when the rail is there. A post under three sections has
+     no TOC, and an unconditional template put its whole body in the 15rem
+     rail column. */
+  @media (min-width: 1024px) {
+    .rf-post-layout-rail {
+      grid-template-columns: 15rem minmax(0, 44rem);
+      gap: clamp(3rem, 5vw, 5rem);
+    }
+
+    .rf-post-rail {
+      display: block;
+    }
+
+    .rf-post-rail .rf-toc {
+      position: sticky;
+      top: 6.5rem;
+    }
+
+    .rf-toc-inline {
+      display: none;
+    }
+  }
+
+  .rf-read .rf-article .rf-body {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: #bcc4d0;
+  }
+
+  @media (min-width: 768px) {
+    .rf-read .rf-article .rf-body {
+      font-size: 1.1875rem;
+    }
+  }
+
+  .rf-read[data-theme="light"] .rf-article .rf-body {
+    color: #2b3445;
+  }
+
+  /* The light palette's Warm is near-black, so the primary CTA inverts on its
+     own; only its hover, a literal white, needs a light-mode value. */
+  @media (hover: hover) {
+    .rf-read[data-theme="light"] .rf-cta-primary:hover {
+      background: var(--color-rf-flow-soft);
+    }
+  }
+
+  /* Key takeaways. A surface that asks nothing, so a Navy panel with the Flow
+     inset edge the gate uses — the one "look here" treatment the system has. */
+  .rf-takeaways {
+    padding: 1.35rem 1.5rem;
+    background: var(--color-rf-navy);
+    border: 1px solid var(--color-rf-hairline);
+    box-shadow: inset 3px 0 0 var(--color-rf-flow);
+  }
+
+  .rf-takeaways ul {
+    margin-top: 0.9rem;
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .rf-takeaways li {
+    position: relative;
+    padding-left: 1.25rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--color-rf-warm);
+  }
+
+  .rf-takeaways li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.7em;
+    width: 0.5rem;
+    height: 1px;
+    background: var(--color-rf-flow);
+  }
+
+  /* Table of contents: the rail, and the mobile in-content list. */
+  .rf-toc ol,
+  .rf-toc-inline ol {
+    margin-top: 0.9rem;
+    border-left: 1px solid var(--color-rf-hairline);
+  }
+
+  .rf-toc a,
+  .rf-toc-inline a {
+    display: block;
+    padding: 0.45rem 0 0.45rem 1rem;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: var(--color-rf-slate);
+    transition: color 0.2s ease;
+  }
+
+  .rf-toc a[aria-current="location"] {
+    color: var(--color-rf-warm);
+    box-shadow: inset 2px 0 0 var(--color-rf-flow);
+  }
+
+  @media (hover: hover) {
+    .rf-toc a:hover,
+    .rf-toc-inline a:hover {
+      color: var(--color-rf-warm);
+    }
+  }
+
+  .rf-toc-inline {
+    margin-top: 2rem;
+  }
+
+  .rf-toc-inline a {
+    font-size: 1rem;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  .rf-post-cover {
+    margin-top: 2rem;
+  }
+
+  .rf-prose {
+    margin-top: 2.5rem;
+  }
+
+  /* --- Blog prose ----------------------------------------------------------
+     Markdown output from `components/Markdown.tsx`, inside
+     `.rf-article .rf-body`: size, colour and paragraph rhythm are already set.
+  ------------------------------------------------------------------------- */
+
+  .rf-prose h2 {
+    margin-top: 2.5em;
+    font-size: clamp(1.35rem, 2vw, 1.6rem);
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+    color: var(--color-rf-warm);
+    text-wrap: balance;
+  }
+
+  .rf-prose h3 {
+    margin-top: 2em;
+    font-size: 1.15rem;
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--color-rf-warm);
+  }
+
+  .rf-prose h2 + *,
+  .rf-prose h3 + * {
+    margin-top: 0.75em;
+  }
+
+  .rf-prose strong {
+    font-weight: 500;
+    color: var(--color-rf-warm);
+  }
+
+  /* Markdown links carry no class; the CTA button inside the prose does. */
+  .rf-prose a:not([class]) {
+    color: var(--color-rf-flow-soft);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  @media (hover: hover) {
+    .rf-prose a:not([class]):hover {
+      color: var(--color-rf-warm);
+    }
+  }
+
+  .rf-prose ul,
+  .rf-prose ol {
+    padding-left: 1.25em;
+  }
+
+  .rf-prose ul {
+    list-style: square;
+  }
+
+  .rf-prose ol {
+    list-style: decimal;
+  }
+
+  .rf-prose li + li {
+    margin-top: 0.4em;
+  }
+
+  .rf-prose li::marker {
+    color: var(--color-rf-line);
+  }
+
+  .rf-prose blockquote {
+    border-left: 2px solid var(--color-rf-flow);
+    padding-left: 1.25em;
+    color: var(--color-rf-warm);
+  }
+
+  .rf-prose code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    padding: 0.1em 0.35em;
+    border: 1px solid var(--color-rf-hairline);
+    color: var(--color-rf-warm);
+  }
+
+  .rf-prose pre {
+    overflow-x: auto;
+    padding: 1em 1.25em;
+    border: 1px solid var(--color-rf-hairline);
+    background: var(--color-rf-navy);
+  }
+
+  .rf-prose pre code {
+    padding: 0;
+    border: 0;
+  }
+
+  .rf-prose hr {
+    border: 0;
+    border-top: 1px solid var(--color-rf-hairline);
+    margin: 2.5em 0;
+  }
+
+  .rf-prose .rf-table-wrap {
+    overflow-x: auto;
+  }
+
+  .rf-prose table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875em;
+    line-height: 1.5;
+  }
+
+  .rf-prose th,
+  .rf-prose td {
+    padding: 0.7em 1em 0.7em 0;
+    border-bottom: 1px solid var(--color-rf-hairline);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .rf-prose th {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-rf-warm);
+  }
+
+  /* Footnote markers and the Sources list. */
+  .rf-prose sup a:not([class]) {
+    font-family: var(--font-mono);
+    font-size: 0.75em;
+    text-decoration: none;
+    padding-inline: 0.1em;
+  }
+
+  .rf-footnotes {
+    margin-top: 3.5em !important;
+    padding-top: 1.5em;
+    border-top: 1px solid var(--color-rf-hairline);
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--color-rf-slate);
+  }
+
+  .rf-prose .rf-footnotes h2 {
+    margin-top: 0;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .rf-footnotes ol {
+    margin-top: 1em;
+  }
+
+  .rf-footnotes p {
+    display: inline;
+  }
+
+  .rf-footnotes a[data-footnote-backref] {
+    margin-left: 0.4em;
+    text-decoration: none;
+  }
+
+  /* --- Blog figures --------------------------------------------------------
+     `components/BlogFigures.tsx`. Diagrams in HTML, so the words are text.
+  ------------------------------------------------------------------------- */
+
+  .rf-figure {
+    margin-block: 2.25em;
+  }
+
+  .rf-figure figcaption {
+    margin-top: 0.9rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--color-rf-slate);
+  }
+
+  .rf-figure-source {
+    display: block;
+    margin-top: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+  }
+
+  /* Body images keep their own shape. A screenshot or a diagram cropped to
+     16:9 loses the edge someone was pointing at, so a sized image renders at
+     its ratio (the width and height attributes reserve the space) and an
+     unsized one is letterboxed in a 16:9 frame rather than cropped. */
+  .rf-figure-frame {
+    overflow: hidden;
+    border: 1px solid var(--color-rf-hairline);
+    background: var(--color-rf-navy);
+  }
+
+  .rf-figure-frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .rf-figure-frame-unsized {
+    position: relative;
+    aspect-ratio: 16 / 9;
+  }
+
+  .rf-figure-frame-unsized img {
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* The video facade: 16:9 from first paint, so swapping in the iframe
+     moves nothing below it. */
+  .rf-video {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border: 1px solid var(--color-rf-hairline);
+    background: var(--color-rf-navy);
+  }
+
+  .rf-video iframe,
+  .rf-video-facade {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .rf-video-facade {
+    cursor: pointer;
+  }
+
+  .rf-video-facade img {
+    object-fit: cover;
+    opacity: 0.85;
+    transition: opacity 0.2s ease;
+  }
+
+  .rf-video-play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: grid;
+    place-items: center;
+    width: 4rem;
+    height: 4rem;
+    transform: translate(-50%, -50%);
+    background: var(--color-rf-flow);
+    color: #fff;
+  }
+
+  @media (hover: hover) {
+    .rf-video-facade:hover img {
+      opacity: 1;
+    }
+  }
+
+  /* Numbered rows rather than columns: any count of steps reads cleanly at
+     any width, and a sequence reads top to bottom. */
+  .rf-figure-steps ol {
+    list-style: none;
+    padding: 0.35rem 1.5rem;
+    border: 1px solid var(--color-rf-hairline);
+    background: var(--color-rf-navy);
+  }
+
+  .rf-figure-steps li {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    column-gap: 0.75rem;
+    margin: 0 !important;
+    padding-block: 1rem;
+  }
+
+  .rf-figure-steps li + li {
+    border-top: 1px solid var(--color-rf-hairline);
+  }
+
+  .rf-figure-steps .rf-index {
+    grid-row: span 2;
+    padding-top: 0.2rem;
+  }
+
+  .rf-figure-steps-title {
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--color-rf-warm);
+  }
+
+  .rf-figure-steps-detail {
+    margin-top: 0.25rem !important;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--color-rf-slate);
+  }
+
+  .rf-figure-bars ul {
+    display: grid;
+    gap: 1.1rem;
+    list-style: none;
+    padding: 1.35rem 1.5rem;
+    border: 1px solid var(--color-rf-hairline);
+    background: var(--color-rf-navy);
+  }
+
+  .rf-figure-bars li {
+    margin: 0 !important;
+  }
+
+  .rf-figure-bars-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.9375rem;
+    line-height: 1.4;
+  }
+
+  .rf-figure-bars-label {
+    color: var(--color-rf-warm);
+  }
+
+  .rf-figure-bars-value {
+    flex: none;
+    font-family: var(--font-mono);
+    color: var(--color-rf-warm);
+  }
+
+  .rf-figure-bars-track {
+    display: block;
+    height: 6px;
+    margin-top: 0.45rem;
+    background: var(--color-rf-hairline);
+  }
+
+  .rf-figure-bars-fill {
+    display: block;
+    height: 100%;
+    background: var(--color-rf-flow);
+  }
+
+  .rf-figure-bars-note {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: 0.8125rem;
+    color: var(--color-rf-slate);
+  }
+
+  .rf-callout {
+    margin-block: 2em;
+    padding: 1.1rem 1.35rem;
+    border: 1px solid var(--color-rf-hairline);
+    box-shadow: inset 3px 0 0 var(--color-rf-line);
+  }
+
+  .rf-callout[data-kind="warning"] {
+    box-shadow: inset 3px 0 0 var(--color-rf-flow);
+  }
+
+  .rf-callout-label {
+    color: var(--color-rf-flow-soft);
+  }
+
+  .rf-callout-title {
+    margin-top: 0.4rem !important;
+    font-weight: 500;
+    color: var(--color-rf-warm);
+  }
+
+  .rf-callout-body {
+    margin-top: 0.35rem !important;
+    font-size: 0.9375em;
+  }
+
+  /* --- Post CTA, author box ----------------------------------------------- */
+
+  .rf-post-cta {
+    margin-block: 2.5em;
+    padding: 1.5rem;
+    border: 1px solid var(--color-rf-hairline);
+    background: var(--color-rf-navy);
+    box-shadow: inset 3px 0 0 var(--color-rf-flow);
+  }
+
+  .rf-post-cta-body {
+    margin-top: 0.6rem;
+    max-width: 52ch;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--color-rf-slate);
+  }
+
+  /* The end CTA sits in its own Navy band, so it drops the panel. */
+  .rf-post-cta-end {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .rf-post-cta-end .rf-post-cta-body {
+    font-size: clamp(1rem, 1.1vw, 1.075rem);
+  }
+
+  .rf-author-box {
+    display: grid;
+    grid-template-columns: 5rem minmax(0, 1fr);
+    gap: 1.25rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-rf-hairline);
+  }
+
+  .rf-author-box-portrait {
+    position: relative;
+    width: 5rem;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border: 1px solid var(--color-rf-hairline);
+    background: var(--color-rf-navy);
+  }
+
+  .rf-author-box-portrait img {
+    object-fit: cover;
+  }
+
+  .rf-author-box-name {
+    text-decoration: underline;
+    text-decoration-color: var(--color-rf-line);
+    text-underline-offset: 0.2em;
+  }
+
+  .rf-author-box-bio {
+    margin-top: 0.75rem;
+    max-width: 60ch;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-rf-slate);
+  }
+
+  /* --- Newsletter signup ---------------------------------------------------
+     `components/NewsletterSignup.tsx`. Inline, never a dialog: one field and
+     a button that sit on one row from sm up. */
+  .rf-newsletter-body {
+    margin-top: 0.75rem;
+    max-width: 52ch;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--color-rf-slate);
+  }
+
+  .rf-newsletter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    max-width: 34rem;
+  }
+
+  .rf-newsletter-form .rf-input {
+    flex: 1 1 auto;
+    min-height: 44px;
+  }
+
+  @media (min-width: 640px) {
+    .rf-newsletter-form {
+      flex-direction: row;
+      align-items: stretch;
+    }
+  }
+
+  /* --- Blog index, hubs, lists -------------------------------------------- */
+
+  .rf-topic-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .rf-topic-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: 1rem;
+    border: 1px solid var(--color-rf-hairline);
+    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-rf-slate);
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .rf-topic-chip[aria-current="page"] {
+    color: var(--color-rf-warm);
+    box-shadow: inset 0 -2px 0 var(--color-rf-flow);
+  }
+
+  .rf-topic-chip:active {
+    border-color: var(--color-rf-flow);
+  }
+
+  @media (hover: hover) {
+    .rf-topic-chip:hover {
+      color: var(--color-rf-warm);
+      border-color: var(--color-rf-slate);
+    }
+  }
+
+  .rf-topic-card {
+    display: block;
+    height: 100%;
+    padding: 1.35rem;
+    border: 1px solid var(--color-rf-hairline);
+    background: var(--color-rf-void);
+    transition: border-color 0.25s ease;
+  }
+
+  @media (hover: hover) {
+    .rf-topic-card:hover {
+      border-color: var(--color-rf-slate);
+    }
+  }
+
+  .rf-post-list {
+    border-top: 1px solid var(--color-rf-hairline);
+  }
+
+  .rf-post-row {
+    display: grid;
+    gap: 0.75rem;
+    padding-block: 1.6rem;
+    border-bottom: 1px solid var(--color-rf-hairline);
+  }
+
+  .rf-post-row-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .rf-post-row {
+      grid-template-columns: 11rem minmax(0, 1fr);
+      gap: 2rem;
+    }
+
+    .rf-post-row-meta {
+      flex-direction: column;
+      padding-top: 0.3rem;
+    }
+  }
+
+  .rf-post-row-title {
+    transition: color 0.2s ease;
+  }
+
+  @media (hover: hover) {
+    .rf-post-row:hover .rf-post-row-title {
+      color: var(--color-rf-flow-soft);
+    }
+  }
+
+  .rf-post-row:focus-visible .rf-post-row-title {
+    color: var(--color-rf-flow-soft);
+  }
+
+  .rf-pager {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
   /* --- At a glance ---------------------------------------------------------
      Scope facts, not results. Rendered like the assessment's proof row so the
      register is consistent: mono label, display figure.
@@ -3017,7 +3872,10 @@
     color: var(--color-rf-warm);
   }
 
-  .rf-gov[data-theme="light"] {
+  /* Shared with the blog's reading mode (`.rf-read`, `ReadingModeToggle`):
+     one light palette, measured once. */
+  .rf-gov[data-theme="light"],
+  .rf-read[data-theme="light"] {
     --color-rf-void: #f6f7fa;
     --color-rf-navy: #ffffff;
     --color-rf-hairline: #d8dde6;

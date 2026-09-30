@@ -74,6 +74,44 @@ export const RF_EVENTS = {
   govPdfViewed: "gov_pdf_viewed",
   /** A report card, from the listing or from a report page. */
   reportOpened: "report_opened",
+  /** A blog post card, from the blog index, the `/insights` band, or a post. */
+  blogPostOpened: "blog_post_opened",
+  /**
+   * A post's own next step, inline or at the end (named in `location`).
+   * Separate from `bookingClicked` because the destination varies by post — a
+   * report, a case study, or the assessment — and the question it answers is
+   * whether a post-specific offer earns the click.
+   */
+  blogCtaClicked: "blog_cta_clicked",
+  /** The share button on a post — native share sheet or copy-link. */
+  blogPostShared: "blog_post_shared",
+  /** Reading mode switched on a post. Carries `theme`. */
+  readingModeChanged: "reading_mode_changed",
+  /** A video facade in a post, pressed. Carries `video` (the YouTube id). */
+  blogVideoPlayed: "blog_video_played",
+  /**
+   * How far through the article body a reader got: 25, 50, 75 and 90, each
+   * once per page view (carries `depth` and `post`). PostHog's pageleave only
+   * records the last position; this records where the drop-offs happen, which
+   * is what the UX research says to look at.
+   */
+  blogScrollDepth: "blog_scroll_depth",
+  /**
+   * The FT-style "quality read": at least half the article scrolled *and* at
+   * least half its expected reading time spent with the tab visible. Once per
+   * page view. Plotted against views per post, it separates posts people open
+   * from posts people read (`docs/blogs_seo/blog_ui_ux.md`, Part 10).
+   */
+  blogQualityRead: "blog_quality_read",
+  /**
+   * The newsletter form, submitted and written: fired from
+   * `/newsletter/check-email`, which only a successful submission reaches.
+   * Not yet a subscriber: that is `newsletterConfirmed`, and the gap between
+   * the two is how many confirmation emails go unanswered.
+   */
+  newsletterSubmitted: "newsletter_submitted",
+  /** Double opt-in completed. Fired from `/newsletter/confirmed`. */
+  newsletterConfirmed: "newsletter_confirmed",
   /**
    * The email gate on a report, accepted. Carries `report`.
    *

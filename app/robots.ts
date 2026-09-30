@@ -19,11 +19,17 @@ const ANSWER_ENGINES = [
   "Applebot-Extended",
 ];
 
+/**
+ * Draft previews. They are token-gated and `noindex` already; this keeps
+ * crawlers from spending requests on URLs that can only ever 404 for them.
+ */
+const PRIVATE = ["/insights/blog/preview/"];
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
-      { userAgent: "*", allow: "/" },
-      ...ANSWER_ENGINES.map((userAgent) => ({ userAgent, allow: "/" })),
+      { userAgent: "*", allow: "/", disallow: PRIVATE },
+      ...ANSWER_ENGINES.map((userAgent) => ({ userAgent, allow: "/", disallow: PRIVATE })),
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
     host: SITE_URL,

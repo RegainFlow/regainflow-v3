@@ -6,6 +6,7 @@ import {
   REPORT_PRICE,
   REPORT_TERMS,
 } from "@/lib/content/assessment";
+import { getPosts } from "@/lib/blog.server";
 import { getCaseStudies } from "@/lib/case-studies.server";
 import {
   DEFAULT_NEXT_LABEL,
@@ -16,6 +17,9 @@ import { FAQ } from "@/lib/content/faq";
 import { PARTNERS } from "@/lib/content/partners";
 import { INDUSTRY_GROUPS } from "@/lib/content/industries";
 import { LAYERS } from "@/lib/content/layers";
+import { postDate, type BlogPostSummary } from "@/lib/content/blog";
+import { resolveAuthor } from "@/lib/content/blog-authors";
+import { BLOG_TOPICS } from "@/lib/content/blog-topics";
 import { reportDate, type Report } from "@/lib/content/reports";
 import { ENGAGEMENT_PATH, STAGES } from "@/lib/content/stages";
 import { getReports } from "@/lib/reports.server";
@@ -24,6 +28,8 @@ import {
   CONTACT_EMAIL,
   CONTACT_PATH,
   FREE_ASSESSMENT_HREF,
+  GOV_DESCRIPTION,
+  GOV_SITE_URL,
   LOCATION,
   POSITIONING,
   SITE_NAME,
@@ -41,7 +47,11 @@ import {
  */
 export const dynamic = "force-dynamic";
 
-function build(reports: Report[], caseStudies: CaseStudy[]): string {
+function build(
+  reports: Report[],
+  caseStudies: CaseStudy[],
+  posts: BlogPostSummary[],
+): string {
   const lines: string[] = [];
 
   lines.push(`# ${SITE_NAME}`);
@@ -198,6 +208,46 @@ function build(reports: Report[], caseStudies: CaseStudy[]): string {
     }
   }
 
+  // Only where something is published, for the same reason as Reports.
+  // Grouped by topic cluster, the way the blog itself is organized, so an
+  // assistant asked about retrieval finds the retrieval posts together.
+  if (posts.length > 0) {
+    lines.push("## Blog");
+    lines.push(`[${SITE_URL}/insights/blog]`);
+    lines.push("");
+    lines.push(
+      "Field notes by RegainFlow's founders, grounded in the engagements above. Posts carry no client names and no performance figures RegainFlow has not measured."
+    );
+    lines.push("");
+    for (const topic of BLOG_TOPICS) {
+      const inTopic = posts.filter((post) => post.topic === topic.slug);
+      if (inTopic.length === 0) continue;
+
+      lines.push(`### ${topic.name}`);
+      lines.push(`[${SITE_URL}/insights/blog/topics/${topic.slug}]`);
+      lines.push(topic.intro);
+      lines.push("");
+      for (const post of inTopic) {
+        const author = resolveAuthor(post.author);
+        lines.push(`#### ${post.title}`);
+        lines.push(`[${SITE_URL}/insights/blog/${post.slug}]`);
+        lines.push(
+          `By ${author.name}${author.href ? ` (${SITE_URL}${author.href})` : ""}. Published ${postDate(post.published)}${post.updatedOn ? `, updated ${postDate(post.updatedOn)}` : ""}.`
+        );
+        lines.push(post.summary);
+        lines.push("");
+      }
+    }
+  }
+
+  // The subdomain a government buyer is sent to. Stated here because nothing
+  // else in this file would tell an assistant it exists.
+  lines.push("## For government buyers");
+  lines.push(`[${GOV_SITE_URL}/]`);
+  lines.push("");
+  lines.push(GOV_DESCRIPTION);
+  lines.push("");
+
   lines.push("## What RegainFlow believes");
   lines.push("");
   for (const item of MANIFESTO) {
@@ -270,6 +320,15 @@ function build(reports: Report[], caseStudies: CaseStudy[]): string {
     );
   }
   lines.push(
+    `- [Blog](${SITE_URL}/insights/blog): shorter notes from the work.`
+  );
+  for (const post of posts) {
+    lines.push(`  - [${post.title}](${SITE_URL}/insights/blog/${post.slug})`);
+  }
+  lines.push(
+    `- [Government](${GOV_SITE_URL}/): capability statement, identifiers, NAICS and PSC codes, past performance.`
+  );
+  lines.push(
     `- [Company](${SITE_URL}/company): the founders, the partner network, manifesto, contact.`
   );
   lines.push(
@@ -290,12 +349,13 @@ export async function GET() {
   // no research. Erroring is the truthful failure.
   // Both throw. An llms.txt that silently omits every case study tells an
   // assistant we have none, and it will repeat that confidently.
-  const [reports, caseStudies] = await Promise.all([
+  const [reports, caseStudies, posts] = await Promise.all([
     getReports({ throwOnError: true }),
     getCaseStudies({ throwOnError: true }),
+    getPosts({ throwOnError: true }),
   ]);
 
-  return new Response(build(reports, caseStudies), {
+  return new Response(build(reports, caseStudies, posts), {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
       "Cache-Control": "public, max-age=0, must-revalidate",

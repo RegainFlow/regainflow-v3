@@ -275,9 +275,14 @@ So:
 
 ### Dark only
 
-There is no light mode. `color-scheme: dark` is set on `:root`, `themeColor` matches Void, and
+The site is dark. `color-scheme: dark` is set on `:root`, `themeColor` matches Void, and
 `colorScheme: "dark"` is declared in the viewport export. Building a light theme means defining
 a second full palette with its own measured ratios — it is not a matter of inverting these.
+
+There is exactly one light palette, and it is scoped: it redefines the eight tokens on a wrapper,
+never on `:root`. Two wrappers use it — `.rf-gov` (light by default) and `.rf-read`, the blog
+post's reading mode (dark by default, light on request). See [Articles](#articles). Do not add a
+third wrapper without measuring its surfaces against the palette.
 
 ### Surface hierarchy
 
@@ -337,6 +342,30 @@ Representative: `.rf-lead` in the hero `46ch` · `PageHeader` lead `52ch` · `.r
 `44ch` · footer tagline `34ch` · a short `.rf-h2` `18ch`. Body prose sits in the 48–58ch band.
 
 Set a measure on every new text block. The 12-column grid alone will not do it.
+
+## Articles
+
+The blog post (`app/(site)/insights/blog/[slug]`) is the one template built for reading rather
+than scanning. Its rules come from `docs/blogs_seo/blog_ui_ux.md`; the reasoning lives there.
+
+- **Type.** Body 18px on phones, 19px from md, line height 1.6, measure 44rem (about 65ch).
+  H2s inside the prose are 1.35–1.6rem, smaller than `.rf-h2`, because they punctuate a column
+  rather than open a section.
+- **Contrast, measured.** Dark body `#bcc4d0` on Void 11.0:1; light body `#2b3445` on
+  `#f6f7fa` 11.7:1. Slate 6.7:1 dark, 7.0:1 light. Flow Soft links 7.4:1 dark, 6.2:1 light —
+  and underlined, so colour is never the only cue.
+- **Reading mode.** `ReadingModeToggle` sets `data-theme` on `.rf-read`; an inline script
+  applies a saved choice before paint. The site header and footer stay dark.
+- **First screen.** Breadcrumb, H1, deck, byline with published and updated dates, then key
+  takeaways. A cover image, where there is one, sits below the takeaways, never above the title.
+- **Navigation.** Posts with three or more sections get a sticky TOC rail at lg and an
+  in-content "On this page" list below lg. Never a pinned, collapsed bar on phones.
+- **Components.** `.rf-takeaways` and `.rf-post-cta` are the Navy panel with the Flow inset
+  edge, like `.rf-gate`. `.rf-callout` is the same shape on Void with a Line edge (Flow for a
+  warning). Figures — `steps`, `bars` — are HTML declared as JSON fences in the markdown
+  (`lib/blog-figures.ts`), so their words are text.
+- **Links in prose.** Only classless links take the underlined prose style
+  (`.rf-prose a:not([class])`), so a button or card placed inside the body keeps its own.
 
 ## The brand beyond the site
 
@@ -696,7 +725,11 @@ is retuned to the house stroke in `.rf-icon` and gated behind one module. A libr
 its own layout, spacing, or color would still be the thing this rule forbids.)
 
 Tables · toasts and notifications · modals and dialogs · skeleton states · pagination · tabs ·
-tooltips · light mode · route-level error states (404/500 render Next.js defaults).
+tooltips · a site-wide light mode (the scoped one is defined — see [Dark only](#dark-only)) ·
+route-level error states (404/500 render Next.js defaults).
+
+Pagination has one worked example: the blog archive, `/insights/blog/page/[n]`, with plain
+"Newer" and "Older" links and a self-referencing canonical on every page.
 
 Form validation and pending states are defined — see [Adding a form](#10-adding-a-form). Empty
 states have one worked example and no rule: `/insights/reports` renders a headline, a sentence,

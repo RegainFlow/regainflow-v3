@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 
 import { GovFooter, GovHeader } from "@/components/gov/GovChrome";
 import { GOV_THEME_KEY } from "@/lib/content/gov";
-import { GOV_SITE_URL, SITE_NAME } from "@/lib/site";
+import { GOV_DESCRIPTION, GOV_SITE_URL, SITE_NAME } from "@/lib/site";
 
 /**
  * Everything under here is served at gov.regainflow.com (see `proxy.ts`), so
@@ -15,8 +15,7 @@ export const metadata: Metadata = {
     default: `${SITE_NAME} for Government | Capability Statement & Past Performance`,
     template: `%s | ${SITE_NAME} for Government`,
   },
-  description:
-    "RegainFlow's capability statement and past performance for federal, state, local, and public-safety buyers. UEI XD3FZFEHMCD7, CAGE 20BV9.",
+  description: GOV_DESCRIPTION,
   alternates: { canonical: "/" },
   openGraph: { url: GOV_SITE_URL, siteName: `${SITE_NAME} for Government` },
 };

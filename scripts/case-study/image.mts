@@ -63,8 +63,10 @@ export const PROMPT_PREAMBLE = [
   "SUBJECT:",
 ].join("\n");
 
-export function buildPrompt(subject: string): string {
-  return `${PROMPT_PREAMBLE}\n${subject.trim()}\n`;
+/** `preamble` defaults to the case study's; the blog passes its own, whose
+ *  crop is 16:9 only (`scripts/blog/images.mts`). */
+export function buildPrompt(subject: string, preamble = PROMPT_PREAMBLE): string {
+  return `${preamble}\n${subject.trim()}\n`;
 }
 
 /** WebP is `RIFF....WEBP`. Checked because a PNG saved under a `.webp` name
@@ -93,9 +95,12 @@ export interface GeneratedImage {
  * both are handled rather than guessed at. The format assertion at the end is
  * what makes a wrong guess loud.
  */
-export async function generateHero(subject: string): Promise<GeneratedImage> {
+export async function generateHero(
+  subject: string,
+  preamble = PROMPT_PREAMBLE,
+): Promise<GeneratedImage> {
   const key = requireEnv("OPENAI_API_KEY");
-  const prompt = buildPrompt(subject);
+  const prompt = buildPrompt(subject, preamble);
 
   const payload = await withRetry("image generation", async () => {
     const response = await fetch(ENDPOINT, {
