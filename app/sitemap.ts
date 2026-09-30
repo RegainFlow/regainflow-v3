@@ -20,6 +20,7 @@ const PRIORITY: Record<string, number> = {
   // The reports index. Level with `/insights` because a gated report is what an
   // inbound search is most likely to be looking for by name.
   "/insights/reports": 0.8,
+  "/insights/case-studies": 0.7,
   "/insights/blog": 0.7,
   "/company": 0.6,
   // The conversion. `/contact/thanks` is deliberately absent — it is `noindex`

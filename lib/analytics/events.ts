@@ -216,4 +216,6 @@ export type RfSurface =
    */
   | "industry"
   /** The "Related reading" shelf on a report or case study page. */
-  | "related_reading";
+  | "related_reading"
+  /** The `/insights/case-studies` index. */
+  | "case_studies_index";

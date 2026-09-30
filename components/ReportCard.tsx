@@ -79,7 +79,11 @@ function ReportMeta({ report }: { report: Report }) {
   return (
     <p className="rf-utility flex flex-wrap items-center gap-3">
       <span>{report.pages ? `${report.pages} pages` : "Report"}</span>
-      {report.audio ? <span className="rf-tag">Audio</span> : null}
+      {report.audio ? (
+        <span className="rf-tag">
+          Audio{report.audioLength ? ` ${report.audioLength}` : ""}
+        </span>
+      ) : null}
     </p>
   );
 }

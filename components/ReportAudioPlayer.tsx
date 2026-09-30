@@ -228,7 +228,7 @@ export default function ReportAudioPlayer({
 
         <div className="rf-audio-main">
           <p className="rf-body max-w-[46ch]">
-            The report as a conversation — the same findings, discussed. Useful
+            The report as a conversation: the same findings, discussed. Useful
             if you would rather listen on the drive than read at a desk.
           </p>
 

@@ -32,7 +32,7 @@ const RELATED_COUNT = 3;
 
 const CRUMBS = [
   { name: "Insights", path: "/insights" },
-  { name: "Case studies", path: "/insights#case-studies" },
+  { name: "Case studies", path: "/insights/case-studies" },
 ];
 
 /**
@@ -340,7 +340,7 @@ export default async function CaseStudyPage({
             </div>
 
             <p className="mt-14">
-              <Link href="/insights#case-studies" className="rf-nav-link">
+              <Link href="/insights/case-studies" className="rf-nav-link">
                 &larr; All case studies
               </Link>
             </p>

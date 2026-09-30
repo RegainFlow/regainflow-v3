@@ -226,7 +226,7 @@ export default async function IndustryPage({
             </ul>
 
             <p className="mt-10">
-              <Link href="/insights#case-studies" className="rf-nav-link">
+              <Link href="/insights/case-studies" className="rf-nav-link">
                 All case studies &rarr;
               </Link>
             </p>

@@ -104,7 +104,7 @@ export default async function ReportsPage() {
                 are the better read in the meantime.
               </p>
               <p className="mt-8 flex flex-wrap gap-6">
-                <Link href="/insights#case-studies" className="rf-nav-link">
+                <Link href="/insights/case-studies" className="rf-nav-link">
                   Case studies &rarr;
                 </Link>
                 <Link href="/insights/blog" className="rf-nav-link">

@@ -105,6 +105,12 @@ export default async function InsightsPage() {
                 </li>
               ))}
             </ul>
+
+            <p className="mt-10">
+              <Link href="/insights/case-studies" className="rf-nav-link">
+                All case studies &rarr;
+              </Link>
+            </p>
           </div>
         </section>
       ) : null}
