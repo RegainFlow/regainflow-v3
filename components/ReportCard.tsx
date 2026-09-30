@@ -65,12 +65,81 @@ export default function ReportCard({
       <p className="rf-body mt-4">{report.summary}</p>
 
       {/* Pinned to the bottom so a short and a long summary still line up. */}
-      <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-rf-hairline pt-5">
-        <p className="rf-utility">
-          {report.pages ? `${report.pages} pages` : "Report"}
-          {report.audio ? " · Audio" : ""}
-        </p>
+      <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-6">
+        <ReportMeta report={report} />
         <span className="rf-nav-link">Read it &rarr;</span>
+      </div>
+    </Link>
+  );
+}
+
+/** Pages, plus an "Audio" chip where there is an audio version: the one
+ *  thing a report offers that a post does not, so it is worth a badge. */
+function ReportMeta({ report }: { report: Report }) {
+  return (
+    <p className="rf-utility flex flex-wrap items-center gap-3">
+      <span>{report.pages ? `${report.pages} pages` : "Report"}</span>
+      {report.audio ? <span className="rf-tag">Audio</span> : null}
+    </p>
+  );
+}
+
+/**
+ * The newest report, large: the cover beside the title, the summary and its
+ * first three findings. The findings are the page's argument, so showing them
+ * here tells a reader what they would be opening, which a cover cannot.
+ */
+export function ReportFeatured({
+  report,
+  surface,
+  priority = false,
+}: {
+  report: Report;
+  surface: "reports_index" | "insights";
+  priority?: boolean;
+}) {
+  return (
+    <Link
+      href={`/insights/reports/${report.slug}`}
+      className="rf-report-featured"
+      data-rf-event={RF_EVENTS.reportOpened}
+      data-rf-report={report.slug}
+      data-rf-surface={`${surface}_featured`}
+    >
+      <div className="rf-report-cover">
+        <Image
+          src={report.cover}
+          alt={`Cover of ${report.title}`}
+          fill
+          priority={priority}
+          sizes="(min-width: 1024px) 320px, (min-width: 768px) 40vw, 90vw"
+        />
+      </div>
+
+      <div className="rf-report-featured-text">
+        <p className="rf-utility text-rf-flow-soft">
+          Latest report · {reportDate(report.published)}
+        </p>
+        <h3 className="rf-blog-featured-title mt-3">{report.title}</h3>
+        <p className="rf-body mt-4 max-w-[58ch]">{report.summary}</p>
+
+        {report.findings.length > 0 ? (
+          <ol className="rf-report-featured-findings mt-6">
+            {report.findings.slice(0, 3).map((finding, i) => (
+              <li key={finding}>
+                <span className="rf-index" aria-hidden="true">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span>{finding}</span>
+              </li>
+            ))}
+          </ol>
+        ) : null}
+
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
+          <ReportMeta report={report} />
+          <span className="rf-nav-link">Read the findings &rarr;</span>
+        </div>
       </div>
     </Link>
   );

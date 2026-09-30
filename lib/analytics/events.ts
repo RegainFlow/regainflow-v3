@@ -83,12 +83,14 @@ export const RF_EVENTS = {
    * whether a post-specific offer earns the click.
    */
   blogCtaClicked: "blog_cta_clicked",
-  /** The share button on a post — native share sheet or copy-link. */
-  blogPostShared: "blog_post_shared",
+  /** The share button on a post, report or case study: native share sheet or
+   *  copy-link. Carries `method` and `page` (blog_post, report, case_study). */
+  pageShared: "page_shared",
   /** Reading mode switched on a post. Carries `theme`. */
   readingModeChanged: "reading_mode_changed",
-  /** "Ask ChatGPT" / "Ask Claude" on a post. `target` names the assistant. */
-  blogExploreAi: "blog_explore_ai",
+  /** "Ask ChatGPT" / "Ask Claude" on a post, report or case study. `target`
+   *  names the assistant and `surface` the kind of page. */
+  exploreAi: "explore_ai",
   /** A video facade in a post, pressed. Carries `video` (the YouTube id). */
   blogVideoPlayed: "blog_video_played",
   /**
@@ -212,4 +214,6 @@ export type RfSurface =
    * into a sector went looking for evidence — the strongest qualifying signal
    * the site can observe short of a booking.
    */
-  | "industry";
+  | "industry"
+  /** The "Related reading" shelf on a report or case study page. */
+  | "related_reading";

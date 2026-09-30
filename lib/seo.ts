@@ -309,6 +309,8 @@ export function caseStudyJsonLd(study: CaseStudy) {
     about: study.industry,
     keywords: [study.industry, ...study.capabilityTags],
     url: `${SITE_URL}/insights/${study.slug}`,
+    mainEntityOfPage: `${SITE_URL}/insights/${study.slug}`,
+    ...(study.image ? { image: absoluteUrl(study.image) } : {}),
     inLanguage: "en-US",
     isPartOf: { "@id": `${SITE_URL}/#website` },
     author: { "@id": `${SITE_URL}/#organization` },
@@ -366,15 +368,17 @@ export function reportJsonLd(report: Report) {
     description: report.summary,
     datePublished: report.published,
     url,
+    mainEntityOfPage: url,
     inLanguage: "en-US",
-    // Already absolute — it points at Supabase storage, not at `/public`.
-    image: report.cover,
+    // Absolute in production (Supabase storage); a relative local cover is
+    // resolved against the site so the node stays valid either way.
+    image: absoluteUrl(report.cover),
     isPartOf: { "@id": `${SITE_URL}/#website` },
     author: { "@id": `${SITE_URL}/#organization` },
     publisher: { "@id": `${SITE_URL}/#organization` },
     encoding: {
       "@type": "MediaObject",
-      contentUrl: report.pdf,
+      contentUrl: absoluteUrl(report.pdf),
       encodingFormat: "application/pdf",
       ...(report.pages ? { numberOfPages: report.pages } : {}),
     },
@@ -386,7 +390,7 @@ export function reportJsonLd(report: Report) {
             "@type": "AudioObject",
             contentUrl: report.audio,
             encodingFormat: "audio/mp4",
-            name: `${report.title} — audio overview`,
+            name: `${report.title} (audio overview)`,
           },
         }
       : {}),
@@ -617,5 +621,49 @@ export function caseStudiesJsonLd(studies: CaseStudy[]) {
         url: `${SITE_URL}/insights/${study.slug}`,
       },
     })),
+  };
+}
+
+/** A site path made absolute; an absolute URL passes through. */
+function absoluteUrl(src: string): string {
+  return src.startsWith("/") ? `${SITE_URL}${src}` : src;
+}
+
+/**
+ * A listing page (`/insights`, `/insights/reports`) as a `CollectionPage`
+ * whose main entity is the ordered list it shows. Items carry their own type,
+ * so a crawler reading the hub can tell a report from a blog post without
+ * opening either. Only what the page lists, in the page's order.
+ */
+export function collectionJsonLd({
+  path,
+  name,
+  description,
+  items,
+}: {
+  path: string;
+  name: string;
+  description: string;
+  items: { type: "Report" | "BlogPosting" | "CreativeWork"; path: string; name: string }[];
+}) {
+  const url = `${SITE_URL}${path}`;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": url,
+    url,
+    name,
+    description,
+    isPartOf: { "@id": `${SITE_URL}/#website` },
+    publisher: { "@id": `${SITE_URL}/#organization` },
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: items.map((item, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        item: { "@type": item.type, name: item.name, url: `${SITE_URL}${item.path}` },
+      })),
+    },
   };
 }

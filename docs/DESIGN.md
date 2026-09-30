@@ -377,9 +377,18 @@ than scanning. Its rules come from `docs/blogs_seo/blog_ui_ux.md`; the reasoning
   `16 Sep, 2026 / Topic`, the title and a two-line excerpt, separated by space, not rules.
   Topic and author pages use the same pills and rows. No hairlines between sections; one
   Navy newsletter panel is the only tonal step.
-- **Softness, blog only.** Approved by the owner: `.rf-soft` on blog pages rounds avatars
-  and pills fully and gives images, panels, figures, fields and controls a 6–8px radius. The
-  rest of the site stays square; do not extend `.rf-soft` beyond the blog without asking.
+- **Softness, Insights only.** Approved by the owner: `.rf-soft` on every Insights page (the
+  hub, the blog, reports and case studies) rounds avatars, pills and tags fully and gives
+  images, cards, panels, figures, fields and controls a 6–8px radius. The rest of the site
+  stays square; do not extend `.rf-soft` beyond Insights without asking.
+- **One shape across Insights.** Report and case study pages follow the post: breadcrumb
+  (`Crumbs`), H1, the summary as the deck, then Share and Explore with AI. A report's
+  findings use the same numbered panel as a post's TL;DR (`Findings`). Each ends with
+  "Related reading" (`RelatedReading`): blog posts that link to the page first, found by
+  their links, then the other libraries. Citing a report or study in a post is how it gets
+  listed there.
+- **Hub and reports index.** Plain `Insights` and `Reports` H1s. The hub's pills jump to its
+  bands; the newest report is featured with its first three findings (`ReportFeatured`).
 - **TL;DR and Explore with AI.** Takeaways render as a numbered TL;DR (`01`, `02`…).
   "Ask ChatGPT" and "Ask Claude" links under the byline open the assistant on the post URL.
 - **Covers** are tinted into the palette (`.rf-blog-cover`: greyscale, then Flow in `color`
@@ -463,7 +472,7 @@ sections adjacent unless one carries the wave, which distinguishes it on its own
 `PageHeader` keeps `py-12 md:py-16 lg:py-20` — it is the opening block, not a band. `Hero` sets
 its own, because it carries a full-bleed element that supplies the space.
 
-The reference and form routes (`/llm-info`, the report pages, `/contact`, `/company`) still use
+The reference and form routes (`/llm-info`, `/contact`, `/company`) still use
 raw `py-*` values. Move each to a band when you next touch it.
 
 **Layout convention.** Headline column left at `lg:col-span-5`, content right at
@@ -498,10 +507,11 @@ inherit both — see [Adding a form](#10-adding-a-form).
 have none. This is a system of hairlines and right angles — a rounded card reads as borrowed
 from another system.
 
-**The one exception is the blog.** Blog pages sit in `.rf-soft`, which the owner approved in
-September 2026: round avatars and topic pills, and a 6–8px radius on the blog's images,
-panels, figures, fields and controls. See [Articles](#articles). It stays scoped to the blog;
-extending it anywhere else is a brand decision, not a styling one.
+**The one exception is Insights.** The blog, report, case study and hub pages sit in
+`.rf-soft`, which the owner approved in September 2026 (blog first, then all of Insights):
+round avatars, pills and tags, and a 6–8px radius on images, cards, panels, figures, fields
+and controls. See [Articles](#articles). It stays scoped to Insights; extending it anywhere
+else is a brand decision, not a styling one.
 
 **The route stub.** `.rf-cta-primary::before` is a 14px Flow Blue rule that extends to 24px on
 interaction. It is the same 14px mark the disclosure marker opens with and the same tick the

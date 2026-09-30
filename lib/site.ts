@@ -281,9 +281,9 @@ export const NAV: NavGroup[] = [
         hint: "Our own engagements",
       },
       {
-        label: "Reports & Guides",
+        label: "Reports",
         href: "/insights/reports",
-        hint: "Written research, with an audio version",
+        hint: "Research, with an audio version",
       },
       {
         label: "Blog",

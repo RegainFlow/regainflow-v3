@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import ClosingCTA from "@/components/ClosingCTA";
-import PageHeader from "@/components/PageHeader";
+import Crumbs from "@/components/Crumbs";
+import ExploreWithAI from "@/components/ExploreWithAI";
+import Findings from "@/components/Findings";
+import RelatedReading, { type RelatedItem } from "@/components/RelatedReading";
 import ReportAudio from "@/components/ReportAudio";
-import ReportCard from "@/components/ReportCard";
 import ReportGate from "@/components/ReportGate";
+import ShareButton from "@/components/ShareButton";
+import { getPostsLinkingTo } from "@/lib/blog.server";
+import { getCaseStudies } from "@/lib/case-studies.server";
 import { reportDate } from "@/lib/content/reports";
 import { getReport, getReports } from "@/lib/reports.server";
 import {
@@ -16,8 +20,12 @@ import {
   reportJsonLd,
   serializeJsonLd,
 } from "@/lib/seo";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 type Params = { slug: string };
+
+/** "Related reading" holds this many cards: one row at desktop. */
+const RELATED_COUNT = 3;
 
 /**
  * Read per request rather than prerendered from a known set of slugs. There is
@@ -27,13 +35,18 @@ type Params = { slug: string };
  */
 export const dynamic = "force-dynamic";
 
+const CRUMBS = [
+  { name: "Insights", path: "/insights" },
+  { name: "Reports", path: "/insights/reports" },
+];
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const report = await getReport(slug);
+  const report = await getReport(slug).catch(() => null);
 
   if (!report) return {};
 
@@ -44,20 +57,29 @@ export async function generateMetadata({
     // This segment generates its own card in `opengraph-image.tsx`, and the
     // file convention emits its (hashed) URL — see `segmentCard`.
     segmentCard: true,
+    article: {
+      publishedTime: report.published,
+      // A report is not revised after publication (see `app/sitemap.ts`).
+      modifiedTime: report.published,
+      authors: [SITE_NAME],
+      section: "Reports",
+    },
   });
 }
 
 /**
- * A report page.
+ * A report page, in the blog post's shape: breadcrumb, title, summary as the
+ * deck, then share and Explore with AI. Below that, the cover beside the
+ * findings (numbered, like a post's TL;DR), the audio overview and the gate.
  *
- * The substance — cover, summary, findings, and the audio overview — is server
- * rendered and crawlable. Only the PDF link sits behind the email ask, and even
- * that is a courtesy: the file is in a public bucket. Gating the page itself
- * would trade the search traffic this page exists to earn for a form nobody has
- * a reason to fill in yet.
+ * The substance (summary, findings, audio) is server rendered and crawlable.
+ * Only the PDF link sits behind the email ask, and even that is a courtesy: the
+ * file is in a public bucket. Gating the page itself would trade the search
+ * traffic this page exists to earn for a form nobody has a reason to fill in.
  *
- * The gate's memory lives in `localStorage`, on the client, so nothing here
- * reads `cookies()` — the route is dynamic because of the fetch, not the user.
+ * "Related reading" lists blog posts that cite this report first (found by
+ * their links, so nobody keeps the list by hand), then other reports, then
+ * case studies.
  *
  * `getReport` returns null only for a slug nobody published, and throws if the
  * fetch itself failed. So this `notFound()` is reached only when the report
@@ -74,137 +96,113 @@ export default async function ReportPage({
 
   if (!report) notFound();
 
-  const others = (await getReports()).filter(
-    (other) => other.slug !== report.slug,
-  );
+  const path = `/insights/reports/${report.slug}`;
+  const url = `${SITE_URL}${path}`;
+
+  const [citing, reports, studies] = await Promise.all([
+    getPostsLinkingTo(path, RELATED_COUNT),
+    getReports(),
+    getCaseStudies(),
+  ]);
+
+  const related: RelatedItem[] = [
+    ...citing.map((post) => ({ kind: "post" as const, post })),
+    ...reports
+      .filter((other) => other.slug !== report.slug)
+      .map((other) => ({ kind: "report" as const, report: other })),
+    ...studies.map((study) => ({ kind: "study" as const, study })),
+  ].slice(0, RELATED_COUNT);
+
+  const facts = [
+    reportDate(report.published),
+    report.pages ? `${report.pages} pages` : null,
+    report.audioLength ? `${report.audioLength} audio` : null,
+  ].filter(Boolean);
 
   return (
-    <>
-      <PageHeader
-        eyebrow={`Report · ${reportDate(report.published)}`}
-        title={report.title}
-        lead={report.summary}
-      />
+    <div className="rf-soft">
+      <article className="rf-article">
+        <header className="rf-section rf-section-open">
+          <div className="rf-shell rf-post-head">
+            <Crumbs items={CRUMBS} />
 
-      <section className="rf-section">
-        <div className="rf-shell rf-grid gap-y-12 py-12 md:py-16">
-          <div className="col-span-full lg:col-span-4">
-            {/* `fill`, because no intrinsic dimensions travel with a URL pasted
-                into a table editor. The frame declares the ratio instead. */}
-            <div className="rf-report-cover rf-report-cover-lead">
-              <Image
-                src={report.cover}
-                alt={`Cover of ${report.title}`}
-                fill
-                sizes="(min-width: 1024px) 380px, 90vw"
-                priority
-              />
+            <h1 className="rf-h1 rf-post-title">{report.title}</h1>
+            <p className="rf-post-deck">{report.summary}</p>
+
+            <div className="rf-byline">
+              <div className="rf-byline-text">
+                <p className="rf-byline-name">
+                  Report<span className="rf-byline-role">by {SITE_NAME}</span>
+                </p>
+                <p className="rf-utility rf-byline-dates">
+                  <span>
+                    Published{" "}
+                    <time dateTime={report.published}>{facts[0]}</time>
+                  </span>
+                  {facts.slice(1).map((fact) => (
+                    <span key={fact}>{fact}</span>
+                  ))}
+                </p>
+              </div>
+              <div className="rf-byline-controls">
+                <ShareButton title={report.title} url={url} kind="report" />
+              </div>
+              <ExploreWithAI url={url} kind="report" />
+            </div>
+          </div>
+        </header>
+
+        <section className="rf-section rf-section-open">
+          <div className="rf-shell rf-grid gap-y-10 rf-band-tight">
+            <div className="col-span-full lg:col-span-4">
+              {/* `fill`, because no intrinsic dimensions travel with a URL
+                  pasted into a table editor. The frame declares the ratio.
+                  Capped on a phone, where full width pushed the findings a
+                  whole screen down. */}
+              <div className="rf-report-cover rf-report-cover-lead max-lg:max-w-[13rem] lg:sticky lg:top-24">
+                <Image
+                  src={report.cover}
+                  alt={`Cover of ${report.title}`}
+                  fill
+                  sizes="(min-width: 1024px) 380px, 90vw"
+                  priority
+                />
+              </div>
             </div>
 
-            <dl className="mt-6">
-              <div className="flex justify-between gap-4 border-t border-rf-hairline py-3">
-                <dt className="rf-utility">Published</dt>
-                <dd className="rf-utility text-rf-warm">
-                  {reportDate(report.published)}
-                </dd>
+            <div className="col-span-full flex flex-col gap-10 lg:col-span-7 lg:col-start-6">
+              {/* Public, and the reason this page is worth landing on cold. The
+                  gate asks for the document, not for the argument. */}
+              <Findings items={report.findings} title="What it found" id="findings" />
+
+              {report.audio ? (
+                // `title` and `cover` are for the OS media session: what the
+                // iOS lock screen and the Android notification show.
+                <ReportAudio
+                  src={report.audio}
+                  length={report.audioLength}
+                  slug={report.slug}
+                  title={report.title}
+                  cover={report.cover}
+                />
+              ) : null}
+
+              <div id="download" className="scroll-mt-24">
+                <ReportGate report={report} />
               </div>
-              {report.pages ? (
-                <div className="flex justify-between gap-4 border-t border-rf-hairline py-3">
-                  <dt className="rf-utility">Length</dt>
-                  <dd className="rf-utility text-rf-warm">
-                    {report.pages} pages
-                  </dd>
-                </div>
-              ) : null}
-              {report.audioLength ? (
-                <div className="flex justify-between gap-4 border-t border-rf-hairline py-3">
-                  <dt className="rf-utility">Audio</dt>
-                  <dd className="rf-utility text-rf-warm">
-                    {report.audioLength}
-                  </dd>
-                </div>
-              ) : null}
-            </dl>
-          </div>
-
-          <div className="col-span-full lg:col-span-7 lg:col-start-6">
-            <h2 className="rf-h2 max-w-[22ch]">What it found</h2>
-
-            {/* Public, and the reason this page is worth landing on cold. The
-                gate asks for the document, not for the argument. */}
-            <ol className="mt-8 border-t border-rf-hairline">
-              {report.findings.map((finding, i) => (
-                <li
-                  key={finding}
-                  className="flex gap-5 border-b border-rf-hairline py-5"
-                >
-                  <span className="rf-index pt-0.5">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <p className="rf-body max-w-[58ch]">{finding}</p>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </div>
-      </section>
-
-      {report.audio ? (
-        <section className="rf-section bg-rf-navy">
-          <div className="rf-shell py-12 md:py-16">
-            {/* `title` and `cover` are for the OS media session — they are what
-                the iOS lock screen and the Android notification show. */}
-            <ReportAudio
-              src={report.audio}
-              length={report.audioLength}
-              slug={report.slug}
-              title={report.title}
-              cover={report.cover}
-            />
+            </div>
           </div>
         </section>
-      ) : null}
+      </article>
 
-      <section id="download" className="rf-section">
-        <div className="rf-shell py-12 md:py-16">
-          <ReportGate report={report} />
-
-          <p className="mt-12">
-            <Link href="/insights/reports" className="rf-nav-link">
-              &larr; All reports
-            </Link>
-          </p>
-        </div>
-      </section>
-
-      {others.length > 0 ? (
-        <section className="rf-section bg-rf-navy">
-          <div className="rf-shell py-12 md:py-16">
-            <p className="rf-eyebrow">More reports</p>
-
-            <ul className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {others.slice(0, 3).map((other) => (
-                <li key={other.slug} className="h-full">
-                  <ReportCard report={other} surface="related" />
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      ) : null}
+      <RelatedReading items={related} />
 
       <ClosingCTA />
 
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: serializeJsonLd(
-            breadcrumbJsonLd(
-              report.title,
-              `/insights/reports/${report.slug}`,
-              { name: "Reports", path: "/insights/reports" },
-            ),
-          ),
+          __html: serializeJsonLd(breadcrumbJsonLd(report.title, path, CRUMBS)),
         }}
       />
       <script
@@ -213,6 +211,6 @@ export default async function ReportPage({
           __html: serializeJsonLd(reportJsonLd(report)),
         }}
       />
-    </>
+    </div>
   );
 }

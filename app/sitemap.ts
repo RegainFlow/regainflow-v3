@@ -69,9 +69,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   // Generated rather than listed, so a new study cannot ship unindexed.
+  // `lastModified` is the row's last edit. Studies carry no visible date, so
+  // there is no hand-set one to prefer, and the request time claimed a change
+  // on every crawl.
   const studies: MetadataRoute.Sitemap = caseStudies.map((study) => ({
     url: `${SITE_URL}/insights/${study.slug}`,
-    lastModified,
+    lastModified: study.updated ? new Date(`${study.updated}T00:00:00Z`) : lastModified,
     changeFrequency: "monthly",
     priority: 0.6,
   }));

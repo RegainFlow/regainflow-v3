@@ -153,6 +153,39 @@ export async function getPosts({
 }
 
 /**
+ * Published posts whose body links to `path` (a site path such as
+ * `/insights/reports/the-ai-roi-problem`), newest first. The backlinks on a
+ * report or case study: a post that cites the page is listed under its
+ * "Related reading" with no hand-kept list to go stale.
+ *
+ * The database narrows by substring; the exact Markdown link target, `](/path)`
+ * or `](/path#fragment)`, is checked here, so `/insights/foo` does not also
+ * match `/insights/foo-bar`. `[]` on failure: a missing shelf is not worth an
+ * error page.
+ */
+export async function getPostsLinkingTo(path: string, limit = 3): Promise<BlogPostSummary[]> {
+  try {
+    const { data, error } = await supabase()
+      .from("blog_posts")
+      .select(LIST_COLUMNS)
+      .eq("status", PUBLISHED)
+      .ilike("body", `%${path}%`)
+      .order("published", { ascending: false });
+
+    if (error) throw new Error(error.message);
+
+    const target = new RegExp(`\\]\\(${path.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[)#\\s]`);
+    return (data as BlogPostRow[])
+      .filter((row) => target.test(row.body))
+      .slice(0, limit)
+      .map(toSummary);
+  } catch (error) {
+    console.error("[blog] backlinks unavailable", error);
+    return [];
+  }
+}
+
+/**
  * One published post, or `null` for a slug nobody published. An outage throws,
  * so it becomes a 500 rather than a 404 that would de-index a live post.
  *

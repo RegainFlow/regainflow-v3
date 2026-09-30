@@ -177,6 +177,9 @@ export interface CaseStudy {
    * order; this decides who else is on it. See `studiesForIndustry()`.
    */
   industries?: string[];
+  /** ISO date of the row's last edit (`updated_at`), for the sitemap's
+   *  `lastModified`. Not shown on the page. */
+  updated?: string;
 }
 
 /** The heading for the closing section when a study does not name its own. */

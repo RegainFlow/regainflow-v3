@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { BlogRow } from "@/components/BlogCard";
+import Pills from "@/components/Pills";
 import type { BlogPostSummary } from "@/lib/content/blog";
 import { BLOG_TOPICS } from "@/lib/content/blog-topics";
 
@@ -31,30 +32,17 @@ export function TopicChips({
     : BLOG_TOPICS;
 
   return (
-    <nav aria-label="Blog topics">
-      <ul className="rf-pills">
-        <li>
-          <Link
-            href="/insights/blog"
-            className="rf-pill"
-            aria-current={current ? undefined : "page"}
-          >
-            All posts
-          </Link>
-        </li>
-        {topics.map((topic) => (
-          <li key={topic.slug}>
-            <Link
-              href={`/insights/blog/topics/${topic.slug}`}
-              className="rf-pill"
-              aria-current={current === topic.slug ? "page" : undefined}
-            >
-              {topic.name}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </nav>
+    <Pills
+      label="Blog topics"
+      items={[
+        { label: "All posts", href: "/insights/blog", current: !current },
+        ...topics.map((topic) => ({
+          label: topic.name,
+          href: `/insights/blog/topics/${topic.slug}`,
+          current: current === topic.slug,
+        })),
+      ]}
+    />
   );
 }
 
@@ -76,7 +64,7 @@ export function PostList({
   posts: BlogPostSummary[];
   page: number;
   total: number;
-  surface?: "blog_index" | "blog_topic" | "blog_author";
+  surface?: "blog_index" | "blog_topic" | "blog_author" | "insights";
   /** Off on a topic page, where every row shares the topic. */
   showTopic?: boolean;
   /** The slug to mark "Read first": a topic's pillar. */

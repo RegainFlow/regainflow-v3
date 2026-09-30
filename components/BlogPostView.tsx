@@ -4,7 +4,9 @@ import Link from "next/link";
 import AuthorBox from "@/components/AuthorBox";
 import BlogCard from "@/components/BlogCard";
 import BlogToc from "@/components/BlogToc";
+import Crumbs from "@/components/Crumbs";
 import ExploreWithAI from "@/components/ExploreWithAI";
+import Findings from "@/components/Findings";
 import Markdown from "@/components/Markdown";
 import NewsletterSignup from "@/components/NewsletterSignup";
 import PostCTA from "@/components/PostCTA";
@@ -73,6 +75,11 @@ export default function BlogPostView({
     : toc;
   const showToc = toc.length >= TOC_MIN_SECTIONS;
   const url = `${SITE_URL}/insights/blog/${post.slug}`;
+  const crumbs = [
+    { name: "Insights", path: "/insights" },
+    { name: "Blog", path: "/insights/blog" },
+    ...(topic ? [{ name: topic.name, path: `/insights/blog/topics/${topic.slug}` }] : []),
+  ];
 
   return (
     <div className="rf-read rf-soft" data-theme="dark" suppressHydrationWarning>
@@ -87,30 +94,7 @@ export default function BlogPostView({
       <article className="rf-article rf-post">
         <header className="rf-section rf-section-open">
           <div className="rf-shell rf-post-head">
-            <nav aria-label="Breadcrumb">
-              <ol className="rf-crumbs rf-utility">
-                <li>
-                  <Link href="/insights" className="rf-nav-link">
-                    Insights
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/insights/blog" className="rf-nav-link">
-                    Blog
-                  </Link>
-                </li>
-                {topic ? (
-                  <li>
-                    <Link
-                      href={`/insights/blog/topics/${topic.slug}`}
-                      className="rf-nav-link"
-                    >
-                      {topic.name}
-                    </Link>
-                  </li>
-                ) : null}
-              </ol>
-            </nav>
+            <Crumbs items={crumbs} />
 
             <h1 className="rf-h1 rf-post-title">{post.title}</h1>
             <p className="rf-post-deck">{post.summary}</p>
@@ -166,26 +150,7 @@ export default function BlogPostView({
             ) : null}
 
             <div className="rf-post-main">
-              {/* The TL;DR: numbered findings, as Profound's research posts
-                  run them. The same Navy panel as before; the numbers give a
-                  scanner a count and an order to talk about. */}
-              {post.takeaways.length > 0 ? (
-                <section className="rf-takeaways" aria-labelledby="takeaways">
-                  <h2 id="takeaways" className="rf-utility">
-                    TL;DR
-                  </h2>
-                  <ol>
-                    {post.takeaways.map((takeaway, i) => (
-                      <li key={takeaway}>
-                        <span className="rf-index" aria-hidden="true">
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                        <span>{takeaway}</span>
-                      </li>
-                    ))}
-                  </ol>
-                </section>
-              ) : null}
+              <Findings items={post.takeaways} />
 
               {/* Below lg, folded: open, the list pushed the first paragraph
                   more than two screens down on a phone. A native <details> in
@@ -298,13 +263,7 @@ export default function BlogPostView({
             type="application/ld+json"
             dangerouslySetInnerHTML={{
               __html: serializeJsonLd(
-                breadcrumbJsonLd(post.title, `/insights/blog/${post.slug}`, [
-                  { name: "Insights", path: "/insights" },
-                  { name: "Blog", path: "/insights/blog" },
-                  ...(topic
-                    ? [{ name: topic.name, path: `/insights/blog/topics/${topic.slug}` }]
-                    : []),
-                ]),
+                breadcrumbJsonLd(post.title, `/insights/blog/${post.slug}`, crumbs),
               ),
             }}
           />

@@ -1911,15 +1911,58 @@
     overflow: hidden;
   }
 
+  /* The newest report, large: cover beside title, summary and three findings.
+     Stacks below md with the cover capped so the text is still in view. */
+  .rf-report-featured {
+    display: grid;
+    gap: 1.75rem;
+    align-items: start;
+  }
+
+  .rf-report-featured > .rf-report-cover {
+    max-width: 16rem;
+  }
+
+  @media (min-width: 768px) {
+    .rf-report-featured {
+      grid-template-columns: minmax(12rem, 20rem) minmax(0, 1fr);
+      gap: clamp(2rem, 4vw, 3.5rem);
+    }
+
+    .rf-report-featured > .rf-report-cover {
+      max-width: none;
+    }
+  }
+
+  .rf-report-featured-findings {
+    display: grid;
+    gap: 0.75rem;
+    max-width: 60ch;
+  }
+
+  .rf-report-featured-findings li {
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--color-rf-slate);
+  }
+
+  .rf-report-featured-findings .rf-index {
+    padding-top: 0.2rem;
+  }
+
   @media (hover: hover) {
     .rf-blog-row:hover .rf-blog-row-title,
-    .rf-blog-featured:hover .rf-blog-featured-title {
+    .rf-blog-featured:hover .rf-blog-featured-title,
+    .rf-report-featured:hover .rf-blog-featured-title {
       color: var(--color-rf-flow-soft);
     }
   }
 
   .rf-blog-row:focus-visible .rf-blog-row-title,
-  .rf-blog-featured:focus-visible .rf-blog-featured-title {
+  .rf-blog-featured:focus-visible .rf-blog-featured-title,
+  .rf-report-featured:focus-visible .rf-blog-featured-title {
     color: var(--color-rf-flow-soft);
   }
 
@@ -1965,10 +2008,11 @@
     }
   }
 
-  /* --- Blog softness ------------------------------------------------------
-     Blog-scoped, approved by the owner: round avatars and pills, and a 6–8px
-     radius on the blog's images, panels, fields and controls. The rest of the
-     site stays square. Opt-in with `.rf-soft` on the page wrapper. */
+  /* --- Insights softness --------------------------------------------------
+     Scoped to Insights (the blog, reports, case studies and the hub), approved
+     by the owner in September 2026: round avatars, pills and tags, and a 6–8px
+     radius on images, cards, panels, fields and controls. The rest of the site
+     stays square. Opt-in with `.rf-soft` on the page wrapper. */
   .rf-soft .rf-blog-cover,
   .rf-soft .rf-blog-newsletter,
   .rf-soft .rf-takeaways,
@@ -1977,8 +2021,17 @@
   .rf-soft .rf-video,
   .rf-soft .rf-figure-frame,
   .rf-soft .rf-prose pre,
-  .rf-soft .rf-post-cover .rf-case-cover {
+  .rf-soft .rf-case-cover,
+  .rf-soft .rf-card,
+  .rf-soft .rf-gate,
+  .rf-soft .rf-audio,
+  .rf-soft .rf-artifact {
     border-radius: 8px;
+  }
+
+  .rf-soft .rf-report-cover {
+    border-radius: 6px;
+    overflow: hidden;
   }
 
   .rf-soft .rf-input,
@@ -1986,6 +2039,28 @@
   .rf-soft .rf-cta-secondary,
   .rf-soft .rf-read-control {
     border-radius: 6px;
+  }
+
+  /* Tags as pills: the square outlined chip read as a form control. Scoped to
+     the full tag list (case studies); the dot-separated run inside a post
+     keeps its own rule. */
+  .rf-soft .rf-tag {
+    border-radius: 999px;
+    padding-inline: 0.8rem;
+  }
+
+  /* Scope facts as soft tiles on Navy rather than figures hung off a rule. */
+  .rf-soft .rf-glance > div {
+    border-top: 0;
+    border-radius: 8px;
+    background: var(--color-rf-navy);
+    padding: 1rem 1.1rem;
+  }
+
+  /* Cards in "Related reading": the meta line sits at the bottom so a row of
+     mixed kinds stays level. */
+  .rf-related-card .rf-h3 {
+    max-width: 30ch;
   }
 
   .rf-pager {

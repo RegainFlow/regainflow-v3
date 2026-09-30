@@ -383,6 +383,11 @@ page 1, `pages` is counted against the file, `audio_length` is measured off the 
 storage URLs are read back from the API rather than string-built. Those were the columns most
 likely to be wrong, because they are the ones nobody can check by eye.
 
+For local development, `supabase/seed/reports.sql` holds the four published reports with their
+committed covers (`public/reports/`), and no PDF or audio. **Local only; never run it against
+production.** Apply it alone with
+`docker exec -i supabase_db_regainflow-v3 psql -U postgres < supabase/seed/reports.sql`.
+
 `--dry-run` renders, counts, and measures without touching anything remote. `.claude/skills/publish-report/`
 drives all of this conversationally, including drafting the copy.
 

@@ -14,7 +14,17 @@ import { track } from "@/lib/analytics/track";
  * INP. So: the native share sheet where the platform has one (phones), and
  * copy-link everywhere else. No counts.
  */
-export default function ShareButton({ title, url }: { title: string; url: string }) {
+export default function ShareButton({
+  title,
+  url,
+  kind = "blog_post",
+}: {
+  title: string;
+  url: string;
+  /** The kind of page, for analytics and the accessible name. */
+  kind?: "blog_post" | "report" | "case_study";
+}) {
+  const noun = kind === "blog_post" ? "post" : kind === "report" ? "report" : "case study";
   const [canShare, setCanShare] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -35,12 +45,12 @@ export default function ShareButton({ title, url }: { title: string; url: string
     <button
       type="button"
       className="rf-read-control"
-      aria-label={canShare ? "Share this post" : "Copy link to this post"}
+      aria-label={canShare ? `Share this ${noun}` : `Copy link to this ${noun}`}
       onClick={async () => {
         if (canShare) {
           try {
             await navigator.share({ title, url });
-            track(RF_EVENTS.blogPostShared, { method: "native" });
+            track(RF_EVENTS.pageShared, { method: "native", page: kind });
           } catch {
             // Dismissing the sheet rejects; nothing to do.
           }
@@ -50,7 +60,7 @@ export default function ShareButton({ title, url }: { title: string; url: string
         try {
           await navigator.clipboard.writeText(url);
           setCopied(true);
-          track(RF_EVENTS.blogPostShared, { method: "copy" });
+          track(RF_EVENTS.pageShared, { method: "copy", page: kind });
         } catch {
           // Clipboard blocked: the URL bar still has it.
         }

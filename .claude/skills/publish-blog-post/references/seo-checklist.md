@@ -24,6 +24,7 @@ Distilled from `docs/blogs_seo/blog_seo.md` and `blog_ui_ux.md`. Evidence tiers:
 - **[G/P] Link the topic's pillar and 2–5 related posts or pages** with descriptive anchor text ("our evaluation harness post", never "click here").
 - **[P] Link *to* the new post** from 2–3 established pages after publishing.
 - **[R] An early contextual link** within the first few paragraphs gets the clicks the end module misses.
+- **[P] Cite our reports and case studies by linking their pages** (`/insights/reports/<slug>`, `/insights/<slug>`), not just naming them. The report or study page then lists the post under "Related reading" automatically, found by the link, so every citation is a link in both directions.
 
 ## Images and media
 

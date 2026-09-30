@@ -2,7 +2,8 @@ import { RF_EVENTS } from "@/lib/analytics/events";
 
 /**
  * "Ask ChatGPT" and "Ask Claude": open the reader's assistant with a prompt
- * about this post, the way Profound's posts do.
+ * about this page, the way Profound's posts do. Used on blog posts, reports
+ * and case studies; `kind` names the page in the prompt and in analytics.
  *
  * An answer-engine move as much as a convenience: the reader keeps the
  * conversation in the tool they already use, and the assistant reads the page
@@ -15,9 +16,22 @@ const ASSISTANTS = [
   { name: "Claude", href: (q: string) => `https://claude.ai/new?q=${q}` },
 ] as const;
 
-export default function ExploreWithAI({ url }: { url: string }) {
+/** What the prompt calls the page, keyed by the analytics `surface`. */
+const NOUNS = {
+  blog_post: "article",
+  report: "report",
+  case_study: "case study",
+} as const;
+
+export default function ExploreWithAI({
+  url,
+  kind = "blog_post",
+}: {
+  url: string;
+  kind?: keyof typeof NOUNS;
+}) {
   const prompt = encodeURIComponent(
-    `Summarize this article from RegainFlow and answer my questions about it: ${url}`,
+    `Summarize this ${NOUNS[kind]} from RegainFlow and answer my questions about it: ${url}`,
   );
 
   return (
@@ -32,7 +46,8 @@ export default function ExploreWithAI({ url }: { url: string }) {
             target="_blank"
             rel="noopener noreferrer"
             className="rf-read-control"
-            data-rf-event={RF_EVENTS.blogExploreAi}
+            data-rf-event={RF_EVENTS.exploreAi}
+            data-rf-surface={kind}
             data-rf-target={assistant.name.toLowerCase()}
           >
             Ask {assistant.name} &#8599;
