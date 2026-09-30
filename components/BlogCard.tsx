@@ -8,7 +8,7 @@ import {
   postDateShort,
   type BlogPostSummary,
 } from "@/lib/content/blog";
-import { resolveAuthor } from "@/lib/content/blog-authors";
+import { ORG_AVATAR, resolveAuthor } from "@/lib/content/blog-authors";
 import { topicBySlug } from "@/lib/content/blog-topics";
 
 type Surface = "blog_index" | "blog_featured" | "blog_topic" | "blog_author" | "insights" | "related";
@@ -173,6 +173,13 @@ export function BlogFeatured({
       data-rf-post={post.slug}
       data-rf-surface="blog_featured"
     >
+      {/* No cover: a Navy panel with the RF mark, so a featured pair stays
+          level when only one post has an image. */}
+      {!post.cover ? (
+        <div className="rf-case-cover rf-blog-cover rf-blog-cover-empty" aria-hidden="true">
+          <Image src={ORG_AVATAR} alt="" width={72} height={72} />
+        </div>
+      ) : null}
       {post.cover ? (
         <div className="rf-case-cover rf-blog-cover">
           <Image

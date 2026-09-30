@@ -105,7 +105,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ? new Date(`${list[0].updatedOn ?? list[0].published}T00:00:00Z`)
       : lastModified;
   const hubs: MetadataRoute.Sitemap = [
-    ...BLOG_TOPICS.map((topic) => ({
+    // Only topics with a published post: an empty hub is a thin page.
+    ...BLOG_TOPICS.filter((topic) => posts.some((post) => post.topic === topic.slug)).map((topic) => ({
       url: `${SITE_URL}/insights/blog/topics/${topic.slug}`,
       lastModified: newest(posts.filter((post) => post.topic === topic.slug)),
       changeFrequency: "monthly" as const,

@@ -1777,6 +1777,19 @@
     gap: 1rem;
   }
 
+  .rf-blog-cover-empty {
+    display: grid;
+    place-items: center;
+  }
+
+  .rf-blog-cover-empty::after {
+    display: none;
+  }
+
+  .rf-blog-cover-empty img {
+    opacity: 0.9;
+  }
+
   .rf-blog-featured .rf-blog-cover {
     margin-bottom: 0.5rem;
   }

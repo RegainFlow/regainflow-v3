@@ -59,6 +59,10 @@ export interface CheckContext {
   coverPrompt?: string;
 }
 
+/** The organization byline: allowed for company posts written by both
+ *  founders. `resolveAuthor` renders it as RegainFlow with the app icon. */
+export const ORG_AUTHOR = "regainflow";
+
 const FIGURE_PARSERS: Record<string, (text: string) => unknown> = {
   callout: parseCallout,
   steps: parseSteps,
@@ -103,7 +107,9 @@ export function checkPost(payload: BlogPayload, ctx: CheckContext): Findings {
   if (!existing && ctx.replace) {
     errors.push(`--replace was passed but "${payload.slug}" is not published; drop the flag for a new post`);
   }
-  if (!ctx.authors.includes(payload.author)) {
+  if (payload.author === ORG_AUTHOR) {
+    warnings.push("bylined to RegainFlow, not a founder: the post gets no author page or Person markup, a weaker trust signal than a named author");
+  } else if (!ctx.authors.includes(payload.author)) {
     errors.push(`author "${payload.author}" is not a founder slug (${ctx.authors.join(", ")}); a post needs a real byline with an author page`);
   }
   if (!ctx.topics.includes(payload.topic)) {

@@ -17,7 +17,19 @@ export function pageCount(total: number): number {
  * filtering is crawlable and needs no JavaScript. Three curated topics rather
  * than a tag cloud: a thin tag archive is an SEO liability.
  */
-export function TopicChips({ current }: { current?: string }) {
+export function TopicChips({
+  current,
+  available,
+}: {
+  current?: string;
+  /** Topic slugs that have published posts. A pill to an empty topic would
+   *  lead to an empty page, so those are left out until a post lands. */
+  available?: string[];
+}) {
+  const topics = available
+    ? BLOG_TOPICS.filter((topic) => available.includes(topic.slug))
+    : BLOG_TOPICS;
+
   return (
     <nav aria-label="Blog topics">
       <ul className="rf-pills">
@@ -30,7 +42,7 @@ export function TopicChips({ current }: { current?: string }) {
             All posts
           </Link>
         </li>
-        {BLOG_TOPICS.map((topic) => (
+        {topics.map((topic) => (
           <li key={topic.slug}>
             <Link
               href={`/insights/blog/topics/${topic.slug}`}

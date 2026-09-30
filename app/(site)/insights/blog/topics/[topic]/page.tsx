@@ -47,7 +47,8 @@ export default async function TopicPage({
   const topic = topicBySlug((await params).topic);
   if (!topic) notFound();
 
-  const posts = await getPosts({ topic: topic.slug });
+  const all = await getPosts();
+  const posts = all.filter((post) => post.topic === topic.slug);
   // The pillar leads, marked "Read first"; the rest follow newest first.
   const pillar = posts.find((post) => post.pillar);
   const ordered = pillar ? [pillar, ...posts.filter((post) => post !== pillar)] : posts;
@@ -61,7 +62,10 @@ export default async function TopicPage({
           <h2 id="in-topic" className="sr-only">
             Posts in {topic.name}
           </h2>
-          <TopicChips current={topic.slug} />
+          <TopicChips
+            current={topic.slug}
+            available={[...new Set(all.map((post) => post.topic))]}
+          />
           <div className="mt-10">
             {ordered.length > 0 ? (
               <PostList

@@ -104,7 +104,7 @@ export default async function BlogPage() {
                 All posts
               </h2>
               <div className="mt-6">
-                <TopicChips />
+                <TopicChips available={[...new Set(posts.map((post) => post.topic))]} />
               </div>
               <div className="mt-10">
                 <PostList
