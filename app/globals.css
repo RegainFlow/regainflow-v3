@@ -110,6 +110,12 @@
     border-bottom: 1px solid var(--color-rf-hairline);
   }
 
+  /* A section set off by space alone. The blog index uses it throughout: a
+     hairline between every block read as rigid. */
+  .rf-section-open {
+    border-bottom: 0;
+  }
+
   /* --- Section rhythm ------------------------------------------------------
      Three band heights, and the point of naming them is that a section has to
      *choose* one.
@@ -891,6 +897,7 @@
     width: 44px;
     height: 44px;
     overflow: hidden;
+    border-radius: 50%;
     border: 1px solid var(--color-rf-hairline);
     background: var(--color-rf-navy);
   }
@@ -928,9 +935,18 @@
     margin-top: 0.35rem;
   }
 
+  /* Under the dates, not floated to the far edge of the header, where they
+     read as detached from the byline they belong to. */
   .rf-byline-controls {
     display: flex;
+    flex-basis: 100%;
     gap: 0.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .rf-byline:has(.rf-byline-portrait) .rf-byline-controls {
+      margin-left: calc(44px + 1.25rem);
+    }
   }
 
   /* 44px tall: these are the only controls on the page a thumb has to hit. */
@@ -1034,28 +1050,23 @@
     box-shadow: inset 3px 0 0 var(--color-rf-flow);
   }
 
-  .rf-takeaways ul {
+  /* Numbered findings: `01`, `02`… in Flow Soft beside each line. */
+  .rf-takeaways ol {
     margin-top: 0.9rem;
     display: grid;
-    gap: 0.6rem;
+    gap: 0.7rem;
   }
 
   .rf-takeaways li {
-    position: relative;
-    padding-left: 1.25rem;
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
     font-size: 1rem;
     line-height: 1.5;
     color: var(--color-rf-warm);
   }
 
-  .rf-takeaways li::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0.7em;
-    width: 0.5rem;
-    height: 1px;
-    background: var(--color-rf-flow);
+  .rf-takeaways .rf-index {
+    padding-top: 0.2rem;
   }
 
   /* Table of contents: the rail, and the mobile in-content list. */
@@ -1077,7 +1088,73 @@
 
   .rf-toc a[aria-current="location"] {
     color: var(--color-rf-warm);
-    box-shadow: inset 2px 0 0 var(--color-rf-flow);
+  }
+
+  /* The rail as a route: a node per section, the line filled in Flow up to the
+     section being read. Nodes sit on the line's axis (x = 3.5px), and the line
+     starts and ends on a node, as every route on the site does. */
+  .rf-toc ol {
+    border-left: 0;
+  }
+
+  .rf-toc li {
+    position: relative;
+  }
+
+  .rf-toc li::before {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--color-rf-hairline);
+  }
+
+  .rf-toc li:first-child::before {
+    top: 1.05rem;
+  }
+
+  .rf-toc li:last-child::before {
+    bottom: calc(100% - 1.05rem);
+  }
+
+  .rf-toc li[data-passed]::before {
+    background: var(--color-rf-flow);
+  }
+
+  /* The current section: the route arrives at its node and stops. */
+  .rf-toc li:has(a[aria-current])::before {
+    background: linear-gradient(
+      var(--color-rf-flow) 0 1.05rem,
+      var(--color-rf-hairline) 1.05rem
+    );
+  }
+
+  .rf-toc li:first-child:has(a[aria-current])::before {
+    background: var(--color-rf-hairline);
+  }
+
+  .rf-toc li::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: calc(1.05rem - 3.5px);
+    width: 7px;
+    height: 7px;
+    border: 1px solid var(--color-rf-line);
+    background: var(--color-rf-void);
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .rf-toc li[data-passed]::after,
+  .rf-toc li:has(a[aria-current])::after {
+    border-color: var(--color-rf-flow);
+    background: var(--color-rf-flow);
+  }
+
+  .rf-toc a {
+    padding-left: 1.4rem;
   }
 
   @media (hover: hover) {
@@ -1088,7 +1165,12 @@
   }
 
   .rf-toc-inline {
-    margin-top: 2rem;
+    margin-top: 1.5rem;
+    border-bottom: 1px solid var(--color-rf-hairline);
+  }
+
+  .rf-toc-inline ol {
+    margin-bottom: 1rem;
   }
 
   .rf-toc-inline a {
@@ -1111,21 +1193,38 @@
      `.rf-article .rf-body`: size, colour and paragraph rhythm are already set.
   ------------------------------------------------------------------------- */
 
+  /* A 1.25 step off the 19px body: H3 1.3rem, H2 up to 1.85rem. H3 used to be
+     1.15rem, *smaller* than the body it headed, and read as a bold paragraph. */
   .rf-prose h2 {
-    margin-top: 2.5em;
-    font-size: clamp(1.35rem, 2vw, 1.6rem);
+    margin-top: 2.75em;
+    font-size: clamp(1.5rem, 2.2vw, 1.85rem);
     font-weight: 500;
-    line-height: 1.25;
-    letter-spacing: -0.015em;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
     color: var(--color-rf-warm);
     text-wrap: balance;
   }
 
+  /* Each section opens with the route tick: an 18px Flow rule with its square
+     terminal, the same mark `.rf-route-tick` draws. Not on the Sources label,
+     which is a mono utility heading. */
+  .rf-prose h2:not(#footnote-label)::before {
+    content: "";
+    display: block;
+    width: 19px;
+    height: 4px;
+    margin-bottom: 0.85rem;
+    background:
+      linear-gradient(var(--color-rf-flow), var(--color-rf-flow)) left center / 18px 1px no-repeat,
+      linear-gradient(var(--color-rf-flow), var(--color-rf-flow)) right center / 4px 4px no-repeat;
+  }
+
   .rf-prose h3 {
-    margin-top: 2em;
-    font-size: 1.15rem;
+    margin-top: 2.25em;
+    font-size: 1.3rem;
     font-weight: 500;
-    line-height: 1.35;
+    line-height: 1.3;
+    letter-spacing: -0.012em;
     color: var(--color-rf-warm);
   }
 
@@ -1460,15 +1559,16 @@
     color: var(--color-rf-slate);
   }
 
+  /* A rule, not a box. The takeaways panel is the one Navy "look here" in a
+     post; a callout is an aside, so it keeps only its left edge. */
   .rf-callout {
     margin-block: 2em;
-    padding: 1.1rem 1.35rem;
-    border: 1px solid var(--color-rf-hairline);
-    box-shadow: inset 3px 0 0 var(--color-rf-line);
+    padding: 0.2rem 0 0.2rem 1.35rem;
+    box-shadow: inset 2px 0 0 var(--color-rf-line);
   }
 
   .rf-callout[data-kind="warning"] {
-    box-shadow: inset 3px 0 0 var(--color-rf-flow);
+    box-shadow: inset 2px 0 0 var(--color-rf-flow);
   }
 
   .rf-callout-label {
@@ -1583,101 +1683,296 @@
     }
   }
 
-  /* --- Blog index, hubs, lists -------------------------------------------- */
+  /* The inline CTA: one line between hairlines, opened by the route tick. The
+     full pitch is the end band's; see `PostCTA`. */
+  .rf-post-cta-inline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+    margin-block: 2.75em 0;
+    padding-block: 1.1rem;
+    border-block: 1px solid var(--color-rf-hairline);
+  }
 
-  .rf-topic-chips {
+  .rf-post-cta-inline .rf-route-tick {
+    margin-top: 0;
+  }
+
+  .rf-post-cta-link {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-rf-warm);
+    text-decoration: underline;
+    text-decoration-color: var(--color-rf-flow);
+    text-underline-offset: 0.3em;
+    transition: color 0.2s ease;
+  }
+
+  @media (hover: hover) {
+    .rf-post-cta-link:hover {
+      color: var(--color-rf-flow-soft);
+    }
+  }
+
+  /* Tags on a post: a mono run separated by dots, not a row of boxes. The
+     bordered chip stays for the author's credential, the one fact worth
+     framing. */
+  .rf-post-main > .rf-tags .rf-tag {
+    padding: 0;
+    border: 0;
+  }
+
+  .rf-post-main > .rf-tags {
+    gap: 0.5rem 0;
+  }
+
+  .rf-post-main > .rf-tags .rf-tag + .rf-tag::before {
+    content: "·";
+    margin-inline: 0.7rem;
+    color: var(--color-rf-line);
+  }
+
+  /* Blog covers, tinted into the palette: greyscale, then Flow laid over in
+     `color` blend. A stock or engagement photo keeps its detail but stops
+     being the loudest, warmest thing on a Void page. Scoped to blog covers;
+     case-study art is generated in-palette already. */
+  .rf-blog-cover img {
+    filter: grayscale(1) contrast(1.08) brightness(0.8);
+  }
+
+  .rf-blog-cover::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--color-rf-flow);
+    mix-blend-mode: color;
+    opacity: 0.42;
+    pointer-events: none;
+  }
+
+  /* --- Blog index, topic and author lists ---------------------------------
+     After Profound's blog: pills over one list, rows separated by space
+     alone, round author avatars. No hairlines between sections or rows; the
+     divider-between-everything version read as rigid. */
+
+  .rf-blog-featured-wrap {
+    padding-block: clamp(0.5rem, 2vw, 1.5rem) clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .rf-blog-featured-grid {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .rf-blog-featured-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(1.5rem, 3vw, 2.5rem);
+    }
+  }
+
+  .rf-blog-featured {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .rf-blog-featured .rf-blog-cover {
+    margin-bottom: 0.5rem;
+  }
+
+  .rf-blog-featured-title {
+    max-width: 30ch;
+    font-size: clamp(1.3rem, 1.9vw, 1.6rem);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.018em;
+    color: var(--color-rf-warm);
+    text-wrap: balance;
+    transition: color 0.2s ease;
+  }
+
+  .rf-blog-archive {
+    padding-block: clamp(2rem, 4vw, 3rem) clamp(3rem, 6vw, 4.5rem);
+  }
+
+  /* Pills: fully round, the one exception to square controls, because a pill
+     reads as a filter at a glance. 44px targets. */
+  .rf-pills {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
   }
 
-  .rf-topic-chip {
+  .rf-pill {
     display: inline-flex;
     align-items: center;
     min-height: 44px;
-    padding-inline: 1rem;
+    padding-inline: 1.1rem;
     border: 1px solid var(--color-rf-hairline);
-    border-radius: 2px;
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    border-radius: 999px;
+    font-size: 0.875rem;
     color: var(--color-rf-slate);
-    transition: color 0.2s ease, border-color 0.2s ease;
+    transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
   }
 
-  .rf-topic-chip[aria-current="page"] {
-    color: var(--color-rf-warm);
-    box-shadow: inset 0 -2px 0 var(--color-rf-flow);
+  .rf-pill[aria-current="page"] {
+    border-color: var(--color-rf-warm);
+    background: var(--color-rf-warm);
+    color: var(--color-rf-void);
   }
 
-  .rf-topic-chip:active {
+  .rf-pill:active {
     border-color: var(--color-rf-flow);
   }
 
   @media (hover: hover) {
-    .rf-topic-chip:hover {
+    .rf-pill:not([aria-current]):hover {
       color: var(--color-rf-warm);
       border-color: var(--color-rf-slate);
     }
   }
 
-  .rf-topic-card {
-    display: block;
-    height: 100%;
-    padding: 1.35rem;
-    border: 1px solid var(--color-rf-hairline);
-    background: var(--color-rf-void);
-    transition: border-color 0.25s ease;
-  }
-
-  @media (hover: hover) {
-    .rf-topic-card:hover {
-      border-color: var(--color-rf-slate);
-    }
-  }
-
-  .rf-post-list {
-    border-top: 1px solid var(--color-rf-hairline);
-  }
-
-  .rf-post-row {
+  /* Two columns from md: rows read in pairs across, newest first along the
+     row, and the list fills the shell instead of leaving its right half
+     empty. One column on phones. */
+  .rf-blog-list {
     display: grid;
-    gap: 0.75rem;
-    padding-block: 1.6rem;
-    border-bottom: 1px solid var(--color-rf-hairline);
-  }
-
-  .rf-post-row-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem 1rem;
+    gap: clamp(2rem, 3.5vw, 2.75rem);
   }
 
   @media (min-width: 768px) {
-    .rf-post-row {
-      grid-template-columns: 11rem minmax(0, 1fr);
-      gap: 2rem;
-    }
-
-    .rf-post-row-meta {
-      flex-direction: column;
-      padding-top: 0.3rem;
+    .rf-blog-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: clamp(2rem, 4vw, 4rem);
     }
   }
 
-  .rf-post-row-title {
+  .rf-blog-row {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .rf-row-byline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.6rem;
+  }
+
+  .rf-avatar {
+    position: relative;
+    flex: none;
+    width: 24px;
+    height: 24px;
+    overflow: hidden;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px var(--color-rf-hairline);
+    background: var(--color-rf-navy);
+  }
+
+  .rf-avatar img {
+    object-fit: cover;
+  }
+
+  .rf-row-author {
+    font-size: 0.875rem;
+    color: var(--color-rf-warm);
+  }
+
+  .rf-row-sep {
+    margin-inline: 0.45rem;
+    color: var(--color-rf-line);
+  }
+
+  .rf-blog-row-title {
+    max-width: 44ch;
     transition: color 0.2s ease;
   }
 
+  .rf-blog-row-excerpt {
+    max-width: 64ch;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
   @media (hover: hover) {
-    .rf-post-row:hover .rf-post-row-title {
+    .rf-blog-row:hover .rf-blog-row-title,
+    .rf-blog-featured:hover .rf-blog-featured-title {
       color: var(--color-rf-flow-soft);
     }
   }
 
-  .rf-post-row:focus-visible .rf-post-row-title {
+  .rf-blog-row:focus-visible .rf-blog-row-title,
+  .rf-blog-featured:focus-visible .rf-blog-featured-title {
     color: var(--color-rf-flow-soft);
+  }
+
+  /* The newsletter as one Navy panel: the page's single tonal step. */
+  .rf-blog-newsletter-wrap {
+    padding-block: clamp(1rem, 3vw, 2rem) clamp(4rem, 7vw, 6rem);
+  }
+
+  .rf-blog-newsletter {
+    padding: clamp(1.75rem, 4vw, 3.5rem);
+    background: var(--color-rf-navy);
+  }
+
+  .rf-newsletter-split {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .rf-newsletter-split {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: clamp(2.5rem, 4vw, 4rem);
+      align-items: end;
+    }
+
+    .rf-newsletter-split .rf-newsletter-body {
+      margin-top: 0;
+    }
+  }
+
+  /* Explore with AI, under the post byline. */
+  .rf-explore-ai {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    flex-basis: 100%;
+  }
+
+  @media (min-width: 640px) {
+    .rf-byline:has(.rf-byline-portrait) .rf-explore-ai {
+      margin-left: calc(44px + 1.25rem);
+    }
+  }
+
+  /* --- Blog softness ------------------------------------------------------
+     Blog-scoped, approved by the owner: round avatars and pills, and a 6–8px
+     radius on the blog's images, panels, fields and controls. The rest of the
+     site stays square. Opt-in with `.rf-soft` on the page wrapper. */
+  .rf-soft .rf-blog-cover,
+  .rf-soft .rf-blog-newsletter,
+  .rf-soft .rf-takeaways,
+  .rf-soft .rf-figure-steps ol,
+  .rf-soft .rf-figure-bars ul,
+  .rf-soft .rf-video,
+  .rf-soft .rf-figure-frame,
+  .rf-soft .rf-prose pre,
+  .rf-soft .rf-post-cover .rf-case-cover {
+    border-radius: 8px;
+  }
+
+  .rf-soft .rf-input,
+  .rf-soft .rf-cta-primary,
+  .rf-soft .rf-cta-secondary,
+  .rf-soft .rf-read-control {
+    border-radius: 6px;
   }
 
   .rf-pager {

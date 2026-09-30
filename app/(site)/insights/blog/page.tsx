@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import BlogCard from "@/components/BlogCard";
 import { PAGE_SIZE, PostList, TopicChips } from "@/components/BlogArchive";
+import { BlogFeatured } from "@/components/BlogCard";
 import ClosingCTA from "@/components/ClosingCTA";
 import DitherReveal from "@/components/DitherReveal";
 import NewsletterSignup from "@/components/NewsletterSignup";
 import PageHeader from "@/components/PageHeader";
 import { getPosts } from "@/lib/blog.server";
-import { BLOG_TOPICS } from "@/lib/content/blog-topics";
+import { FEATURED_SLOTS } from "@/lib/content/blog";
 import { breadcrumbJsonLd, pageMetadata, serializeJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: "Blog",
   description:
-    "Field notes from RegainFlow's engineers on getting AI into production in government and regulated organizations: retrieval and evaluation, enablement, procurement, and what stalls between the pilot and the system.",
+    "Posts by RegainFlow's engineers on production AI, retrieval and data, and AI in the public sector, from work in government, aerospace and regulated enterprise.",
   path: "/insights/blog",
   feed: true,
 });
@@ -23,10 +23,17 @@ export const metadata: Metadata = pageMetadata({
 export const dynamic = "force-dynamic";
 
 /**
- * The blog index, as a hub rather than a feed (`docs/blogs_seo/blog_seo.md`,
- * section 5): a "Start here" row of featured pieces, the newsletter signup
- * (UX doc Part 4: one block, right after the featured posts), the three topic
- * clusters with their own intros, then the latest posts as a dense list.
+ * The blog index, after Profound's (tryprofound.com/blog):
+ *
+ * - a plain "Blog" header with one line under it and the RSS link;
+ * - up to two featured posts, side by side;
+ * - topic pills, each its own URL, then every post newest first as rows
+ *   separated by space alone: one way to browse;
+ * - the newsletter panel at the end.
+ *
+ * Earlier versions had a Topics band plus a "Latest" list (two ways to browse
+ * the same posts) and a hairline between every block; both read as confusing
+ * and rigid. The page sits in `.rf-soft`, the blog-scoped softer shape.
  *
  * A static segment beside `insights/[slug]`, as `reports` is. Static segments
  * resolve first, so `blog` is a slug no case study can use — and under it,
@@ -35,14 +42,22 @@ export const dynamic = "force-dynamic";
 export default async function BlogPage() {
   // Degrades to `[]` on a Supabase failure and lands in the empty state.
   const posts = await getPosts();
-  const featured = posts.filter((post) => post.featured).slice(0, 3);
+  const featured = posts.filter((post) => post.featured).slice(0, FEATURED_SLOTS);
 
   return (
-    <>
+    <div className="rf-soft">
       <PageHeader
-        eyebrow="Blog"
-        title="Field notes on putting AI into production."
-        lead="Written by the engineers doing the work, from engagements in government, aerospace and regulated enterprise. What we measured, what stalled, and what we would do again."
+        open
+        eyebrow="Insights"
+        title="Blog"
+        lead="Posts by the RegainFlow engineers, from work in government, aerospace and regulated enterprise."
+        meta={
+          <p className="mt-5">
+            <a href="/insights/blog/feed.xml" className="rf-nav-link rf-utility">
+              RSS feed
+            </a>
+          </p>
+        }
       />
 
       {posts.length === 0 ? (
@@ -65,20 +80,16 @@ export default async function BlogPage() {
       ) : (
         <>
           {featured.length > 0 ? (
-            <section className="rf-section" aria-labelledby="start-here">
-              <div className="rf-shell rf-band-tight">
-                <h2 id="start-here" className="rf-eyebrow">
-                  Start here
+            <section className="rf-section rf-section-open" aria-labelledby="featured">
+              <div className="rf-shell rf-blog-featured-wrap">
+                <h2 id="featured" className="rf-eyebrow">
+                  Featured
                 </h2>
-                <ul className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <ul className="rf-blog-featured-grid mt-6">
                   {featured.map((post, i) => (
-                    <li key={post.slug} className="h-full">
-                      <DitherReveal className="h-full" delay={(i % 3) * 90}>
-                        <BlogCard
-                          post={post}
-                          surface="blog_featured"
-                          priority={i === 0}
-                        />
+                    <li key={post.slug}>
+                      <DitherReveal delay={i * 90}>
+                        <BlogFeatured post={post} priority={i === 0} />
                       </DitherReveal>
                     </li>
                   ))}
@@ -87,56 +98,29 @@ export default async function BlogPage() {
             </section>
           ) : null}
 
-          <div className="rf-section">
-            <div className="rf-shell rf-band-tight">
-              <NewsletterSignup source="blog_index" />
-            </div>
-          </div>
-
-          <section className="rf-section bg-rf-navy" aria-labelledby="topics">
-            <div className="rf-shell rf-band-tight">
-              <h2 id="topics" className="rf-eyebrow">
-                Topics
+          <section className="rf-section rf-section-open" aria-labelledby="all-posts">
+            <div className="rf-shell rf-blog-archive">
+              <h2 id="all-posts" className="rf-h2">
+                All posts
               </h2>
-              <ul className="mt-8 grid gap-4 md:grid-cols-3">
-                {BLOG_TOPICS.map((topic) => (
-                  <li key={topic.slug}>
-                    <Link
-                      href={`/insights/blog/topics/${topic.slug}`}
-                      className="rf-topic-card"
-                    >
-                      <span className="rf-h3">{topic.name}</span>
-                      <span className="rf-body mt-3 block">{topic.hint}</span>
-                      <span className="rf-nav-link mt-5 inline-block">
-                        Browse the topic &rarr;
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
-
-          <section className="rf-section" aria-labelledby="latest">
-            <div className="rf-shell rf-band">
-              <div className="flex flex-wrap items-end justify-between gap-6">
-                <h2 id="latest" className="rf-h2">
-                  Latest
-                </h2>
+              <div className="mt-6">
                 <TopicChips />
               </div>
-              <div className="mt-8">
+              <div className="mt-10">
                 <PostList
                   posts={posts.slice(0, PAGE_SIZE)}
                   page={1}
                   total={posts.length}
                 />
               </div>
-              <p className="mt-8">
-                <a href="/insights/blog/feed.xml" className="rf-nav-link">
-                  RSS feed &rarr;
-                </a>
-              </p>
+            </div>
+          </section>
+
+          <section className="rf-section rf-section-open" aria-label="Newsletter">
+            <div className="rf-shell rf-blog-newsletter-wrap">
+              <div className="rf-blog-newsletter">
+                <NewsletterSignup source="blog_index" layout="split" />
+              </div>
             </div>
           </section>
         </>
@@ -155,6 +139,6 @@ export default async function BlogPage() {
           ),
         }}
       />
-    </>
+    </div>
   );
 }

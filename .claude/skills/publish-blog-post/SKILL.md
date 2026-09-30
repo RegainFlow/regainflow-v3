@@ -76,6 +76,12 @@ Before outlining, go back on what the interview left soft:
 
 Propose: the title (specific, leads with the topic), the one-sentence answer the post opens with, the H2s (each one readable as a standalone summary), where each image and figure goes, the takeaways, and the links. Wait for a yes before drafting.
 
+For **research and data posts**, follow the pattern Profound uses on its research posts (tryprofound.com/blog), which AI assistants cite well:
+- a **question title** ("Where do AI citations come from?") with a one-line summary that states the finding;
+- the **answer in the first sentence** of the body;
+- takeaways written as **findings**, because they render as a numbered TL;DR (`01`, `02`…);
+- a **How we measured** section: data, sample size, time window, method, limits. Start from `assets/research-template.md`.
+
 ### 5. Draft
 
 Write `.blog/<slug>/post.md` from `assets/post-template.md`:

@@ -10,10 +10,10 @@
 | `author` | yes | `will-baltus` or `leo-ramirez` | A real byline linked to an author page is a core trust signal. |
 | `topic` | yes | `production-ai`, `retrieval-and-data`, `public-sector-ai` | Places the post in its cluster hub and breadcrumb. |
 | `tags` | no | up to 6 | Shown as chips and in `article:tag`. No tag pages exist, deliberately. |
-| `takeaways` | yes | 3–5 claims, none repeated verbatim in the body | The key-takeaways box near the top. Repetition costs attention (NZZ). |
+| `takeaways` | yes | 3–5 findings, none repeated verbatim in the body | The numbered TL;DR under the title (`01`, `02`…). Write them as findings. Repetition costs attention (NZZ). |
 | `related` | no | up to 5 published slugs, in order | "Keep reading". Relevance beats volume. |
 | `cta` | no | `{eyebrow, heading, body, label, href}`; href `/…` or `https://…` | Shown after the first section and at the end. Null means the free assessment. |
-| `featured` | no | boolean | "Start here" on the index shows three. |
+| `featured` | no | boolean | The index features the newest two (`FEATURED_SLOTS` in `lib/content/blog.ts`). A third featured post drops the oldest from that row. |
 | `pillar` | no | boolean; one per topic | The post the topic hub leads with. |
 | `published` | no | `YYYY-MM-DD` | First-publish date; default today. Ignored on `--replace`. |
 | `meta_title` | no | about 60 characters or fewer | Only when the H1 is too long or too clever for a results page. |

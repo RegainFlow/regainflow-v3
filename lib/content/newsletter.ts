@@ -11,8 +11,8 @@
  */
 export const NEWSLETTER = {
   eyebrow: "Newsletter",
-  heading: "New field notes, by email.",
-  body: "Each new post and report from the engineers doing the work, sent when it is published. Nothing else, and one click to leave.",
+  heading: "Get new posts by email.",
+  body: "We send each new post and report when it is published, and nothing else. Every email has a one-click unsubscribe.",
   label: "Subscribe",
 } as const;
 

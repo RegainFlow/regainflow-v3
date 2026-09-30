@@ -63,7 +63,7 @@ export async function GET() {
     <title>${xml(`${SITE_NAME} Blog`)}</title>
     <link>${SITE_URL}/insights/blog</link>
     <atom:link href="${self}" rel="self" type="application/rss+xml" />
-    <description>Field notes from RegainFlow's engineers on putting AI into production.</description>
+    <description>Posts by RegainFlow's engineers on production AI, retrieval and data, and public-sector AI.</description>
     <language>en-us</language>
     <managingEditor>${CONTACT_EMAIL} (${xml(SITE_NAME)})</managingEditor>
 ${latest ? `    <lastBuildDate>${rfc822(latest)}</lastBuildDate>\n` : ""}${items}

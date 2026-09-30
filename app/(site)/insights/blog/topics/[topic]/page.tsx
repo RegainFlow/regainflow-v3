@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import BlogCard from "@/components/BlogCard";
 import { PostList, TopicChips } from "@/components/BlogArchive";
 import ClosingCTA from "@/components/ClosingCTA";
 import PageHeader from "@/components/PageHeader";
@@ -35,10 +34,10 @@ export async function generateMetadata({
 }
 
 /**
- * A topic hub: a curated category page worth indexing on its own. It leads
- * with a unique intro and the topic's pillar post, then lists every post in
- * the cluster — the pillar-and-cluster structure the SEO research recommends,
- * and the constructive alternative to a thin tag archive.
+ * A topic hub: the index filtered to one topic (its pill is active), with the
+ * topic's own intro as the lead so the page is worth indexing on its own. The
+ * pillar is listed first and marked "Read first": the pillar-and-cluster
+ * structure the SEO research recommends, not a thin tag archive.
  */
 export default async function TopicPage({
   params,
@@ -49,39 +48,33 @@ export default async function TopicPage({
   if (!topic) notFound();
 
   const posts = await getPosts({ topic: topic.slug });
+  // The pillar leads, marked "Read first"; the rest follow newest first.
   const pillar = posts.find((post) => post.pillar);
-  const rest = posts.filter((post) => post !== pillar);
+  const ordered = pillar ? [pillar, ...posts.filter((post) => post !== pillar)] : posts;
 
   return (
-    <>
-      <PageHeader eyebrow="Blog · Topic" title={topic.name} lead={topic.intro} />
+    <div className="rf-soft">
+      <PageHeader open eyebrow="Blog" title={topic.name} lead={topic.intro} />
 
-      {pillar ? (
-        <section className="rf-section" aria-labelledby="pillar">
-          <div className="rf-shell rf-band-tight">
-            <h2 id="pillar" className="rf-eyebrow">
-              Start with
-            </h2>
-            <div className="mt-8 max-w-[44rem]">
-              <BlogCard post={pillar} surface="blog_topic" priority />
-            </div>
-          </div>
-        </section>
-      ) : null}
-
-      <section className="rf-section" aria-labelledby="in-topic">
-        <div className="rf-shell rf-band">
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <h2 id="in-topic" className="rf-h2">
-              {pillar ? "More in this topic" : "Posts"}
-            </h2>
-            <TopicChips current={topic.slug} />
-          </div>
-          <div className="mt-8">
-            {rest.length > 0 ? (
-              <PostList posts={rest} page={1} total={rest.length} />
+      <section className="rf-section rf-section-open" aria-labelledby="in-topic">
+        <div className="rf-shell rf-blog-archive">
+          <h2 id="in-topic" className="sr-only">
+            Posts in {topic.name}
+          </h2>
+          <TopicChips current={topic.slug} />
+          <div className="mt-10">
+            {ordered.length > 0 ? (
+              <PostList
+                posts={ordered}
+                page={1}
+                total={ordered.length}
+                surface="blog_topic"
+                showTopic={false}
+                paginate={false}
+                {...(pillar ? { readFirst: pillar.slug } : {})}
+              />
             ) : (
-              <p className="rf-body">More posts in this topic are on the way.</p>
+              <p className="rf-body">Posts in this topic are on the way.</p>
             )}
           </div>
         </div>
@@ -106,6 +99,6 @@ export default async function TopicPage({
           __html: serializeJsonLd(topicCollectionJsonLd(topic, posts)),
         }}
       />
-    </>
+    </div>
   );
 }

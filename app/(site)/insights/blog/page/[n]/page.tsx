@@ -49,10 +49,10 @@ export default async function BlogArchivePage({
 
   return (
     <>
-      <PageHeader eyebrow="Blog" title={`Older posts — page ${page}`} lead="Everything we have written, newest first." />
+      <PageHeader open eyebrow="Blog" title={`Page ${page}`} lead="Every post, newest first." />
 
-      <section className="rf-section">
-        <div className="rf-shell rf-band">
+      <section className="rf-section rf-section-open rf-soft">
+        <div className="rf-shell rf-blog-archive">
           <TopicChips />
           <div className="mt-8">
             <PostList

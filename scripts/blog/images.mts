@@ -102,7 +102,7 @@ export function imageSize(bytes: Uint8Array): { width: number; height: number } 
 /**
  * The house preamble for a generated blog cover. The case study's, adjusted
  * for where a blog cover is shown: `.rf-case-cover` at 16:9 only (the post
- * page and the "Start here" cards), so the 3:2 frame loses a strip from the
+ * page and the featured cards on the index), so the 3:2 frame loses a strip from the
  * top and bottom, not the case study's 21:9 band.
  *
  * A generated cover is the fallback. The skill asks for real imagery first,

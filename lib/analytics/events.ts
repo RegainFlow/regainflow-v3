@@ -87,6 +87,8 @@ export const RF_EVENTS = {
   blogPostShared: "blog_post_shared",
   /** Reading mode switched on a post. Carries `theme`. */
   readingModeChanged: "reading_mode_changed",
+  /** "Ask ChatGPT" / "Ask Claude" on a post. `target` names the assistant. */
+  blogExploreAi: "blog_explore_ai",
   /** A video facade in a post, pressed. Carries `video` (the YouTube id). */
   blogVideoPlayed: "blog_video_played",
   /**

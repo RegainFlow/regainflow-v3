@@ -65,6 +65,18 @@ export function postDate(date: string): string {
   });
 }
 
+/** Featured posts shown at the top of the blog index. The publishing checks
+ *  warn when a post would push one off this row. */
+export const FEATURED_SLOTS = 2;
+
+/** "16 Sep, 2026": the compact form list rows use beside the author. */
+export function postDateShort(date: string): string {
+  const d = new Date(`${date}T00:00:00Z`);
+  const day = d.getUTCDate();
+  const month = d.toLocaleDateString("en-US", { month: "short", timeZone: "UTC" });
+  return `${day} ${month}, ${d.getUTCFullYear()}`;
+}
+
 /** Words in the prose, ignoring fenced figure blocks and link targets. */
 export function countWords(body: string): number {
   return body

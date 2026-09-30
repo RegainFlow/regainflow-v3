@@ -30,21 +30,21 @@ export const BLOG_TOPICS: BlogTopic[] = [
     name: "Production AI",
     hint: "Getting from a working pilot to a system people run",
     intro:
-      "Most AI work does not fail in the lab. It stalls between the demo and the day an operations team owns it. These posts are about that gap: ownership, failure handling, enablement, and the engineering nobody puts in the pitch.",
+      "Most AI work stalls between the demo and the day an operations team owns it. These posts cover that stretch: ownership, failure handling, enablement, and the unglamorous engineering a pilot skips.",
   },
   {
     slug: "retrieval-and-data",
     name: "Retrieval & Data",
     hint: "RAG, evaluation, and the document pipelines underneath",
     intro:
-      "A retrieval system is only as good as what survives ingestion. These posts cover how we evaluate document processing, retrieval and answers on real technical material, and what changes when a knowledge assistant starts taking actions.",
+      "Retrieval quality is mostly decided at ingestion. These posts cover how we evaluate document processing, retrieval and answers on real technical material, and what changes when a knowledge assistant starts taking actions.",
   },
   {
     slug: "public-sector-ai",
     name: "Public-Sector AI",
     hint: "Procurement, readiness, and governance for agencies",
     intro:
-      "Public agencies buy and run AI under constraints a startup never sees: procurement law, records retention, public scrutiny, and staff who already have full-time jobs. These posts are written for the people inside those constraints.",
+      "Agencies buy and run AI under procurement law, records retention and public scrutiny, with staff who already have full-time jobs. These posts are for the people working inside those rules.",
   },
 ];
 

@@ -37,7 +37,7 @@ lockfile that ships.
 | `/insights/[slug]`                                             | One case study in full: context, constraints, our role, what we engineered, outcome, what next  |
 | `/insights/reports`                                            | Published reports. Renders an empty state until the first is authored                           |
 | `/insights/reports/[slug]`                                     | One report: cover, findings, audio overview, and the email gate in front of the PDF             |
-| `/insights/blog`                                               | Blog hub: "Start here", newsletter signup, topic clusters, latest posts. Pages at `/insights/blog/page/[n]` |
+| `/insights/blog`                                               | Blog index: two featured posts, topic pills, every post newest first (two columns), newsletter. Pages at `/insights/blog/page/[n]` |
 | `/insights/blog/[slug]`                                        | One post. Template in `components/BlogPostView.tsx`, laid out to `docs/blogs_seo/`             |
 | `/insights/blog/topics/[topic]`, `/insights/blog/authors/[slug]` | Topic hubs (pillar first) and author pages                                                   |
 | `/insights/blog/preview/[slug]?token=…`                        | Draft preview for `pnpm blog stage`. `noindex`; 404 without `BLOG_PREVIEW_TOKEN`                |

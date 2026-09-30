@@ -20,6 +20,8 @@ import {
   parseVideo,
 } from "../../lib/blog-figures";
 
+import { FEATURED_SLOTS } from "../../lib/content/blog";
+
 import {
   RESERVED_SLUGS,
   bodyImages,
@@ -233,8 +235,11 @@ export function checkPost(payload: BlogPayload, ctx: CheckContext): Findings {
   if (payload.pillar && pillar) {
     warnings.push(`"${pillar.slug}" is already this topic's pillar; the hub leads with only one`);
   }
-  if (payload.featured && others.filter((post) => post.featured).length >= 3) {
-    warnings.push("three posts are already featured, and \"Start here\" shows three: one of them will drop off");
+  const featuredCount = others.filter((post) => post.featured).length;
+  if (payload.featured && featuredCount >= FEATURED_SLOTS) {
+    warnings.push(
+      `${featuredCount} posts are already featured and the index shows ${FEATURED_SLOTS}: the oldest drops off the featured row (it stays in the list)`,
+    );
   }
 
   // --- Sources and names ---------------------------------------------------

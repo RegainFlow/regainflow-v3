@@ -4,6 +4,7 @@ import Link from "next/link";
 import AuthorBox from "@/components/AuthorBox";
 import BlogCard from "@/components/BlogCard";
 import BlogToc from "@/components/BlogToc";
+import ExploreWithAI from "@/components/ExploreWithAI";
 import Markdown from "@/components/Markdown";
 import NewsletterSignup from "@/components/NewsletterSignup";
 import PostCTA from "@/components/PostCTA";
@@ -36,7 +37,8 @@ export const cardPath = (slug: string) => `/insights/blog/${slug}/card.png`;
 /**
  * A blog post, laid out to `docs/blogs_seo/blog_ui_ux.md`.
  *
- * - **First screen:** title, deck, byline and dates, then the key takeaways —
+ * - **First screen:** title, deck, byline and dates, Explore with AI, then the
+ *   numbered TL;DR —
  *   and the body starts inside the first viewport on a phone. No full-bleed
  *   hero: a cover, where there is one, sits *below* the takeaways.
  * - **Navigation:** a sticky TOC rail on desktop; an in-content "On this page"
@@ -73,7 +75,7 @@ export default function BlogPostView({
   const url = `${SITE_URL}/insights/blog/${post.slug}`;
 
   return (
-    <div className="rf-read" data-theme="dark" suppressHydrationWarning>
+    <div className="rf-read rf-soft" data-theme="dark" suppressHydrationWarning>
       <script dangerouslySetInnerHTML={{ __html: READ_THEME_SCRIPT }} />
 
       {preview ? (
@@ -83,7 +85,7 @@ export default function BlogPostView({
       ) : null}
 
       <article className="rf-article rf-post">
-        <header className="rf-section">
+        <header className="rf-section rf-section-open">
           <div className="rf-shell rf-post-head">
             <nav aria-label="Breadcrumb">
               <ol className="rf-crumbs rf-utility">
@@ -150,6 +152,7 @@ export default function BlogPostView({
                 <ReadingModeToggle />
                 <ShareButton title={post.title} url={url} />
               </div>
+              {preview ? null : <ExploreWithAI url={url} />}
             </div>
           </div>
         </header>
@@ -163,35 +166,52 @@ export default function BlogPostView({
             ) : null}
 
             <div className="rf-post-main">
+              {/* The TL;DR: numbered findings, as Profound's research posts
+                  run them. The same Navy panel as before; the numbers give a
+                  scanner a count and an order to talk about. */}
               {post.takeaways.length > 0 ? (
                 <section className="rf-takeaways" aria-labelledby="takeaways">
                   <h2 id="takeaways" className="rf-utility">
-                    Key takeaways
+                    TL;DR
                   </h2>
-                  <ul>
-                    {post.takeaways.map((takeaway) => (
-                      <li key={takeaway}>{takeaway}</li>
-                    ))}
-                  </ul>
-                </section>
-              ) : null}
-
-              {showToc ? (
-                <nav className="rf-toc-inline" aria-label="On this page">
-                  <p className="rf-utility">On this page</p>
                   <ol>
-                    {tocEntries.map((entry) => (
-                      <li key={entry.id}>
-                        <a href={`#${entry.id}`}>{entry.text}</a>
+                    {post.takeaways.map((takeaway, i) => (
+                      <li key={takeaway}>
+                        <span className="rf-index" aria-hidden="true">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <span>{takeaway}</span>
                       </li>
                     ))}
                   </ol>
-                </nav>
+                </section>
+              ) : null}
+
+              {/* Below lg, folded: open, the list pushed the first paragraph
+                  more than two screens down on a phone. A native <details> in
+                  the flow, not the pinned collapsed bar NN/g found nobody
+                  notices, and its links are in the server output either way. */}
+              {showToc ? (
+                <details className="rf-toc-inline rf-disclosure">
+                  <summary className="rf-disclosure-summary">
+                    <span className="rf-disclosure-marker" aria-hidden="true" />
+                    On this page ({tocEntries.length})
+                  </summary>
+                  <nav aria-label="On this page">
+                    <ol>
+                      {tocEntries.map((entry) => (
+                        <li key={entry.id}>
+                          <a href={`#${entry.id}`}>{entry.text}</a>
+                        </li>
+                      ))}
+                    </ol>
+                  </nav>
+                </details>
               ) : null}
 
               {post.cover ? (
                 <figure className="rf-figure rf-post-cover">
-                  <div className="rf-case-cover">
+                  <div className="rf-case-cover rf-blog-cover">
                     <Image
                       src={post.cover}
                       alt={post.coverAlt ?? ""}

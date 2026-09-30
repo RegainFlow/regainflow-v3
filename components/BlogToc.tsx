@@ -5,8 +5,11 @@ import { useEffect, useState } from "react";
 import type { TocEntry } from "@/lib/blog-toc";
 
 /**
- * The desktop table of contents: a sticky rail beside the article, with the
- * section being read marked.
+ * The desktop table of contents: a sticky rail beside the article, drawn as a
+ * route. Each section is a node; the route fills in Flow up to the section
+ * being read, and every node already passed is filled. The site's diagram
+ * vocabulary (`docs/DESIGN.md`, "Adding a diagram") applied to reading
+ * progress: the reader's position becomes a drawn path.
  *
  * Server-rendered as a plain list of anchor links, so it works before and
  * without JavaScript; the observer only adds the active marker. On mobile this
@@ -42,12 +45,14 @@ export default function BlogToc({ entries }: { entries: TocEntry[] }) {
     return () => observer.disconnect();
   }, [entries]);
 
+  const activeIndex = entries.findIndex((entry) => entry.id === active);
+
   return (
     <nav className="rf-toc" aria-label="On this page">
       <p className="rf-utility">On this page</p>
       <ol>
-        {entries.map((entry) => (
-          <li key={entry.id}>
+        {entries.map((entry, i) => (
+          <li key={entry.id} data-passed={i < activeIndex || undefined}>
             <a
               href={`#${entry.id}`}
               aria-current={active === entry.id ? "location" : undefined}

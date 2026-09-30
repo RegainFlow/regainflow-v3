@@ -39,15 +39,34 @@ export default function PostCTA({
     "data-rf-target": cta.href,
   };
 
+  // Inline, one line: the route tick, the offer's label and a link. The full
+  // pitch (heading, body, button) is the end band's. Rendering both in full
+  // printed the same heading and paragraph twice on one page, and turned the
+  // body into a run of identical Navy boxes.
+  if (placement === "inline") {
+    const link = { ...props, className: "rf-post-cta-link" };
+
+    return (
+      <aside className="rf-post-cta-inline" aria-label={cta.eyebrow}>
+        <span className="rf-route-tick" aria-hidden="true" />
+        <p className="rf-eyebrow">{cta.eyebrow}</p>
+        {external ? (
+          <a href={cta.href} {...link}>
+            {cta.label}&nbsp;&rarr;
+          </a>
+        ) : (
+          <Link href={cta.href} {...link}>
+            {cta.label}&nbsp;&rarr;
+          </Link>
+        )}
+      </aside>
+    );
+  }
+
   return (
-    <aside
-      className={placement === "inline" ? "rf-post-cta" : "rf-post-cta rf-post-cta-end"}
-      aria-label={cta.eyebrow}
-    >
+    <aside className="rf-post-cta rf-post-cta-end" aria-label={cta.eyebrow}>
       <p className="rf-eyebrow">{cta.eyebrow}</p>
-      <p className={placement === "inline" ? "rf-h3 mt-3" : "rf-h2 mt-4 max-w-[24ch]"}>
-        {cta.heading}
-      </p>
+      <p className="rf-h2 mt-4 max-w-[24ch]">{cta.heading}</p>
       <p className="rf-post-cta-body">{cta.body}</p>
       <p className="mt-6">
         {external ? (

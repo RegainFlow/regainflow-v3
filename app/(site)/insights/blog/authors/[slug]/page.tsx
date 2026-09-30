@@ -49,8 +49,8 @@ export default async function AuthorPage({
   const path = `/insights/blog/authors/${member.slug}`;
 
   return (
-    <>
-      <section className="rf-section">
+    <div className="rf-soft">
+      <section className="rf-section rf-section-open">
         <div className="rf-shell rf-band-lead rf-grid gap-y-10">
           <div className="col-span-full lg:col-span-3">
             {/* Sized like the portraits on `/company`: intrinsic 4/5
@@ -100,14 +100,20 @@ export default async function AuthorPage({
         </div>
       </section>
 
-      <section className="rf-section bg-rf-navy" aria-labelledby="posts">
-        <div className="rf-shell rf-band">
+      <section className="rf-section rf-section-open" aria-labelledby="posts">
+        <div className="rf-shell rf-blog-archive">
           <h2 id="posts" className="rf-h2">
             Posts by {member.name.split(" ")[0]}
           </h2>
           <div className="mt-8">
             {posts.length > 0 ? (
-              <PostList posts={posts} page={1} total={posts.length} />
+              <PostList
+                posts={posts}
+                page={1}
+                total={posts.length}
+                surface="blog_author"
+                paginate={false}
+              />
             ) : (
               <p className="rf-body">Nothing published yet.</p>
             )}
@@ -134,6 +140,6 @@ export default async function AuthorPage({
           __html: serializeJsonLd(authorProfileJsonLd(member, posts.length)),
         }}
       />
-    </>
+    </div>
   );
 }

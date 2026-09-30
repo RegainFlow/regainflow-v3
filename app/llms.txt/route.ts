@@ -216,7 +216,7 @@ function build(
     lines.push(`[${SITE_URL}/insights/blog]`);
     lines.push("");
     lines.push(
-      "Field notes by RegainFlow's founders, grounded in the engagements above. Posts carry no client names and no performance figures RegainFlow has not measured."
+      "Posts by RegainFlow's founders, grounded in the engagements above. Posts carry no client names and no performance figures RegainFlow has not measured."
     );
     lines.push("");
     for (const topic of BLOG_TOPICS) {

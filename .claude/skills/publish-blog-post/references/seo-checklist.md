@@ -37,6 +37,15 @@ Distilled from `docs/blogs_seo/blog_seo.md` and `blog_ui_ux.md`. Evidence tiers:
 - **[G] Meta description:** unique and accurate, about 120–160 characters. A click aid, not a ranking factor.
 - **[G] Slug:** short, readable, no dates; never changed without a redirect.
 
+## Practitioner examples: Profound (tryprofound.com/blog)
+
+An AEO company's own blog, observed September 2026. Useful patterns, not evidence:
+- **Question titles** on research posts, and a one-line summary that states the finding.
+- **A numbered TL;DR** of findings under the title, then the answer in the first sentence.
+- **A methodology section** on every data post (data, size, method, limits).
+- **Explore with AI** links (ChatGPT, Claude) near the top. Our posts have them.
+- **Index:** one list, newest first, with topic pills, and rows separated by space and carrying author avatars. Our blog follows this.
+
 ## Myths to ignore (Google, May 2026)
 
 llms.txt for Google, "chunking" for AI, AI-specific rewrites for every long-tail variant, special schema, FAQ markup for rich results (retired May 7, 2026). Clear sections still help readers; that is the only reason to write them.

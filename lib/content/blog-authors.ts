@@ -18,6 +18,9 @@ export interface BlogAuthor {
   href?: string;
 }
 
+/** The RF app icon, for posts bylined to the organization. */
+export const ORG_AVATAR = "/brand/regainflow-icon-180.png";
+
 export function authorPath(slug: string): string {
   return `/insights/blog/authors/${slug}`;
 }
@@ -25,7 +28,9 @@ export function authorPath(slug: string): string {
 export function resolveAuthor(slug: string): BlogAuthor {
   const member = authorBySlug(slug);
 
-  if (!member) return { name: SITE_NAME };
+  // The organization's avatar is the app icon, so a list row never shows an
+  // empty circle. Still no author page: there is no person to back it.
+  if (!member) return { name: SITE_NAME, image: ORG_AVATAR };
 
   return {
     member,

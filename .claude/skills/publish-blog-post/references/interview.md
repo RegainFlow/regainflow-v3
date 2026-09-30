@@ -21,12 +21,20 @@ At least one of these must be real, or the post is not written:
 
 Follow-ups: *Which team? Which week? What did the log/metric/reviewer actually say? What would you do differently?*
 
+## Round 2b: how it was measured (research and data posts)
+
+- What data, from where, and how much of it (documents, queries, systems, weeks)?
+- Over what time window?
+- How was it measured or scored, and by whom?
+- What does it not show? The limits go in the post.
+- Can the method be described without naming the client? If not, stop.
+
 ## Round 3: placement
 
 5. **Author.** `will-baltus` (William J. Baltus) or `leo-ramirez` (Leonardo J. Ramirez). The byline is the person who reviewed it and will stand behind it.
 6. **Topic cluster.** Run `pnpm blog:prod list`, then offer `production-ai`, `retrieval-and-data` or `public-sector-ai`. A post that fits none is a signal: either a new cluster (a code change to `lib/content/blog-topics.ts`, and only once there are posts to fill it) or the wrong post.
 7. **Pillar or cluster?** A pillar is the one comprehensive post a topic hub leads with. Most posts are cluster posts that link to the pillar.
-8. **Featured?** "Start here" shows three. Featuring a new post drops one.
+8. **Featured?** The index shows two featured posts side by side. Featuring a new post pushes the older one off the row (it stays in the list).
 9. **Links out.** Which 2–5 existing posts, case studies, reports or service pages does this build on? Offer candidates from `pnpm blog:prod list`, `/insights` and `/services`.
 10. **Links in.** Which existing pages should link *to* this post once it is live?
 

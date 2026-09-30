@@ -12,18 +12,19 @@ export function pageCount(total: number): number {
 }
 
 /**
- * Topic chips — the blog's only taxonomy navigation. Three curated clusters
- * rather than a tag cloud, because the research is blunt that a tag cloud is
- * decoration and a thin tag archive is an SEO liability.
+ * Topic pills: the blog's one piece of taxonomy navigation, the way Profound
+ * browses its blog. Each pill is its own URL (the index, or a topic hub), so
+ * filtering is crawlable and needs no JavaScript. Three curated topics rather
+ * than a tag cloud: a thin tag archive is an SEO liability.
  */
 export function TopicChips({ current }: { current?: string }) {
   return (
     <nav aria-label="Blog topics">
-      <ul className="rf-topic-chips">
+      <ul className="rf-pills">
         <li>
           <Link
             href="/insights/blog"
-            className="rf-topic-chip"
+            className="rf-pill"
             aria-current={current ? undefined : "page"}
           >
             All posts
@@ -33,7 +34,7 @@ export function TopicChips({ current }: { current?: string }) {
           <li key={topic.slug}>
             <Link
               href={`/insights/blog/topics/${topic.slug}`}
-              className="rf-topic-chip"
+              className="rf-pill"
               aria-current={current === topic.slug ? "page" : undefined}
             >
               {topic.name}
@@ -46,34 +47,51 @@ export function TopicChips({ current }: { current?: string }) {
 }
 
 /**
- * The "Latest" list with sequential, crawlable pagination: every page is a
- * real URL with a self-referencing canonical, linked with plain `<a href>`, as
- * Google's pagination guidance asks. Links render only when there is more than
- * one page.
+ * Every post, newest first, as rows separated by space alone, with sequential,
+ * crawlable pagination: every page is a real URL with a self-referencing
+ * canonical, linked with plain `<a href>`, as Google's pagination guidance
+ * asks. Links render only when there is more than one page.
  */
 export function PostList({
   posts,
   page,
   total,
+  surface = "blog_index",
+  showTopic = true,
+  readFirst,
+  paginate = true,
 }: {
   posts: BlogPostSummary[];
   page: number;
   total: number;
+  surface?: "blog_index" | "blog_topic" | "blog_author";
+  /** Off on a topic page, where every row shares the topic. */
+  showTopic?: boolean;
+  /** The slug to mark "Read first": a topic's pillar. */
+  readFirst?: string;
+  /** Off where the list is already complete (topic and author pages): the
+   *  pager's links belong to the index's chronology. */
+  paginate?: boolean;
 }) {
   const pages = pageCount(total);
   const href = (n: number) => (n === 1 ? "/insights/blog" : `/insights/blog/page/${n}`);
 
   return (
     <>
-      <ol className="rf-post-list">
+      <ol className="rf-blog-list">
         {posts.map((post) => (
           <li key={post.slug}>
-            <BlogRow post={post} surface="blog_index" />
+            <BlogRow
+              post={post}
+              surface={surface}
+              showTopic={showTopic}
+              readFirst={post.slug === readFirst}
+            />
           </li>
         ))}
       </ol>
 
-      {pages > 1 ? (
+      {paginate && pages > 1 ? (
         <nav className="rf-pager" aria-label="Pagination">
           {page > 1 ? (
             <Link href={href(page - 1)} rel="prev" className="rf-nav-link">

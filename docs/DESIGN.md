@@ -360,10 +360,30 @@ than scanning. Its rules come from `docs/blogs_seo/blog_ui_ux.md`; the reasoning
   takeaways. A cover image, where there is one, sits below the takeaways, never above the title.
 - **Navigation.** Posts with three or more sections get a sticky TOC rail at lg and an
   in-content "On this page" list below lg. Never a pinned, collapsed bar on phones.
-- **Components.** `.rf-takeaways` and `.rf-post-cta` are the Navy panel with the Flow inset
-  edge, like `.rf-gate`. `.rf-callout` is the same shape on Void with a Line edge (Flow for a
-  warning). Figures — `steps`, `bars` — are HTML declared as JSON fences in the markdown
-  (`lib/blog-figures.ts`), so their words are text.
+- **Type inside the prose.** A 1.25 step off the 19px body: H3 1.3rem, H2 up to 1.85rem, and
+  each H2 opens with the route tick (18px Flow rule, square terminal). H3 must stay larger
+  than the body; it was once smaller and read as a bold paragraph.
+- **Components, by weight.** `.rf-takeaways` is the one Navy panel with the Flow inset edge in
+  a post. `.rf-callout` is a 2px left rule only (Line; Flow for a warning), never a box. The
+  inline CTA is a single row between hairlines (tick, eyebrow, link); the full pitch lives
+  only in the end band, so no heading or paragraph appears twice. Figures (`steps`, `bars`,
+  `video`) are HTML declared as JSON fences in the markdown (`lib/blog-figures.ts`), so their
+  words are text.
+- **The route rail.** The desktop TOC is drawn as a route: a square node per section, the
+  line filled in Flow up to the section being read, passed nodes filled. It is the blog's
+  signature device.
+- **The blog index**, after Profound's: up to two featured posts, then topic pills (each its
+  own URL) over one list of every post, newest first. Rows carry a round avatar, the author,
+  `16 Sep, 2026 / Topic`, the title and a two-line excerpt, separated by space, not rules.
+  Topic and author pages use the same pills and rows. No hairlines between sections; one
+  Navy newsletter panel is the only tonal step.
+- **Softness, blog only.** Approved by the owner: `.rf-soft` on blog pages rounds avatars
+  and pills fully and gives images, panels, figures, fields and controls a 6–8px radius. The
+  rest of the site stays square; do not extend `.rf-soft` beyond the blog without asking.
+- **TL;DR and Explore with AI.** Takeaways render as a numbered TL;DR (`01`, `02`…).
+  "Ask ChatGPT" and "Ask Claude" links under the byline open the assistant on the post URL.
+- **Covers** are tinted into the palette (`.rf-blog-cover`: greyscale, then Flow in `color`
+  blend) until original imagery replaces the placeholders.
 - **Links in prose.** Only classless links take the underlined prose style
   (`.rf-prose a:not([class])`), so a button or card placed inside the body keeps its own.
 
@@ -477,6 +497,11 @@ inherit both — see [Adding a form](#10-adding-a-form).
 `.rf-skip-link` carry a radius, and it is 2px. Cards, iso frames, menu panels, and stage panels
 have none. This is a system of hairlines and right angles — a rounded card reads as borrowed
 from another system.
+
+**The one exception is the blog.** Blog pages sit in `.rf-soft`, which the owner approved in
+September 2026: round avatars and topic pills, and a 6–8px radius on the blog's images,
+panels, figures, fields and controls. See [Articles](#articles). It stays scoped to the blog;
+extending it anywhere else is a brand decision, not a styling one.
 
 **The route stub.** `.rf-cta-primary::before` is a 14px Flow Blue rule that extends to 24px on
 interaction. It is the same 14px mark the disclosure marker opens with and the same tick the
