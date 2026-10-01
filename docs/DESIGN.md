@@ -387,8 +387,10 @@ than scanning. Its rules come from `docs/blogs_seo/blog_ui_ux.md`; the reasoning
   "Related reading" (`RelatedReading`): blog posts that link to the page first, found by
   their links, then the other libraries. Citing a report or study in a post is how it gets
   listed there.
-- **Hub and reports index.** Plain `Insights` and `Reports` H1s. The hub's pills jump to its
-  bands; the newest report is featured with its first three findings (`ReportFeatured`).
+- **Hub and indexes.** Plain `Insights`, `Case studies`, `Reports` and `Blog` H1s: each
+  library has its own index, and the hub shows all three. The hub's pills jump to its bands;
+  the newest report is featured with its first three findings (`ReportFeatured`), and report
+  cards carry an Audio chip with the length.
 - **TL;DR and Explore with AI.** Takeaways render as a numbered TL;DR (`01`, `02`…).
   "Ask ChatGPT" and "Ask Claude" links under the byline open the assistant on the post URL.
 - **Covers** are tinted into the palette (`.rf-blog-cover`: greyscale, then Flow in `color`

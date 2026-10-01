@@ -105,7 +105,9 @@ The row lands as a **draft**. No page renders it: every query in `lib/reports.se
 pnpm report:publish --slug <slug> --publish
 ```
 
-Live on the next request across all five surfaces: `/insights/reports`, the reports band on `/insights`, `/insights/reports/<slug>`, `/sitemap.xml`, and `/llms.txt`.
+Live on the next request everywhere a report shows: `/insights/reports` (the newest report is featured there with its first three findings), the reports band on `/insights`, `/insights/reports/<slug>`, "Related reading" on case study and other report pages, `/llm-info`, `/sitemap.xml`, and `/llms.txt`.
+
+Then offer a companion blog post (the **publish-blog-post** skill): a short post that leads its title with the report's idea and links the report page. The report page lists any post that links to it under "Related reading", found by the link.
 
 To pull one back — the row and its files are untouched, it just stops rendering:
 
@@ -132,6 +134,9 @@ Re-run the content command. Uploads upsert, the row upserts on `slug`, and **`st
 - **Reports sharing a `published` date have no defined order** among themselves; the listing sorts by that date alone. If the sequence in the listing matters, give each one its own date.
 - **The live site sits behind Cloudflare**, so `curl` and WebFetch against `www.regainflow.com` return 403 with a bot challenge. Post-publish verification means reading the row back from the table and asking the user to load the page in a browser. Do not report a page as visually verified on the strength of the database alone.
 - **Slug rules:** lowercase letters, digits, single hyphens. Anything else is rejected rather than turned into a bad URL.
+- **A published slug is permanent in practice.** Blog posts link to `/insights/reports/<slug>`, and those links are what build "Related reading". Republishing under a new slug breaks them in both directions; fix the posts in the same change if a slug ever has to move.
+- **The first three findings are the listing copy.** The featured report on `/insights/reports` and `/insights` prints them, so order the findings with the strongest three first.
+- **Local development** has its own rows: `supabase/seed/reports.sql` (the committed covers, no PDF or audio). It is local-only and is never the source for a production publish.
 - **pdfjs and `Buffer`:** it rejects a plain `Uint8Array` with "Cannot transfer object of unsupported type". `scripts/lib/cover.mjs` already converts; keep it that way if you touch it.
 - **A draft is not previewable.** There is no URL that renders one. Review against the meta JSON and the PDF. Recovery is fast if something slips through — the pages are `force-dynamic`, so `--unpublish` takes effect on the next refresh with no deploy.
 - **The cover is never hand-exported.** It is always page 1 of the PDF, rendered by the script. `pnpm report:cover <pdf> <slug>` does that step alone if that is all you need.

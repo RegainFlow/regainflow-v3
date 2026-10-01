@@ -33,10 +33,11 @@ lockfile that ships.
 | `/services`                                                    | Full Discover / Implement / Scale, the engagement path, the four capability layers, free assessment |
 | `/industries`                                                  | Hub: four large cards into the group pages, then the selected engagements                       |
 | `/industries/[slug]`                                           | One group: sectors, where the work stalls, what we install, proof, and the assessment callout   |
-| `/insights`                                                    | The three case studies, then the reports band                                                   |
-| `/insights/[slug]`                                             | One case study in full: context, constraints, our role, what we engineered, outcome, what next  |
-| `/insights/reports`                                            | Published reports. Renders an empty state until the first is authored                           |
-| `/insights/reports/[slug]`                                     | One report: cover, findings, audio overview, and the email gate in front of the PDF             |
+| `/insights`                                                    | The hub: section pills, case studies, the newest report featured, blog rows, newsletter         |
+| `/insights/case-studies`                                       | Every case study, then the reports behind the work. A static segment, so `case-studies` is not a usable study slug |
+| `/insights/[slug]`                                             | One case study in full: context, constraints, our role, what we engineered, outcome, what next, then Related reading |
+| `/insights/reports`                                            | Published reports, the newest featured with its findings. Renders an empty state until the first is authored |
+| `/insights/reports/[slug]`                                     | One report: cover, numbered findings, audio overview, the email gate in front of the PDF, then Related reading |
 | `/insights/blog`                                               | Blog index: two featured posts, topic pills, every post newest first (two columns), newsletter. Pages at `/insights/blog/page/[n]` |
 | `/insights/blog/[slug]`                                        | One post. Template in `components/BlogPostView.tsx`, laid out to `docs/blogs_seo/`             |
 | `/insights/blog/topics/[topic]`, `/insights/blog/authors/[slug]` | Topic hubs (pillar first) and author pages                                                   |
@@ -299,11 +300,11 @@ of each report's PDF. Both go through Server Actions, and **neither makes a rout
 dynamic** — a Server Action does not opt its page into dynamic rendering, and nothing on
 this site reads `cookies()` or `searchParams`.
 
-The routes that *are* dynamic (`ƒ` in `pnpm build`) are the ones that read the `reports`
-table: `/insights`, `/insights/reports`, `/insights/reports/[slug]` and its OG image,
-`/sitemap.xml`, and `/llms.txt`. That is the deliberate price of publishing a report by
-adding a row rather than by deploying. Everything else — `/`, `/services`, `/industries` and
-its four group pages, `/company`, `/contact`, `/llm-info`, and all three case studies — must
+The routes that *are* dynamic (`ƒ` in `pnpm build`) are the ones that read a content table
+(reports, case studies, blog posts): `/insights` and everything under it, each segment's OG
+image, `/llm-info`, `/sitemap.xml`, and `/llms.txt`. That is the deliberate price of
+publishing by adding a row rather than by deploying. Everything else — `/`, `/services`,
+`/industries` and its four group pages, `/company`, and `/contact` — must
 still show `○` or `●`, and a new `ƒ` among them means something opted a route into dynamic
 rendering by accident.
 
@@ -452,6 +453,20 @@ Staging writes to `preview--<slug>`, so a refresh of a live post is reviewed at
 `supabase/seed/blog-posts.sql` holds sample posts with placeholder images, inserted as
 `published`. **Never run it against production.**
 
+Two conventions the pipeline does not enforce:
+
+- **A post built on one of our reports leads its title with the report's named idea**, then
+  says what the post adds ("The AI ROI problem: what AI really costs"). The question a reader
+  would type goes in `meta_title`, so the page gets both. It does not reuse the report's exact
+  title, which would compete with the report page in search.
+- **Cite a report or case study by linking its page**, with the report's exact title as the
+  link text. That link is what lists the post under "Related reading" on the report or study
+  page, so changing a report's slug after posts link to it breaks both directions.
+
+The byline is a founder (`will-baltus`, `leo-ramirez`) or, for a company post written by both,
+`regainflow`, which renders the organization with the app icon and earns a pipeline warning
+because it has no author page.
+
 ### Newsletter
 
 `components/NewsletterSignup.tsx` sits at the end of every post and on the blog index. It is
@@ -542,7 +557,13 @@ With three studies, grouping is degenerate and gone: `CaseStudyGroup`, `GROUPS`,
 `studiesInGroup`, `FEATURED_SLUGS`, and `HOME_SLUGS` were all removed, along with the
 `/insights` disclosure, the "more in this category" band, and the `all_work` / `related`
 analytics surfaces they fed. All three studies render on `/`, `/insights`, and the
-`/industries` hub. Filter chips and pagination land when the library needs them, not before.
+`/industries` hub, and on their own index at `/insights/case-studies`. Filter chips and
+pagination land when the library needs them, not before.
+
+A shelf did come back, in a different form: **Related reading** (`components/RelatedReading.tsx`)
+closes every case study and report page. It lists blog posts that link to the page first, found
+by their links (`getPostsLinkingTo` in `lib/blog.server.ts`), then the other libraries. Its
+clicks carry the `related_reading` surface.
 
 > **The prose in these three entries was expanded from one-line briefs** and has not had a
 > factual pass from either founder. Before treating any sentence as fact, check it.

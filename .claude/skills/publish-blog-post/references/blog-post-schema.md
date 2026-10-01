@@ -5,9 +5,9 @@
 | Field | Required | Rule | Why |
 |---|---|---|---|
 | `slug` | yes | kebab-case; short; no year; not `topics`, `authors`, `page`, `preview` | It is the URL. Changing it later needs a redirect, and a dated slug reads stale after a refresh. |
-| `title` | yes | specific, leads with the topic, unique | The H1 and the card. Google rewrites generic or misleading titles. |
+| `title` | yes | specific, leads with the topic, unique. For a post built on one of our reports, lead with the report's named idea and add the post's own angle after a colon; never the report's exact title | The H1 and the card. Google rewrites generic or misleading titles, and a post sharing a report's title competes with the report page. |
 | `summary` | yes | one or two sentences | The deck under the H1, the card copy, and the meta description fallback. |
-| `author` | yes | `will-baltus` or `leo-ramirez` | A real byline linked to an author page is a core trust signal. |
+| `author` | yes | `will-baltus` or `leo-ramirez`; `regainflow` for a company post written by both (a warning, not an error) | A real byline linked to an author page is a core trust signal. The organization byline has no author page or Person markup. |
 | `topic` | yes | `production-ai`, `retrieval-and-data`, `public-sector-ai` | Places the post in its cluster hub and breadcrumb. |
 | `tags` | no | up to 6 | Shown as chips and in `article:tag`. No tag pages exist, deliberately. |
 | `takeaways` | yes | 3–5 findings, none repeated verbatim in the body | The numbered TL;DR under the title (`01`, `02`…). Write them as findings. Repetition costs attention (NZZ). |
@@ -16,7 +16,7 @@
 | `featured` | no | boolean | The index features the newest two (`FEATURED_SLOTS` in `lib/content/blog.ts`). A third featured post drops the oldest from that row. |
 | `pillar` | no | boolean; one per topic | The post the topic hub leads with. |
 | `published` | no | `YYYY-MM-DD` | First-publish date; default today. Ignored on `--replace`. |
-| `meta_title` | no | about 60 characters or fewer | Only when the H1 is too long or too clever for a results page. |
+| `meta_title` | no | about 60 characters or fewer | When the H1 is too long or too clever for a results page, and always when the H1 leads with a report's name: put the question a reader would type here. |
 | `meta_description` | no | 120–160 characters | A click aid, not a ranking factor. Falls back to `summary`. |
 | `cover` | no | `{file, alt, credit, cleared: true}` or `{generate, alt}` | Real image first. `generate` is the house illustration, paid, and last resort. |
 | `images` | when the body has local images | `[{file, cleared: true, credit?}]` | Every local image in `post.md` must be listed and cleared. Alt text and captions live in the markdown. |

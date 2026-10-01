@@ -35,7 +35,8 @@ Use `references/interview.md`. Ask in small batches with AskUserQuestion where t
 
 - the reader, the question they would type, and what format the current results show (guide, comparison, checklist, opinion);
 - **the first-hand element** (the thing only we know);
-- author (`will-baltus` or `leo-ramirez`), topic cluster, and pillar or cluster post;
+- author (`will-baltus` or `leo-ramirez`; `regainflow` only for a company post written by both founders, which gets no author page), topic cluster, and pillar or cluster post;
+- whether the post draws on one of our reports or case studies (it changes the title and the links, see step 4);
 - sources for every number;
 - the deny list;
 - the next step the post should offer (the CTA);
@@ -81,6 +82,14 @@ For **research and data posts**, follow the pattern Profound uses on its researc
 - the **answer in the first sentence** of the body;
 - takeaways written as **findings**, because they render as a numbered TL;DR (`01`, `02`…);
 - a **How we measured** section: data, sample size, time window, method, limits. Start from `assets/research-template.md`.
+
+For a post **built on one of our reports**, tie the two together:
+- lead the `title` with the report's named idea, then say what the post adds: "The AI ROI problem: what AI really costs", not the report's exact title (that would compete with the report page in search);
+- put the question a reader would type in `meta_title` ("What AI really costs, and how to budget for it"), so the page has both;
+- link the report in the first paragraph, with its exact title as the link text (`[*The AI ROI Problem*](/insights/reports/the-ai-roi-problem)`). Check `/insights/reports` for the real slug; do not guess it;
+- footnote any figure taken from it as "as cited in RegainFlow, *Report title* (year)".
+
+The same goes for a case study: link `/insights/<slug>`. The link is what lists the post under "Related reading" on that page.
 
 ### 5. Draft
 
@@ -138,7 +147,7 @@ pnpm blog publish .blog/<slug>/preview          # local
 pnpm blog:prod publish .blog/<slug>/preview     # PRODUCTION
 ```
 
-Report the live URL and the IndexNow result. Then suggest 2–3 established posts or pages that should now link **to** the new post, with the anchor text and the sentence it would go in. Those edits are separate refreshes; offer to do them.
+Report the live URL and the IndexNow result. If the post links a report or case study, open that page and confirm the post is listed first under "Related reading". Then suggest 2–3 established posts or pages that should now link **to** the new post, with the anchor text and the sentence it would go in. Those edits are separate refreshes; offer to do them.
 
 ## Modes
 

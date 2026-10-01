@@ -31,7 +31,8 @@ Follow-ups: *Which team? Which week? What did the log/metric/reviewer actually s
 
 ## Round 3: placement
 
-5. **Author.** `will-baltus` (William J. Baltus) or `leo-ramirez` (Leonardo J. Ramirez). The byline is the person who reviewed it and will stand behind it.
+5. **Author.** `will-baltus` (William J. Baltus) or `leo-ramirez` (Leonardo J. Ramirez). The byline is the person who reviewed it and will stand behind it. A company post both founders wrote (the founding story, a method) can use `regainflow`; say that it gets no author page.
+   - **Is it built on one of our reports or case studies?** If so, which. The title leads with that report's idea and the first paragraph links it.
 6. **Topic cluster.** Run `pnpm blog:prod list`, then offer `production-ai`, `retrieval-and-data` or `public-sector-ai`. A post that fits none is a signal: either a new cluster (a code change to `lib/content/blog-topics.ts`, and only once there are posts to fill it) or the wrong post.
 7. **Pillar or cluster?** A pillar is the one comprehensive post a topic hub leads with. Most posts are cluster posts that link to the pillar.
 8. **Featured?** The index shows two featured posts side by side. Featuring a new post pushes the older one off the row (it stays in the list).

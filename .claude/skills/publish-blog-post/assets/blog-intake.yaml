@@ -20,7 +20,7 @@ title:
 # One or two sentences.
 summary:
 
-# will-baltus | leo-ramirez
+# will-baltus | leo-ramirez (regainflow only for a company post by both founders)
 author:
 
 # production-ai | retrieval-and-data | public-sector-ai
@@ -54,7 +54,8 @@ pillar: false
 # Optional. First-publish date, YYYY-MM-DD. Defaults to the day prepare runs.
 # published:
 
-# Optional search overrides: about 60 and 120–160 characters.
+# Optional search overrides: about 60 and 120–160 characters. When the title
+# leads with one of our reports' names, put the reader's question in meta_title.
 # meta_title:
 # meta_description:
 
