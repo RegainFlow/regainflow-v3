@@ -25,11 +25,17 @@ export async function generateMetadata({
   const topic = topicBySlug((await params).topic);
   if (!topic) return {};
 
+  // Empty until its first post, and an empty hub is a thin page: keep it out
+  // of search until then. `[]` on a failed fetch would hide a live hub, so an
+  // outage leaves the page indexable.
+  const posts = await getPosts({ topic: topic.slug, throwOnError: true }).catch(() => null);
+
   return pageMetadata({
-    title: `${topic.name} — Blog`,
+    title: `${topic.name} blog posts`,
     description: topic.intro,
     path: `/insights/blog/topics/${topic.slug}`,
     feed: true,
+    noindex: posts?.length === 0,
   });
 }
 

@@ -14,7 +14,6 @@ import { getCaseStudies } from "@/lib/case-studies.server";
 import { getReports } from "@/lib/reports.server";
 import {
   breadcrumbJsonLd,
-  caseStudiesJsonLd,
   collectionJsonLd,
   pageMetadata,
   serializeJsonLd,
@@ -28,6 +27,7 @@ export const metadata: Metadata = pageMetadata({
   title: "Insights",
   description: DESCRIPTION,
   path: "/insights",
+  feed: true,
 });
 
 /** Every band reads a table, so there is no prerender to protect here. */
@@ -255,12 +255,6 @@ export default async function InsightsPage() {
               ],
             }),
           ),
-        }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: serializeJsonLd(caseStudiesJsonLd(studies)),
         }}
       />
     </div>

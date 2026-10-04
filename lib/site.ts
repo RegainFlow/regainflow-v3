@@ -118,6 +118,9 @@ export const PROFILES: Profile[] = [
 
 export const LOCATION = "Orlando, Florida";
 
+/** Year and month the company was founded, as schema.org `foundingDate`. */
+export const FOUNDED = "2025-01";
+
 /**
  * Cased for use mid-sentence as well as in the eyebrow, which is why "AI" is
  * capitalized and nothing else is. Two call sites drop it into running prose —

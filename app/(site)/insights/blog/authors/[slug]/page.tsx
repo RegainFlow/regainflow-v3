@@ -25,10 +25,16 @@ export async function generateMetadata({
   const member = authorBySlug((await params).slug);
   if (!member) return {};
 
+  // No posts yet means a bio already on `/company` and an empty list: keep it
+  // out of search until the first one. An outage leaves it indexable.
+  const posts = await getPosts({ author: member.slug, throwOnError: true }).catch(() => null);
+
   return pageMetadata({
     title: `${member.name}, ${member.role}`,
     description: member.bio,
     path: `/insights/blog/authors/${member.slug}`,
+    feed: true,
+    noindex: posts?.length === 0,
   });
 }
 

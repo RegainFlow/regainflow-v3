@@ -1,5 +1,8 @@
 import posthog from "posthog-js";
 
+import { aiSource } from "@/lib/analytics/ai-source";
+import { RF_EVENTS } from "@/lib/analytics/events";
+
 /**
  * PostHog, and the whole of the site's client-side analytics.
  *
@@ -91,6 +94,35 @@ function onDisclosure(event: Event) {
   posthog.capture(name, properties(el.dataset, "rfToggle"));
 }
 
+/**
+ * Marks a session that came from an AI assistant.
+ *
+ * PostHog already records `$referring_domain`, but ChatGPT often sends no
+ * referrer and identifies itself only by `utm_source=chatgpt.com`, and nobody
+ * wants to rebuild the list of assistant hostnames in every insight. So the
+ * answer is computed once, here, and registered for the session: every event
+ * afterwards carries `ai_source`, including the booking click.
+ *
+ * `sessionStorage` keeps a reload, or a second tab opened from the first, from
+ * counting the landing twice. It can throw in a locked-down browser; then the
+ * landing may be counted again, which is the lesser error.
+ */
+function tagAiReferral() {
+  const source = aiSource(document.referrer, window.location.search);
+  if (!source) return;
+
+  posthog.register_for_session({ ai_source: source });
+
+  try {
+    if (window.sessionStorage.getItem("rf_ai_landing")) return;
+    window.sessionStorage.setItem("rf_ai_landing", source);
+  } catch {
+    // Counted without the guard.
+  }
+
+  posthog.capture(RF_EVENTS.aiReferralLanded, { ai_source: source });
+}
+
 if (KEY) {
   posthog.init(KEY, {
     // The proxy path from `next.config.ts`, not a PostHog domain: this audience
@@ -113,6 +145,8 @@ if (KEY) {
     // line is how replay gets turned on, deliberately.
     disable_session_recording: true,
   });
+
+  tagAiReferral();
 
   document.addEventListener("click", onActivate);
   // Middle-click and open-in-new-tab, which never fire `click`.

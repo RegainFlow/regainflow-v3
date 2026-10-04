@@ -45,7 +45,7 @@ The pipeline scans for violations of both. It cannot detect compliance, which is
    ```
    pnpm case-study publish .case-study/<slug>/preview
    ```
-7. **Report** the live URLs the command prints. A published study also appears on `/insights/case-studies` (the index), the hub at `/insights`, and "Related reading" on report and other study pages; its own page lists any blog post that links to `/insights/<slug>`, so offer a companion post (**publish-blog-post**). If the study should *lead* an industry page rather than merely appear on it, that is still a repository edit to `INDUSTRY_GROUPS[].proof` in `lib/content/industries.ts` — say so.
+7. **Report** the live URLs the command prints, and the `IndexNow:` line (the study, the two listings and its industry pages are announced to Bing; "skipped" means `INDEXNOW_KEY` is unset). A published study also appears on `/insights/case-studies` (the index), the hub at `/insights`, and "Related reading" on report and other study pages; its own page lists any blog post that links to `/insights/<slug>`, so offer a companion post (**publish-blog-post**). If the study should *lead* an industry page rather than merely appear on it, that is still a repository edit to `INDUSTRY_GROUPS[].proof` in `lib/content/industries.ts` — say so.
 
 ## The approval gate
 

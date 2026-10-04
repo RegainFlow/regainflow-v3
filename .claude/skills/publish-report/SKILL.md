@@ -107,6 +107,8 @@ pnpm report:publish --slug <slug> --publish
 
 Live on the next request everywhere a report shows: `/insights/reports` (the newest report is featured there with its first three findings), the reports band on `/insights`, `/insights/reports/<slug>`, "Related reading" on case study and other report pages, `/llm-info`, `/sitemap.xml`, and `/llms.txt`.
 
+`--publish`, `--unpublish` and a content run against an already-published report each ping IndexNow (Bing, and through it Copilot and DuckDuckGo) and print the result. It needs `INDEXNOW_KEY` in the env file and reports "skipped" without it; a failed ping never fails the run.
+
 Then offer a companion blog post (the **publish-blog-post** skill): a short post that leads its title with the report's idea and links the report page. The report page lists any post that links to it under "Related reading", found by the link.
 
 To pull one back — the row and its files are untouched, it just stops rendering:

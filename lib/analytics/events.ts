@@ -58,6 +58,14 @@ export const RF_EVENTS = {
    * this is the list of dead links and where they are linked from.
    */
   notFoundViewed: "not_found_viewed",
+  /**
+   * A visit that arrived from an AI assistant (ChatGPT, Perplexity, Claude,
+   * Gemini, Copilot…), once per browser session. Carries `ai_source`, and the
+   * same value is registered on every later event in the session, so any
+   * funnel can be split by it. See `lib/analytics/ai-source.ts` for what it
+   * can and cannot detect.
+   */
+  aiReferralLanded: "ai_referral_landed",
   assessmentStepOpened: "assessment_step_opened",
   /**
    * A footer assistant link. Carries `assistant` — which of them was picked.

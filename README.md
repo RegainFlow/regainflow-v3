@@ -44,7 +44,7 @@ lockfile that ships.
 | `/insights/blog/preview/[slug]?token=…`                        | Draft preview for `pnpm blog stage`. `noindex`; 404 without `BLOG_PREVIEW_TOKEN`                |
 | `/insights/blog/feed.xml`                                      | RSS 2.0, the twenty newest posts                                                                |
 | `/newsletter/*`                                                | Double opt-in: check-email, confirm (a button, never on GET), confirmed. All `noindex`          |
-| `/indexnow.txt`                                                | The IndexNow key from `INDEXNOW_KEY`; 404 when unset                                            |
+| `/indexnow.txt`                                                | The IndexNow key from `INDEXNOW_KEY`; 404 when unset. All three publishing pipelines (blog, reports, case studies) ping IndexNow with it |
 | `/company`                                                     | Who we are, the partner network, manifesto, contact                                             |
 | `/contact`                                                     | The contact form. The canonical contact route — every contact CTA points here                   |
 | `/contact/thanks`                                              | Post-submission confirmation. `noindex`, reachable only by submitting                           |

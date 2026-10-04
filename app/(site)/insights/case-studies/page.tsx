@@ -11,7 +11,6 @@ import { getCaseStudies } from "@/lib/case-studies.server";
 import { getReports } from "@/lib/reports.server";
 import {
   breadcrumbJsonLd,
-  caseStudiesJsonLd,
   collectionJsonLd,
   pageMetadata,
   serializeJsonLd,
@@ -133,12 +132,6 @@ export default async function CaseStudiesPage() {
                   })),
                 }),
               ),
-            }}
-          />
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: serializeJsonLd(caseStudiesJsonLd(studies)),
             }}
           />
         </>

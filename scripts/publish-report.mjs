@@ -94,6 +94,52 @@ function parseArgs(argv) {
   return flags;
 }
 
+/* ----------------------------------------------------------------- IndexNow */
+
+/** The public site. Not derived from the Supabase host: they are unrelated. */
+const SITE_URL = "https://www.regainflow.com";
+
+/** A report's page, plus the two listings it appears on. */
+const reportUrls = (slug) => [
+  `${SITE_URL}/insights/reports/${slug}`,
+  `${SITE_URL}/insights/reports`,
+  `${SITE_URL}/insights`,
+];
+
+/**
+ * Tells Bing and the other IndexNow engines that these URLs changed. Copilot
+ * and DuckDuckGo read Bing's index, so this is how a new report reaches them
+ * without waiting for a crawl. The blog pipeline does the same
+ * (`scripts/blog/remote.mts`); this is a copy because that module is
+ * TypeScript and this script is plain Node.
+ *
+ * Best-effort: the report is already live, so a failed ping is printed and
+ * never fatal. Skipped against a local database, where the URLs do not exist.
+ */
+async function pingIndexNow(env, host, urls) {
+  const key = env.INDEXNOW_KEY;
+  if (!key) return "skipped (INDEXNOW_KEY unset)";
+  if (/^(localhost|127\.0\.0\.1|\[::1\])(:|$)/.test(host)) return "skipped (local database)";
+
+  try {
+    const response = await fetch("https://api.indexnow.org/indexnow", {
+      method: "POST",
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+      body: JSON.stringify({
+        host: new URL(SITE_URL).host,
+        key,
+        keyLocation: `${SITE_URL}/indexnow.txt`,
+        urlList: urls,
+      }),
+    });
+    return response.ok
+      ? `sent (${response.status})`
+      : `refused (${response.status} ${await response.text()})`;
+  } catch (error) {
+    return `failed (${error instanceof Error ? error.message : String(error)})`;
+  }
+}
+
 /* ---------------------------------------------------------------------- env */
 
 /**
@@ -327,9 +373,12 @@ async function main() {
     console.log(`  status → ${row.status}\n`);
     console.log(
       flags.publish
-        ? `Live on the next request: /insights/reports/${row.slug}\n`
-        : `Off the site on the next request. The row and its files are untouched.\n`,
+        ? `Live on the next request: /insights/reports/${row.slug}`
+        : `Off the site on the next request. The row and its files are untouched.`,
     );
+    // Both directions: Bing should learn that a report appeared, and that one
+    // was pulled.
+    console.log(`IndexNow: ${await pingIndexNow(env, host, reportUrls(row.slug))}\n`);
     return;
   }
 
@@ -438,7 +487,8 @@ async function main() {
   console.log(`  audio_url     ${row.audio_url ?? "—"}`);
 
   if (data.status === "published") {
-    console.log(`\nAlready published — the update is live on the next request.\n`);
+    console.log(`\nAlready published — the update is live on the next request.`);
+    console.log(`IndexNow: ${await pingIndexNow(env, host, reportUrls(slug))}\n`);
   } else {
     console.log(`\nStill a draft, so no page renders it yet. Check the copy above, then:\n`);
     console.log(`  pnpm report:publish --slug ${slug} --publish\n`);

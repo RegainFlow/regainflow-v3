@@ -24,6 +24,18 @@ export const RETIRED_GOV_PATHS = ["/capability-statement", "/past-performance"];
 
 const PRODUCTION_HOSTS = new Set(["regainflow.com", "www.regainflow.com"]);
 
+/**
+ * `/services/` to `/services`: the same page must not answer at two addresses.
+ * Next would do this itself, but `skipTrailingSlashRedirect` is on for the
+ * PostHog proxy (see `next.config.ts`), so the proxy does it for the paths it
+ * handles. Returns the path without its trailing slashes, or `null` when there
+ * is nothing to strip. The root is left alone.
+ */
+export function withoutTrailingSlash(pathname: string): string | null {
+  if (pathname.length < 2 || !pathname.endsWith("/")) return null;
+  return pathname.replace(/\/+$/, "") || "/";
+}
+
 export type GovRoute =
   | { kind: "next" }
   | { kind: "rewrite"; pathname: string }

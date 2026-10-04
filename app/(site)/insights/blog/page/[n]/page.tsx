@@ -28,9 +28,10 @@ export async function generateMetadata({
   if (!page || page < 2) return {};
 
   return pageMetadata({
-    title: `Blog — page ${page}`,
+    title: `Blog, page ${page}`,
     description: `Older posts from the RegainFlow blog, page ${page}.`,
     path: `/insights/blog/page/${page}`,
+    feed: true,
   });
 }
 
@@ -49,7 +50,12 @@ export default async function BlogArchivePage({
 
   return (
     <>
-      <PageHeader open eyebrow="Blog" title={`Page ${page}`} lead="Every post, newest first." />
+      <PageHeader
+        open
+        eyebrow="Insights"
+        title={`Blog, page ${page}`}
+        lead="Every post, newest first."
+      />
 
       <section className="rf-section rf-section-open rf-soft">
         <div className="rf-shell rf-blog-archive">

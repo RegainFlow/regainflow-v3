@@ -13,6 +13,9 @@ import type { NextConfig } from "next";
  * to precede the catch-all or they never match.
  */
 const nextConfig: NextConfig = {
+  /** No `X-Powered-By: Next.js`. It tells a scanner which exploits to try. */
+  poweredByHeader: false,
+
   /**
    * Report covers live in Supabase storage, not in `/public`.
    *
@@ -96,6 +99,37 @@ const nextConfig: NextConfig = {
     ];
   },
 
+  /**
+   * The baseline security headers, on every response.
+   *
+   * HSTS is not here because Vercel already sends it. There is no
+   * Content-Security-Policy either: a real one needs a nonce on every inline
+   * script (the JSON-LD blocks, the theme scripts), and a loose one is theatre.
+   * These four are the ones a procurement security questionnaire checks for
+   * and that cannot break a page:
+   *
+   * - `nosniff`: a file is what its Content-Type says it is.
+   * - `SAMEORIGIN`: the site cannot be framed by another origin. The gov page's
+   *   inline PDF viewer frames `/files/*`, which is this origin, so it works.
+   * - `Referrer-Policy`: other sites learn the origin a visitor came from, not
+   *   the full URL.
+   * - `Permissions-Policy`: nothing here uses the camera, microphone or
+   *   location, so no embedded script can ask for them either.
+   */
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+        ],
+      },
+    ];
+  },
+
   async rewrites() {
     return [
       {
@@ -129,9 +163,8 @@ const nextConfig: NextConfig = {
    * capture entirely.
    *
    * The trade is that Next no longer auto-redirects `/services/` to
-   * `/services`. Nothing on the site links that way — `lib/site.ts`,
-   * `app/sitemap.ts`, and every `<Link>` use the canonical no-slash form — so
-   * this only affects a hand-typed or badly-copied inbound URL.
+   * `/services`. `proxy.ts` does it instead, for page paths only, so each page
+   * still has one address and `/relay/` is left alone.
    */
   skipTrailingSlashRedirect: true,
 

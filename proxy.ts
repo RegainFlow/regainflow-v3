@@ -1,12 +1,24 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { routeGov } from "@/lib/gov-routing";
+import { routeGov, withoutTrailingSlash } from "@/lib/gov-routing";
 
 /**
- * Serves gov.regainflow.com from `app/gov`. The rules live in
- * `lib/gov-routing.ts`, where they are tested; this only applies them.
+ * Serves gov.regainflow.com from `app/gov`, and removes trailing slashes. The
+ * rules live in `lib/gov-routing.ts`, where they are tested; this only applies
+ * them.
  */
 export function proxy(request: NextRequest) {
+  // One address per page, before anything else looks at the path.
+  const stripped = withoutTrailingSlash(request.nextUrl.pathname);
+  if (stripped) {
+    // A plain `URL`, not `request.nextUrl.clone()`: a cloned NextURL remembers
+    // that the request had a trailing slash and writes it back, which redirects
+    // the page to itself.
+    const url = new URL(request.url);
+    url.pathname = stripped;
+    return NextResponse.redirect(url.toString(), 308);
+  }
+
   const host = request.headers.get("host") ?? request.nextUrl.host;
   const route = routeGov(host, request.nextUrl.pathname, request.nextUrl.protocol);
 

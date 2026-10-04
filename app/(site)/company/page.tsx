@@ -20,7 +20,12 @@ import {
   PARTNERS_LEAD,
   type PartnerPerson,
 } from "@/lib/content/partners";
-import { breadcrumbJsonLd, pageMetadata, serializeJsonLd } from "@/lib/seo";
+import {
+  breadcrumbJsonLd,
+  pageMetadata,
+  peopleJsonLd,
+  serializeJsonLd,
+} from "@/lib/seo";
 import {
   FREE_ASSESSMENT_CTA,
   FREE_ASSESSMENT_HREF,
@@ -442,6 +447,16 @@ export default function CompanyPage() {
           __html: serializeJsonLd(breadcrumbJsonLd("Company", "/company")),
         }}
       />
+      {/* The founders, on the page their `Person` nodes name as their URL
+          (`/company#about`) and that shows their bios. They used to be marked
+          up only on `/llm-info`. One script per person, as there. */}
+      {peopleJsonLd().map((person) => (
+        <script
+          key={person["@id"]}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(person) }}
+        />
+      ))}
     </>
   );
 }

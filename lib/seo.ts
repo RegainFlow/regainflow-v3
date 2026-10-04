@@ -13,7 +13,7 @@ import type { BlogPost } from "@/lib/content/blog";
 import { STAGES } from "@/lib/content/stages";
 import {
   CONTACT_EMAIL,
-  FREE_ASSESSMENT_HREF,
+  FOUNDED,
   GOV_SITE_URL,
   PROFILES,
   SITE_NAME,
@@ -71,6 +71,7 @@ export function pageMetadata({
   segmentCard = false,
   article,
   feed = false,
+  noindex = false,
 }: {
   title: string;
   description: string;
@@ -103,6 +104,12 @@ export function pageMetadata({
   };
   /** Advertise the blog's RSS feed (`<link rel="alternate">`) from this page. */
   feed?: boolean;
+  /**
+   * Keep the page out of search while it has nothing on it: a topic or author
+   * with no posts yet. Links are still followed. Remove nothing else, so the
+   * page is ready the moment a post lands.
+   */
+  noindex?: boolean;
 }): Metadata {
   const fullTitle = `${title} | ${SITE_NAME}`;
   const card = {
@@ -121,6 +128,9 @@ export function pageMetadata({
         ? { types: { "application/rss+xml": `${SITE_URL}/insights/blog/feed.xml` } }
         : {}),
     },
+    // Only when asked. Every other page inherits the root layout's `robots`,
+    // which carries the `max-snippet` and `max-image-preview` settings.
+    ...(noindex ? { robots: { index: false, follow: true } } : {}),
     openGraph: {
       title: fullTitle,
       description,
@@ -194,7 +204,12 @@ export function organizationJsonLd() {
     // this node and the profiles it already knows about are one organization.
     // Derived from `PROFILES` rather than restated, so the footer and this node
     // cannot come to disagree about where the company is.
-    sameAs: [FREE_ASSESSMENT_HREF, ...PROFILES.map((profile) => profile.href)],
+    //
+    // Profiles only. The booking link used to be listed here; it is a place to
+    // book a call, not a profile of the organization, and `sameAs` asserts
+    // identity.
+    sameAs: PROFILES.map((profile) => profile.href),
+    foundingDate: FOUNDED,
     // Name as well as `@id`, not a bare reference. This node ships on every
     // route but the full `Person` nodes only exist on `/llm-info`, so a
     // reference alone would dangle on four pages out of five. Carrying the name
@@ -592,33 +607,6 @@ export function faqJsonLd() {
       acceptedAnswer: {
         "@type": "Answer",
         text: item.answer,
-      },
-    })),
-  };
-}
-
-/**
- * Takes the studies rather than reading them.
- *
- * It read a module-level array until the studies moved into Supabase. Fetching
- * here would make this async and pull the secret-key client into a module whose
- * only job is building strings — and every caller already has the data, because
- * it just rendered the list this describes.
- */
-export function caseStudiesJsonLd(studies: CaseStudy[]) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    name: "RegainFlow case studies",
-    itemListElement: studies.map((study, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      item: {
-        "@type": "CreativeWork",
-        name: study.title,
-        abstract: study.summary,
-        about: study.industry,
-        url: `${SITE_URL}/insights/${study.slug}`,
       },
     })),
   };
