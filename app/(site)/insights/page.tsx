@@ -30,8 +30,9 @@ export const metadata: Metadata = pageMetadata({
   feed: true,
 });
 
-/** Every band reads a table, so there is no prerender to protect here. */
-export const dynamic = "force-dynamic";
+/** Every band reads a table. Cached, and rebuilt at most once a minute: see
+ *  `docs/content-cache.md`. */
+export const revalidate = 60;
 
 /** Posts shown in the blog band: two rows of the two-column list. */
 const HUB_POSTS = 4;

@@ -105,7 +105,7 @@ The row lands as a **draft**. No page renders it: every query in `lib/reports.se
 pnpm report:publish --slug <slug> --publish
 ```
 
-Live on the next request everywhere a report shows: `/insights/reports` (the newest report is featured there with its first three findings), the reports band on `/insights`, `/insights/reports/<slug>`, "Related reading" on case study and other report pages, `/llm-info`, `/sitemap.xml`, and `/llms.txt`.
+Live within a minute everywhere a report shows (the pages are cached and rebuilt at most once a minute, see `docs/content-cache.md`): `/insights/reports` (the newest report is featured there with its first three findings), the reports band on `/insights`, `/insights/reports/<slug>`, "Related reading" on case study and other report pages, `/llm-info`, `/sitemap.xml`, and `/llms.txt`.
 
 `--publish`, `--unpublish` and a content run against an already-published report each ping IndexNow (Bing, and through it Copilot and DuckDuckGo) and print the result. It needs `INDEXNOW_KEY` in the env file and reports "skipped" without it; a failed ping never fails the run.
 
@@ -123,7 +123,7 @@ Re-run the content command. Uploads upsert, the row upserts on `slug`, and **`st
 
 **Two things about updating a report that is already live.**
 
-*There is no draft gate.* The content run leaves `status` alone, so on an already-published row the new title, summary, findings, cover, and PDF are live on the next request. Approval has to happen **before** the run, not after. Use `--dry-run` to show the user the copy, get the go-ahead, then run it. If they would rather see it off the site first, `--unpublish`, update, review, `--publish`.
+*There is no draft gate.* The content run leaves `status` alone, so on an already-published row the new title, summary, findings, cover, and PDF are live within a minute. Approval has to happen **before** the run, not after. Use `--dry-run` to show the user the copy, get the go-ahead, then run it. If they would rather see it off the site first, `--unpublish`, update, review, `--publish`.
 
 *Storage URLs carry a content hash, and that is what makes a replaced file appear.* Object paths are stable, so without it the URL after a replacement is byte-for-byte the URL before, and storage sends `cache-control: public, max-age=3600` — Cloudflare, the browser, and the Next image optimizer would all keep serving the old cover for an hour. The script appends `?v=<first 8 of sha256>` to each uploaded URL, so identical bytes give an identical URL and new bytes give one nothing has cached. If a replaced cover ever fails to appear, check that the `?v=` on `cover_url` changed; if it did not, the upload did not take.
 
@@ -140,5 +140,5 @@ Re-run the content command. Uploads upsert, the row upserts on `slug`, and **`st
 - **The first three findings are the listing copy.** The featured report on `/insights/reports` and `/insights` prints them, so order the findings with the strongest three first.
 - **Local development** has its own rows: `supabase/seed/reports.sql` (the committed covers, no PDF or audio). It is local-only and is never the source for a production publish.
 - **pdfjs and `Buffer`:** it rejects a plain `Uint8Array` with "Cannot transfer object of unsupported type". `scripts/lib/cover.mjs` already converts; keep it that way if you touch it.
-- **A draft is not previewable.** There is no URL that renders one. Review against the meta JSON and the PDF. Recovery is fast if something slips through — the pages are `force-dynamic`, so `--unpublish` takes effect on the next refresh with no deploy.
+- **A draft is not previewable.** There is no URL that renders one. Review against the meta JSON and the PDF. Recovery is fast if something slips through — the pages are rebuilt at most once a minute, so `--unpublish` takes effect within a minute with no deploy.
 - **The cover is never hand-exported.** It is always page 1 of the PDF, rendered by the script. `pnpm report:cover <pdf> <slug>` does that step alone if that is all you need.

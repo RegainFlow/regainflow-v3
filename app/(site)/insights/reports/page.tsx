@@ -24,11 +24,13 @@ export const metadata: Metadata = pageMetadata({
 });
 
 /**
- * Read on every request, so a row flipped to `published` in the Supabase UI is
- * on this page at the next refresh with no deploy. That is the whole point of
- * the table, and this is where it is paid for.
+ * A row flipped to `published` in the Supabase UI is on this page within a
+ * minute, with no deploy. That is the whole point of the table. It used to be
+ * "at the next refresh", at the price of a database read on every visit; the
+ * page is now cached and rebuilt at most once a minute. See
+ * `docs/content-cache.md`.
  */
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 /**
  * The reports index, in the Insights shape: plain header, the newest report

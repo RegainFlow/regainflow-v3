@@ -23,16 +23,15 @@ type Params = { slug: string };
 
 /**
  * The four groups still come from the repository, so the slugs are known at
- * build time. The proof band's *content* does not, which is what makes the
- * route dynamic below — but keeping this means an unknown slug still 404s
- * rather than rendering an empty page.
+ * build time, so all four are prerendered. The proof band's *content* does
+ * not, which is why the route revalidates below.
  */
 export function generateStaticParams(): Params[] {
   return INDUSTRY_GROUPS.map((group) => ({ slug: group.slug }));
 }
 
-/** The proof band reads the case studies table. */
-export const dynamic = "force-dynamic";
+/** The proof band reads the case studies table. See `docs/content-cache.md`. */
+export const revalidate = 60;
 
 export async function generateMetadata({
   params,

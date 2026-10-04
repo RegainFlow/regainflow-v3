@@ -20,8 +20,9 @@ export const metadata: Metadata = pageMetadata({
   feed: true,
 });
 
-/** Read per request, like the reports — publishing is flipping a row. */
-export const dynamic = "force-dynamic";
+/** Publishing is flipping a row; the page picks it up within a minute. See
+ *  `docs/content-cache.md`. */
+export const revalidate = 60;
 
 /**
  * The blog index, after Profound's (tryprofound.com/blog):

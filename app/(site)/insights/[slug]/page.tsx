@@ -36,12 +36,17 @@ const CRUMBS = [
 ];
 
 /**
- * No `generateStaticParams`. The slugs live in Supabase now, so prerendering
- * them would freeze the set at deploy time and a study inserted afterwards
- * would 404 until the next build — which is the staleness the table exists to
- * remove. See the migration for what this costs.
+ * Nothing is prerendered at build. The slugs live in Supabase, so a list frozen
+ * at deploy time would 404 a study inserted afterwards until the next build,
+ * which is the staleness the table exists to remove. `generateStaticParams`
+ * returns nothing; each study is rendered on its first visit, cached, and
+ * rebuilt at most once a minute. See `docs/content-cache.md`.
  */
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
+
+export function generateStaticParams(): Params[] {
+  return [];
+}
 
 export async function generateMetadata({
   params,

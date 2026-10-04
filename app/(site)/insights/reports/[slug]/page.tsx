@@ -28,12 +28,17 @@ type Params = { slug: string };
 const RELATED_COUNT = 3;
 
 /**
- * Read per request rather than prerendered from a known set of slugs. There is
- * no `generateStaticParams` any more because there is no build-time list to
- * generate it from — a report published in the Supabase UI has to resolve here
- * without a deploy.
+ * Nothing is prerendered at build: there is no build-time list of slugs, and a
+ * report published in the Supabase UI has to resolve here without a deploy. So
+ * `generateStaticParams` returns nothing, and each report is rendered on its
+ * first visit, cached, and rebuilt at most once a minute after that. See
+ * `docs/content-cache.md`.
  */
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
+
+export function generateStaticParams(): Params[] {
+  return [];
+}
 
 const CRUMBS = [
   { name: "Insights", path: "/insights" },

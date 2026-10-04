@@ -28,8 +28,9 @@ export const metadata: Metadata = pageMetadata({
  *
  * The whole card is the link, the same shape `CaseStudyCard` uses.
  */
-// The selected-engagements band reads the case studies table.
-export const dynamic = "force-dynamic";
+// The selected-engagements band reads the case studies table. Cached, and
+// rebuilt at most once a minute: see `docs/content-cache.md`.
+export const revalidate = 60;
 
 export default async function IndustriesPage() {
   const studies = await getCaseStudies();

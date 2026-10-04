@@ -10,8 +10,16 @@ import { SITE_URL } from "@/lib/site";
 
 type Params = { slug: string };
 
-/** Read per request — a post published in the Supabase UI resolves here with no deploy. */
-export const dynamic = "force-dynamic";
+/**
+ * A post published in the Supabase UI resolves here with no deploy: nothing is
+ * prerendered at build, each post is rendered on its first visit, cached, and
+ * rebuilt at most once a minute. See `docs/content-cache.md`.
+ */
+export const revalidate = 60;
+
+export function generateStaticParams(): Params[] {
+  return [];
+}
 
 export async function generateMetadata({
   params,

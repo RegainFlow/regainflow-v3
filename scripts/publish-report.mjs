@@ -373,8 +373,8 @@ async function main() {
     console.log(`  status → ${row.status}\n`);
     console.log(
       flags.publish
-        ? `Live on the next request: /insights/reports/${row.slug}`
-        : `Off the site on the next request. The row and its files are untouched.`,
+        ? `Live within a minute: /insights/reports/${row.slug}`
+        : `Off the site within a minute. The row and its files are untouched.`,
     );
     // Both directions: Bing should learn that a report appeared, and that one
     // was pulled.
@@ -487,7 +487,7 @@ async function main() {
   console.log(`  audio_url     ${row.audio_url ?? "—"}`);
 
   if (data.status === "published") {
-    console.log(`\nAlready published — the update is live on the next request.`);
+    console.log(`\nAlready published — the update is live within a minute.`);
     console.log(`IndexNow: ${await pingIndexNow(env, host, reportUrls(slug))}\n`);
   } else {
     console.log(`\nStill a draft, so no page renders it yet. Check the copy above, then:\n`);

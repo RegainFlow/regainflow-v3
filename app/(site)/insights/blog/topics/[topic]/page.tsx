@@ -5,7 +5,7 @@ import { PostList, TopicChips } from "@/components/BlogArchive";
 import ClosingCTA from "@/components/ClosingCTA";
 import PageHeader from "@/components/PageHeader";
 import { getPosts } from "@/lib/blog.server";
-import { topicBySlug } from "@/lib/content/blog-topics";
+import { BLOG_TOPICS, topicBySlug } from "@/lib/content/blog-topics";
 import {
   breadcrumbJsonLd,
   pageMetadata,
@@ -15,7 +15,13 @@ import {
 
 type Params = { topic: string };
 
-export const dynamic = "force-dynamic";
+/** The topics are in the repository, so each hub is prerendered; its posts
+ *  come from the table, so it revalidates. See `docs/content-cache.md`. */
+export const revalidate = 60;
+
+export function generateStaticParams(): Params[] {
+  return BLOG_TOPICS.map((topic) => ({ topic: topic.slug }));
+}
 
 export async function generateMetadata({
   params,

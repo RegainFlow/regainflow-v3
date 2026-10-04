@@ -8,7 +8,12 @@ import { pageMetadata } from "@/lib/seo";
 
 type Params = { n: string };
 
-export const dynamic = "force-dynamic";
+/** Rendered on first visit and cached. See `docs/content-cache.md`. */
+export const revalidate = 60;
+
+export function generateStaticParams(): Params[] {
+  return [];
+}
 
 function parse(n: string): number | null {
   return /^[1-9]\d*$/.test(n) ? Number(n) : null;

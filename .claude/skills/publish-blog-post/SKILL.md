@@ -9,7 +9,7 @@ description: Use when writing, publishing, refreshing, or taking down a RegainFl
 
 Turn something RegainFlow actually saw, measured or decided into a post worth citing. You do the editorial work: interview, outline, draft, edit. `scripts/blog-pipeline.mts` does everything that must not be improvised: validation against `docs/blogs_seo/`, image measurement and upload, the draft preview, the database write, and the IndexNow ping.
 
-A published post is live the moment its row commits. The site reads the table on every request.
+A published post is live the moment its row commits. The site rebuilds its pages from the table at most once a minute, so a published post is live within a minute.
 
 ## Precondition
 

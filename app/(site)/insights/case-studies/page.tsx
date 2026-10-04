@@ -25,8 +25,8 @@ export const metadata: Metadata = pageMetadata({
   path: "/insights/case-studies",
 });
 
-/** Reads the table, like the reports index. */
-export const dynamic = "force-dynamic";
+/** Reads the table, like the reports index. See `docs/content-cache.md`. */
+export const revalidate = 60;
 
 /**
  * The case studies index, beside Reports and Blog, so each library has its own

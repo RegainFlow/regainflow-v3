@@ -300,13 +300,16 @@ of each report's PDF. Both go through Server Actions, and **neither makes a rout
 dynamic** — a Server Action does not opt its page into dynamic rendering, and nothing on
 this site reads `cookies()` or `searchParams`.
 
-The routes that *are* dynamic (`ƒ` in `pnpm build`) are the ones that read a content table
-(reports, case studies, blog posts): `/insights` and everything under it, each segment's OG
-image, `/llm-info`, `/sitemap.xml`, and `/llms.txt`. That is the deliberate price of
-publishing by adding a row rather than by deploying. Everything else — `/`, `/services`,
-`/industries` and its four group pages, `/company`, and `/contact` — must
-still show `○` or `●`, and a new `ƒ` among them means something opted a route into dynamic
-rendering by accident.
+The pages that read a content table (reports, case studies, blog posts) are **cached and
+rebuilt at most once a minute** (`export const revalidate = 60`): `/`, `/industries` and its
+group pages, `/llm-info`, and everything under `/insights`. A row published in Supabase is
+live within a minute, a new slug renders on its first visit, and no visitor or crawler waits
+on the database. `docs/content-cache.md` has the rule and the reasons.
+
+The routes that are still dynamic (`ƒ` in `pnpm build`) are `/sitemap.xml` and `/llms.txt`
+(they must fail, not serve stale, when the database is down), the draft preview, the
+generated card images, and the two newsletter pages that read the query string. A new `ƒ`
+on any other route means something opted it into per-request rendering by accident.
 
 **Both forms work with JavaScript disabled, and that is measured.** Replaying the native
 `multipart/form-data` POST that a scripting-off browser sends — the four `$ACTION_*` fields React
@@ -395,7 +398,7 @@ drives all of this conversationally, including drafting the copy.
 **Publishing is two commands on purpose.** The content run leaves the row at its `draft` default and
 never writes `status` — on insert or on update — so re-running against a corrected PDF cannot flip a
 report's visibility as a side effect. Approving copy stays an act someone takes rather than a flag
-someone forgets. The pages read this table on every request, so there is no build step standing
+someone forgets. The pages rebuild from this table at most once a minute, so there is no build step standing
 between a half-checked row and a visitor.
 
 The script defaults to **`.env`** and prints the target host on every run: `.env.local` points at a

@@ -9,7 +9,7 @@ description: Use when publishing, drafting, or replacing a RegainFlow case study
 
 Turn an engagement into a published case study. You do the editorial work; `scripts/case-study-pipeline.mts` does everything that must not be improvised — validation, image generation, upload, the database write, cleanup, and verification.
 
-A published study is live the moment the row commits. The site reads the table on every request and there is no build step between a typo and a visitor.
+A published study is live the moment the row commits. The site rebuilds its pages from the table at most once a minute and there is no build step between a typo and a visitor.
 
 ## Precondition
 

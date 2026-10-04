@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { PostList } from "@/components/BlogArchive";
 import ClosingCTA from "@/components/ClosingCTA";
 import { getPosts } from "@/lib/blog.server";
-import { authorBySlug } from "@/lib/content/company";
+import { TEAM, authorBySlug } from "@/lib/content/company";
 import {
   authorProfileJsonLd,
   breadcrumbJsonLd,
@@ -15,7 +15,13 @@ import {
 
 type Params = { slug: string };
 
-export const dynamic = "force-dynamic";
+/** The founders are in the repository, so each page is prerendered; the posts
+ *  come from the table, so it revalidates. See `docs/content-cache.md`. */
+export const revalidate = 60;
+
+export function generateStaticParams(): Params[] {
+  return TEAM.map((member) => ({ slug: member.slug }));
+}
 
 export async function generateMetadata({
   params,

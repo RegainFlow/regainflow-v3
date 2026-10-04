@@ -67,8 +67,9 @@ const KEY_FACTS: { term: string; detail: string }[] = [
   { term: "Contact", detail: CONTACT_EMAIL },
 ];
 
-// The case-study and report sections read their tables.
-export const dynamic = "force-dynamic";
+// The case-study and report sections read their tables. Cached, and rebuilt
+// at most once a minute: see `docs/content-cache.md`.
+export const revalidate = 60;
 
 export default async function LlmInfoPage() {
   const [studies, reports] = await Promise.all([getCaseStudies(), getReports()]);
