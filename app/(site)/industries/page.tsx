@@ -40,7 +40,7 @@ export default async function IndustriesPage() {
       <PageHeader
         eyebrow="Industries"
         title="We engineer the AI systems public agencies and complex organizations run on."
-        lead="Four industries, and the page for each one. If yours is here, its page says where the work usually stalls and what we would build instead."
+        lead="RegainFlow builds production AI systems for four industries: public safety, infrastructure and utilities, government, and defense and aerospace. Each page says where the work usually stalls and what we would build instead."
       />
 
       <section className="rf-section">

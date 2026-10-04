@@ -189,7 +189,9 @@ export default async function LlmInfoPage() {
                 </div>
 
                 <div className="col-span-full lg:col-span-8">
-                  <p className="rf-body max-w-[68ch]">{group.lead}</p>
+                  <p className="rf-body max-w-[68ch]">
+                    {group.answer} {group.lead}
+                  </p>
 
                   <p className="rf-utility mt-6">Where the work stalls</p>
                   <ul className="mt-2 flex flex-col gap-2">

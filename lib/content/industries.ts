@@ -54,6 +54,14 @@ export interface IndustryGroup {
   name: string;
   /** One line. Nav hint and listing-card subtitle. Names their job, not ours. */
   hint: string;
+  /**
+   * What we do for this sector, in one plain sentence that stands on its own:
+   * who it is for, what gets built, and what that gives them. It opens the
+   * page, ahead of the lead, because the lead starts with the sector's problem
+   * and a reader (or an assistant quoting the page) should not have to read on
+   * to learn what is on offer.
+   */
+  answer: string;
   /** Page lead. Two sentences. */
   lead: string;
   /**
@@ -89,6 +97,8 @@ export const INDUSTRY_GROUPS: IndustryGroup[] = [
     gov: true,
     name: "Public Safety",
     hint: "Law enforcement, fire & EMS, corrections, dispatch",
+    answer:
+      "RegainFlow builds AI systems for law enforcement, fire and EMS, corrections and dispatch agencies that let staff search and question their own case files, CAD logs and reports in plain language.",
     metaTitle: "AI for public safety agencies",
     metaDescription:
       "AI systems for law enforcement, fire and EMS, corrections and dispatch that make records searchable, with every answer traced to its source document.",
@@ -162,6 +172,8 @@ export const INDUSTRY_GROUPS: IndustryGroup[] = [
     hint: "Power, water and wastewater, public works",
     // No longer opens on "we built the monitoring for a grid operator". That
     // was pre-RegainFlow work, and the study behind it is gone.
+    answer:
+      "RegainFlow builds AI systems for power, water, wastewater and public works organizations that read sensor telemetry and asset records and flag what needs a crew.",
     metaTitle: "AI for utilities and public works",
     metaDescription:
       "AI systems for power, water, wastewater and public works that read sensor telemetry and asset records and surface what is worth a call-out.",
@@ -230,6 +242,8 @@ export const INDUSTRY_GROUPS: IndustryGroup[] = [
     gov: true,
     name: "Federal, State & Local Government",
     hint: "Federal, state, and local agencies, records, risk",
+    answer:
+      "RegainFlow delivers AI modernization programs for federal, state and local agencies, from the assessment through the build to the handoff to agency staff.",
     metaTitle: "AI for federal, state and local government",
     metaDescription:
       "AI modernization for federal, state and local agencies, taken end to end from the assessment through the build to the handoff to your own team.",
@@ -305,6 +319,8 @@ export const INDUSTRY_GROUPS: IndustryGroup[] = [
     // No longer claims the site's case studies as this career's work. The
     // pre-RegainFlow record is a credibility line in the founder bios now, not
     // a portfolio — see the header in `lib/content/case-studies.ts`.
+    answer:
+      "RegainFlow builds retrieval and platform systems for defense, aerospace and federal contractors: searchable technical documentation and secure internal platforms that stand up to audit.",
     metaTitle: "AI for defense and aerospace",
     metaDescription:
       "Retrieval and platform engineering for defense, aerospace and federal contractors: searchable technical documentation and secure platforms built for audit.",

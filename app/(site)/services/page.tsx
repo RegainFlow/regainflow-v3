@@ -24,7 +24,7 @@ export default function ServicesPage() {
       <PageHeader
         eyebrow="Services"
         title="From the right decision to a production system your team can run."
-        lead="You can start at any stage, and you can stop at any stage — the only thing we will not do is hand you something half-built and call it delivery."
+        lead="RegainFlow provides AI engineering services in three stages: Discover decides what is worth building, Implement builds the production system, and Scale runs it with your team until handoff. You can start or stop at any stage. We will not hand you something half-built and call it delivery."
       />
 
       {/* The engagement sequence sits above the engineering layers, not below

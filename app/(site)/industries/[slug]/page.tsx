@@ -87,7 +87,13 @@ export default async function IndustryPage({
 
   return (
     <>
-      <PageHeader eyebrow="Industries" title={group.name} lead={group.lead} />
+      {/* The plain answer first, then the sector's own problem. */}
+      <PageHeader
+        eyebrow="Industries"
+        title={group.name}
+        lead={group.answer}
+        meta={<p className="rf-body mt-5 max-w-[52ch]">{group.lead}</p>}
+      />
 
       <section className="rf-section">
         <div className="rf-shell py-12 md:py-16">

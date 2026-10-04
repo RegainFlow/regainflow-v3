@@ -109,6 +109,7 @@ function build(
     lines.push(
       `Sectors: ${group.industries.map((industry) => `${industry.name} (${industry.detail.replace(/\.$/, "")})`).join("; ")}.`
     );
+    lines.push(group.answer);
     lines.push(group.lead);
     lines.push("Where the work commonly stalls:");
     // `stall.text`, not `stall`. A template literal will happily stringify the
