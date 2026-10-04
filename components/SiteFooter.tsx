@@ -32,6 +32,8 @@ export default function SiteFooter() {
                   <a
                     href={profile.href}
                     className="rf-nav-link"
+                    data-rf-event={RF_EVENTS.socialProfileOpened}
+                    data-rf-network={profile.label.toLowerCase()}
                     target="_blank"
                     rel="noopener noreferrer"
                   >

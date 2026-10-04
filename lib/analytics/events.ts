@@ -36,6 +36,28 @@ export const RF_EVENTS = {
   /** Non-converting CTAs, kept separate so they cannot inflate the above. */
   secondaryClicked: "cta_secondary_clicked",
   caseStudyOpened: "case_study_opened",
+  /**
+   * An industry page, opened from a card or the home marquee. Carries
+   * `industry` (the group slug) and `surface`. The menu is not counted here:
+   * the question is which on-page route into a sector earns the click.
+   */
+  industryOpened: "industry_opened",
+  /**
+   * A pill: a section jump on `/insights` or a topic filter on the blog.
+   * Carries `target` (the pill's label) and `surface` (which row of pills).
+   */
+  insightsNavClicked: "insights_nav_clicked",
+  /** A breadcrumb link above a post, report or case study. Carries `target`. */
+  breadcrumbClicked: "breadcrumb_clicked",
+  /** LinkedIn or GitHub from the footer. Carries `network`. */
+  socialProfileOpened: "social_profile_opened",
+  /** The blog's RSS link. A reader subscribing without giving an email. */
+  feedOpened: "rss_feed_opened",
+  /**
+   * The 404 page, rendered. PostHog attaches `$pathname` and `$referrer`, so
+   * this is the list of dead links and where they are linked from.
+   */
+  notFoundViewed: "not_found_viewed",
   assessmentStepOpened: "assessment_step_opened",
   /**
    * A footer assistant link. Carries `assistant` — which of them was picked.
@@ -187,7 +209,18 @@ export type RfLocation =
   /** A report page, outside the gate. */
   | "report"
   /** Any page on gov.regainflow.com. */
-  | "gov";
+  | "gov"
+  /** The three home sections that link into `/services` and `/company`. */
+  | "home_production_gap"
+  | "home_stage_summary"
+  | "home_partnership"
+  /** "All case studies" under the home proof strip. */
+  | "home_proof"
+  /** The "All …" links closing each band of `/insights`. Carries `target`. */
+  | "insights_hub"
+  /** The way back in from the 404 and error pages. */
+  | "not_found"
+  | "error_page";
 
 /**
  * Which surface a case study card was opened from.

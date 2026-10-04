@@ -45,8 +45,8 @@ export async function generateMetadata({
   if (!group) return {};
 
   return pageMetadata({
-    title: group.name,
-    description: group.lead,
+    title: group.metaTitle,
+    description: group.metaDescription,
     path: `/industries/${group.slug}`,
   });
 }

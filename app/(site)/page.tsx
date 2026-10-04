@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import ClosingCTA from "@/components/ClosingCTA";
 import FreeAssessment from "@/components/FreeAssessment";
 import Hero from "@/components/Hero";
@@ -20,6 +22,13 @@ import StageSummary from "@/components/StageSummary";
  * see the migration, and `export const revalidate` if it needs walking back.
  */
 export const dynamic = "force-dynamic";
+
+/**
+ * Title, description and the share card come from the root layout's defaults,
+ * which are written for this page. Only the canonical is stated here: it used
+ * to sit in the root layout, where every page without its own inherited it.
+ */
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 export default function Home() {
   return (

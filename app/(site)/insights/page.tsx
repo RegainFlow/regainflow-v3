@@ -18,7 +18,8 @@ import {
   collectionJsonLd,
   pageMetadata,
   serializeJsonLd,
-} from "@/lib/seo";
+} from "@/lib/seo";
+import { RF_EVENTS } from "@/lib/analytics/events";
 
 const DESCRIPTION =
   "Case studies, research reports and blog posts from RegainFlow's AI engineering work in government, aerospace and regulated enterprise.";
@@ -107,7 +108,13 @@ export default async function InsightsPage() {
             </ul>
 
             <p className="mt-10">
-              <Link href="/insights/case-studies" className="rf-nav-link">
+              <Link
+                href="/insights/case-studies"
+                className="rf-nav-link"
+                data-rf-event={RF_EVENTS.secondaryClicked}
+                data-rf-location="insights_hub"
+                data-rf-target="case_studies"
+              >
                 All case studies &rarr;
               </Link>
             </p>
@@ -149,7 +156,13 @@ export default async function InsightsPage() {
             ) : null}
 
             <p className="mt-10">
-              <Link href="/insights/reports" className="rf-nav-link">
+              <Link
+                href="/insights/reports"
+                className="rf-nav-link"
+                data-rf-event={RF_EVENTS.secondaryClicked}
+                data-rf-location="insights_hub"
+                data-rf-target="reports"
+              >
                 All reports &rarr;
               </Link>
             </p>
@@ -185,7 +198,13 @@ export default async function InsightsPage() {
             </div>
 
             <p className="mt-10">
-              <Link href="/insights/blog" className="rf-nav-link">
+              <Link
+                href="/insights/blog"
+                className="rf-nav-link"
+                data-rf-event={RF_EVENTS.secondaryClicked}
+                data-rf-location="insights_hub"
+                data-rf-target="blog"
+              >
                 All posts &rarr;
               </Link>
             </p>

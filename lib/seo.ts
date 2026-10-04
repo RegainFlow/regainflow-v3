@@ -107,7 +107,7 @@ export function pageMetadata({
   const fullTitle = `${title} | ${SITE_NAME}`;
   const card = {
     url: image?.url ?? "/opengraph-image",
-    alt: image?.alt ?? `${SITE_NAME} — AI engineering & transformation partner`,
+    alt: image?.alt ?? `${SITE_NAME}, AI engineering & transformation partner`,
     ...OG_CARD,
   };
   const images = segmentCard ? {} : { images: [card] };
@@ -179,7 +179,7 @@ export function organizationJsonLd() {
     logo: `${SITE_URL}/icon.png`,
     image: `${SITE_URL}/opengraph-image`,
     description:
-      "AI engineering and transformation partner for public agencies and complex organizations — AI portfolio direction, production engineering, and managed AI operations, through adoption and handoff.",
+      "AI engineering and transformation partner for public agencies and complex organizations: AI portfolio direction, production engineering, and managed AI operations, through adoption and handoff.",
     areaServed: "US",
     address: {
       "@type": "PostalAddress",

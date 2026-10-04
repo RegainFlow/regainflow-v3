@@ -56,6 +56,17 @@ export interface IndustryGroup {
   hint: string;
   /** Page lead. Two sentences. */
   lead: string;
+  /**
+   * The `<title>`, before the site suffix. `name` is the H1 and the menu
+   * label; a sector name alone ("Public Safety") says nothing about AI to
+   * someone scanning a results page.
+   */
+  metaTitle: string;
+  /**
+   * The search description, 120 to 160 characters. The lead runs to twice
+   * that and was being truncated or replaced.
+   */
+  metaDescription: string;
   /** Where the work gets stuck here. Lines a reader recognises themselves in. */
   stalls: Stall[];
   /** What we install, keyed to `LAYERS[].index` so the four layers stay the spine. */
@@ -78,7 +89,10 @@ export const INDUSTRY_GROUPS: IndustryGroup[] = [
     gov: true,
     name: "Public Safety",
     hint: "Law enforcement, fire & EMS, corrections, dispatch",
-    lead: "Public safety agencies generate more record than anyone has time to read — CAD logs, incident reports, body camera transcripts, inspection histories. We build the systems that make that record searchable and answerable, and we build them so every answer traces back to the document it came from.",
+    metaTitle: "AI for public safety agencies",
+    metaDescription:
+      "AI systems for law enforcement, fire and EMS, corrections and dispatch that make records searchable, with every answer traced to its source document.",
+    lead: "Public safety agencies generate more record than anyone has time to read: CAD logs, incident reports, body camera transcripts, inspection histories. We build the systems that make that record searchable and answerable, and we build them so every answer traces back to the document it came from.",
     stalls: [
       {
         icon: "clock",
@@ -148,7 +162,10 @@ export const INDUSTRY_GROUPS: IndustryGroup[] = [
     hint: "Power, water and wastewater, public works",
     // No longer opens on "we built the monitoring for a grid operator". That
     // was pre-RegainFlow work, and the study behind it is gone.
-    lead: "Utilities and public works run on telemetry that arrives faster than anyone can watch it, and on asset records split between three systems and a filing cabinet. We engineer the systems that read that telemetry and surface what is worth a call-out — on a treatment plant, a lift station, a substation, or a fleet.",
+    metaTitle: "AI for utilities and public works",
+    metaDescription:
+      "AI systems for power, water, wastewater and public works that read sensor telemetry and asset records and surface what is worth a call-out.",
+    lead: "Utilities and public works run on telemetry that arrives faster than anyone can watch it, and on asset records split between three systems and a filing cabinet. We engineer the systems that read that telemetry and surface what is worth a call-out, on a treatment plant, a lift station, a substation, or a fleet.",
     stalls: [
       {
         icon: "activity",
@@ -213,6 +230,9 @@ export const INDUSTRY_GROUPS: IndustryGroup[] = [
     gov: true,
     name: "Federal, State & Local Government",
     hint: "Federal, state, and local agencies, records, risk",
+    metaTitle: "AI for federal, state and local government",
+    metaDescription:
+      "AI modernization for federal, state and local agencies, taken end to end from the assessment through the build to the handoff to your own team.",
     lead: "Federal, state, and local departments carry modernization scope on top of the job they already have. We take one of those programs end to end, from the assessment through the build to the handoff, so it does not become another system that needs a champion to survive.",
     stalls: [
       {
@@ -285,7 +305,10 @@ export const INDUSTRY_GROUPS: IndustryGroup[] = [
     // No longer claims the site's case studies as this career's work. The
     // pre-RegainFlow record is a credibility line in the founder bios now, not
     // a portfolio — see the header in `lib/content/case-studies.ts`.
-    lead: "Technical documentation nobody can search, secure platforms every team rebuilds, and engineering workflows held together by someone moving a file each morning. We engineer retrieval and platform systems inside organizations that audit everything — and it is the environment the two of us spent our careers in before RegainFlow.",
+    metaTitle: "AI for defense and aerospace",
+    metaDescription:
+      "Retrieval and platform engineering for defense, aerospace and federal contractors: searchable technical documentation and secure platforms built for audit.",
+    lead: "Technical documentation nobody can search, secure platforms every team rebuilds, and engineering workflows held together by someone moving a file each morning. We engineer retrieval and platform systems inside organizations that audit everything. It is the environment the two of us spent our careers in before RegainFlow.",
     stalls: [
       {
         icon: "search",

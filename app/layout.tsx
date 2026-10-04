@@ -22,8 +22,10 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 const TITLE = "RegainFlow | AI Engineering & Transformation Partner";
+// Under 160 characters: it is the home page's search snippet and the fallback
+// for any page that sets none, and Google truncates past that.
 const DESCRIPTION =
-  "RegainFlow builds production AI systems for public agencies and complex organizations. We find the AI work worth doing, engineer the production system around it, and stay through integration, deployment, adoption, and handoff.";
+  "RegainFlow builds production AI systems for public agencies and complex organizations, from the first assessment through deployment, adoption and handoff.";
 
 /**
  * `viewportFit` is deliberately left at its default rather than set to
@@ -49,7 +51,10 @@ export const metadata: Metadata = {
   },
   description: DESCRIPTION,
   applicationName: SITE_NAME,
-  alternates: { canonical: "/" },
+  // No `alternates.canonical` here. A canonical in the root layout is inherited
+  // by every page that sets none, so the thank-you and newsletter pages all
+  // claimed to be the home page. Each page states its own (`pageMetadata`), and
+  // the home page does in `app/(site)/page.tsx`.
   // Without these Google will not use a large image or a full-length snippet,
   // which is most of what a mobile result is.
   robots: {

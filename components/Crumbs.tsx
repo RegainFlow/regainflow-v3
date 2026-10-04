@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { RF_EVENTS } from "@/lib/analytics/events";
+
 /**
  * The visible breadcrumb above a title: the parents only, not the page itself,
  * which the H1 already names. Pair it with `breadcrumbJsonLd` from `lib/seo`
@@ -11,7 +13,12 @@ export default function Crumbs({ items }: { items: { name: string; path: string 
       <ol className="rf-crumbs rf-utility">
         {items.map((item) => (
           <li key={item.path}>
-            <Link href={item.path} className="rf-nav-link">
+            <Link
+              href={item.path}
+              className="rf-nav-link"
+              data-rf-event={RF_EVENTS.breadcrumbClicked}
+              data-rf-target={item.path}
+            >
               {item.name}
             </Link>
           </li>

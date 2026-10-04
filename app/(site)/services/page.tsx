@@ -8,9 +8,9 @@ import RegainFlowSystem from "@/components/RegainFlowSystem";
 import { breadcrumbJsonLd, pageMetadata, serializeJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Services",
+  title: "AI engineering services",
   description:
-    "Discover, Implement, and Scale — AI portfolio direction, production engineering across the intelligence, data, workflow, and platform layers, and managed AI operations.",
+    "AI services in three stages: Discover sets the portfolio direction, Implement engineers the production system, and Scale runs it through managed AI operations.",
   path: "/services",
 });
 

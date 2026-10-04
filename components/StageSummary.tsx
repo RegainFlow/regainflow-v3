@@ -5,7 +5,8 @@ import { useEffect, useRef, useState } from "react";
 
 import PlayOnView from "@/components/stage-models/PlayOnView";
 import StageModel from "@/components/stage-models/StageModel";
-import { STAGES, type StageId } from "@/lib/content/stages";
+import { STAGES, type StageId } from "@/lib/content/stages";
+import { RF_EVENTS } from "@/lib/analytics/events";
 
 /**
  * The home-page version of the three services: name, promise, and one line
@@ -113,6 +114,9 @@ export default function StageSummary() {
                 <Link
                   href={`/services#${item.id}`}
                   className="rf-nav-link mt-4 inline-block"
+                  data-rf-event={RF_EVENTS.secondaryClicked}
+                  data-rf-location="home_stage_summary"
+                  data-rf-target={item.id}
                 >
                   {`What ${item.name.toLowerCase()} includes →`}
                 </Link>

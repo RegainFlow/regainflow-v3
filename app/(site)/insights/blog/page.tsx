@@ -9,7 +9,8 @@ import NewsletterSignup from "@/components/NewsletterSignup";
 import PageHeader from "@/components/PageHeader";
 import { getPosts } from "@/lib/blog.server";
 import { FEATURED_SLOTS } from "@/lib/content/blog";
-import { breadcrumbJsonLd, pageMetadata, serializeJsonLd } from "@/lib/seo";
+import { breadcrumbJsonLd, pageMetadata, serializeJsonLd } from "@/lib/seo";
+import { RF_EVENTS } from "@/lib/analytics/events";
 
 export const metadata: Metadata = pageMetadata({
   title: "Blog",
@@ -53,7 +54,11 @@ export default async function BlogPage() {
         lead="Posts by the RegainFlow engineers, from work in government, aerospace and regulated enterprise."
         meta={
           <p className="mt-5">
-            <a href="/insights/blog/feed.xml" className="rf-nav-link rf-utility">
+            <a
+              href="/insights/blog/feed.xml"
+              className="rf-nav-link rf-utility"
+              data-rf-event={RF_EVENTS.feedOpened}
+            >
               RSS feed
             </a>
           </p>

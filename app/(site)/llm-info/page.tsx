@@ -53,7 +53,7 @@ import {
  */
 export const metadata: Metadata = pageMetadata({
   title: "AI fact sheet",
-  description: `A factual overview of ${SITE_NAME} — what it does, who it works with, how engagements run, and what it will not take on. Written to be quoted accurately by AI assistants and search engines.`,
+  description: `A factual overview of ${SITE_NAME}: what it does, who it works with, how engagements run and what it will not take on. Written for AI assistants to quote.`,
   path: "/llm-info",
 });
 

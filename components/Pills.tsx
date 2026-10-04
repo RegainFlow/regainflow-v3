@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { RF_EVENTS } from "@/lib/analytics/events";
+
 export interface Pill {
   label: string;
   href: string;
@@ -22,6 +24,9 @@ export default function Pills({ label, items }: { label: string; items: Pill[] }
               href={item.href}
               className="rf-pill"
               aria-current={item.current ? "page" : undefined}
+              data-rf-event={RF_EVENTS.insightsNavClicked}
+              data-rf-target={item.label}
+              data-rf-surface={label}
             >
               {item.label}
             </Link>

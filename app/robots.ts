@@ -32,6 +32,5 @@ export default function robots(): MetadataRoute.Robots {
       ...ANSWER_ENGINES.map((userAgent) => ({ userAgent, allow: "/", disallow: PRIVATE })),
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
-    host: SITE_URL,
   };
 }

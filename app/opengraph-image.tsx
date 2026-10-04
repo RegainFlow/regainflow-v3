@@ -3,7 +3,7 @@ import { ImageResponse } from "next/og";
 import { ogCard, ogFonts } from "@/lib/og";
 import { POSITIONING, SITE_NAME } from "@/lib/site";
 
-export const alt = "RegainFlow — AI engineering & transformation partner";
+export const alt = "RegainFlow, AI engineering & transformation partner";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

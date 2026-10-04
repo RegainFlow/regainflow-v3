@@ -32,7 +32,7 @@ import {
 } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Company",
+  title: "About the company and its founders",
   description:
     "RegainFlow is an AI engineering and transformation partner based in Orlando, Florida. Who we are, what we believe about AI in production, and how to reach us.",
   path: "/company",

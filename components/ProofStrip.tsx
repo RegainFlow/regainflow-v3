@@ -3,7 +3,8 @@ import Link from "next/link";
 import AsciiField from "@/components/brand/AsciiField";
 import CaseStudyCard from "@/components/CaseStudyCard";
 import DitherReveal from "@/components/DitherReveal";
-import { getCaseStudies } from "@/lib/case-studies.server";
+import { getCaseStudies } from "@/lib/case-studies.server";
+import { RF_EVENTS } from "@/lib/analytics/events";
 
 /**
  * Proof on the home page without duplicating `/insights`.
@@ -66,7 +67,13 @@ export default async function ProofStrip() {
         </ul>
 
         <p className="mt-10">
-          <Link href="/insights/case-studies" className="rf-nav-link">
+          <Link
+            href="/insights/case-studies"
+            className="rf-nav-link"
+            data-rf-event={RF_EVENTS.secondaryClicked}
+            data-rf-location="home_proof"
+            data-rf-target="case_studies"
+          >
             All case studies &rarr;
           </Link>
         </p>

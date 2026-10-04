@@ -3,7 +3,8 @@ import Link from "next/link";
 import {
   GROUP_BY_INDUSTRY,
   INDUSTRY_NAMES,
-} from "@/lib/content/industries";
+} from "@/lib/content/industries";
+import { RF_EVENTS } from "@/lib/analytics/events";
 
 /**
  * Who the site is for, said once and kept moving.
@@ -35,6 +36,9 @@ export default function IndustryMarquee() {
               <Link
                 href={`/industries/${GROUP_BY_INDUSTRY[name].slug}`}
                 className="rf-marquee-link"
+                data-rf-event={RF_EVENTS.industryOpened}
+                data-rf-industry={GROUP_BY_INDUSTRY[name].slug}
+                data-rf-surface="home_marquee"
               >
                 {name}
               </Link>

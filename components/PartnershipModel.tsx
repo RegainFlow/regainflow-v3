@@ -3,7 +3,8 @@ import Link from "next/link";
 import Icon from "@/components/Icon";
 import PlayOnView from "@/components/stage-models/PlayOnView";
 import StageModel from "@/components/stage-models/StageModel";
-import { PRINCIPLES } from "@/lib/content/company";
+import { PRINCIPLES } from "@/lib/content/company";
+import { RF_EVENTS } from "@/lib/analytics/events";
 
 export default function PartnershipModel() {
   return (
@@ -56,7 +57,13 @@ export default function PartnershipModel() {
             ))}
           </ul>
 
-          <Link href="/company#manifesto" className="rf-nav-link mt-6 inline-block">
+          <Link
+            href="/company#manifesto"
+            className="rf-nav-link mt-6 inline-block"
+            data-rf-event={RF_EVENTS.secondaryClicked}
+            data-rf-location="home_partnership"
+            data-rf-target="manifesto"
+          >
             Read the manifesto &rarr;
           </Link>
         </div>

@@ -7,12 +7,13 @@ import DitherReveal from "@/components/DitherReveal";
 import PageHeader from "@/components/PageHeader";
 import { getCaseStudies } from "@/lib/case-studies.server";
 import { INDUSTRY_GROUPS } from "@/lib/content/industries";
-import { breadcrumbJsonLd, pageMetadata, serializeJsonLd } from "@/lib/seo";
+import { breadcrumbJsonLd, pageMetadata, serializeJsonLd } from "@/lib/seo";
+import { RF_EVENTS } from "@/lib/analytics/events";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Industries",
+  title: "AI engineering by industry",
   description:
-    "AI engineering for public safety, infrastructure and utilities, federal, state and local government, and defense and aerospace. Four industries, and the page for each one.",
+    "AI engineering for public safety, infrastructure and utilities, federal, state and local government, and defense and aerospace, with a page for each.",
   path: "/industries",
 });
 
@@ -48,7 +49,13 @@ export default async function IndustriesPage() {
             {INDUSTRY_GROUPS.map((group, i) => (
               <li key={group.slug} className="h-full">
                 <DitherReveal className="h-full" delay={(i % 2) * 90}>
-                  <Link href={`/industries/${group.slug}`} className="rf-card">
+                  <Link
+                    href={`/industries/${group.slug}`}
+                    className="rf-card"
+                    data-rf-event={RF_EVENTS.industryOpened}
+                    data-rf-industry={group.slug}
+                    data-rf-surface="industries_hub"
+                  >
                     <p className="rf-utility text-rf-flow-soft">{group.hint}</p>
 
                     <h2 className="rf-h2 mt-4 max-w-[16ch]">{group.name}</h2>
