@@ -218,6 +218,10 @@ export type RfLocation =
   | "report"
   /** Any page on gov.regainflow.com. */
   | "gov"
+  /** The government card on `/industries`, which opens gov.regainflow.com. */
+  | "industries_hub"
+  /** A government sector in the home marquee, which opens gov.regainflow.com. */
+  | "home_marquee"
   /** The three home sections that link into `/services` and `/company`. */
   | "home_production_gap"
   | "home_stage_summary"

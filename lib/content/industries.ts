@@ -89,6 +89,14 @@ export interface IndustryGroup {
   industries: Industry[];
   /** Buyers here procure through government, so the page links to gov.regainflow.com. */
   gov?: boolean;
+  /**
+   * Links to this group from elsewhere on the site (the nav, the hub card, the
+   * home marquee) go to gov.regainflow.com instead of the group's own page. A
+   * reader choosing "government" is usually procuring, and wants the capability
+   * statement and past performance, not the pitch. The page still exists, at
+   * its own address and in the sitemap, for a reader who arrives from search.
+   */
+  govFirst?: boolean;
 }
 
 export const INDUSTRY_GROUPS: IndustryGroup[] = [
@@ -240,6 +248,7 @@ export const INDUSTRY_GROUPS: IndustryGroup[] = [
   {
     slug: "federal-state-local",
     gov: true,
+    govFirst: true,
     name: "Federal, State & Local Government",
     hint: "Federal, state, and local agencies, records, risk",
     answer:
