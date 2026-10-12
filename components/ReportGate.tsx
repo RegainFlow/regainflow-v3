@@ -101,7 +101,12 @@ export default function ReportGate({ report }: { report: Report }) {
     // submitting onto it retroactively. See `instrumentation-client.ts`.
     identify(state.email);
     track(RF_EVENTS.reportUnlocked, { report: report.slug });
+    if (state.subscribed) {
+      track(RF_EVENTS.newsletterSubmitted, { source: `report_gate:${report.slug}` });
+    }
   }, [state, report.slug]);
+
+  const subscribed = state.status === "ok" && state.subscribed;
 
   const errors = state.status === "error" ? state.errors : {};
   const formError = state.status === "error" ? state.formError : undefined;
@@ -128,6 +133,11 @@ export default function ReportGate({ report }: { report: Report }) {
         </div>
 
         <p className="rf-form-note mt-6 max-w-[46ch]">
+          {subscribed ? (
+            <>
+              Check your inbox to confirm the newsletter.{" "}
+            </>
+          ) : null}
           Unlocked with {reader} on this device.{" "}
           <button
             type="button"
@@ -149,7 +159,7 @@ export default function ReportGate({ report }: { report: Report }) {
       </h2>
       <p className="rf-body mt-4 max-w-[46ch]">
         One address, once. Every report we publish opens for you after this.
-        It does not sign you up for the newsletter, and we do not pass it on.
+        We do not pass it on.
       </p>
 
       <form action={action} className="mt-7 flex flex-col gap-5">
@@ -202,6 +212,17 @@ export default function ReportGate({ report }: { report: Report }) {
             className="rf-input"
           />
         </div>
+
+        {/* Unticked by default: the report is the ask, the newsletter is an
+            offer. Ticking it sends a confirmation link, the same double opt-in
+            as the signup block. */}
+        <label className="rf-check">
+          <input type="checkbox" name="newsletter" />
+          <span>
+            Also email me new reports and posts. Confirm by email, unsubscribe
+            anytime.
+          </span>
+        </label>
 
         <div role="alert" aria-live="polite">
           {formError ? (

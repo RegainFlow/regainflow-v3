@@ -15,7 +15,9 @@
     "case-study": "node --env-file=.env.local --import tsx scripts/case-study-pipeline.mts",
     "case-study:prod": "node --env-file=.env --import tsx scripts/case-study-pipeline.mts",
     "blog": "node --env-file=.env.local --import tsx scripts/blog-pipeline.mts",
-    "blog:prod": "node --env-file=.env --import tsx scripts/blog-pipeline.mts"
+    "blog:prod": "node --env-file=.env --import tsx scripts/blog-pipeline.mts",
+    "newsletter:sync": "node --env-file=.env.local --import tsx scripts/newsletter-sync.mts",
+    "newsletter:sync:prod": "node --env-file=.env --import tsx scripts/newsletter-sync.mts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.2",

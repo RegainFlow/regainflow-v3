@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useEffect, useRef } from "react";
 
 import { subscribe } from "@/app/(site)/newsletter/actions";
@@ -26,8 +27,9 @@ export default function NewsletterSignup({
 }: {
   source: string;
   /** `split` puts the heading left and the promise and form right, for a
-   *  full-width band; `stack` is the narrow column under a post. */
-  layout?: "stack" | "split";
+   *  full-width band; `stack` is the narrow column under a post; `compact` is
+   *  the footer's: a label and one line, no heading. */
+  layout?: "stack" | "split" | "compact";
 }) {
   const [state, action, pending] = useActionState(subscribe, IDLE);
   const errorRef = useRef<HTMLParagraphElement>(null);
@@ -40,22 +42,33 @@ export default function NewsletterSignup({
     if (error) errorRef.current?.focus();
   }, [error]);
 
+  const compact = layout === "compact";
+
   return (
     <section
-      className={`rf-newsletter${layout === "split" ? " rf-newsletter-split" : ""}`}
+      className={`rf-newsletter${layout === "stack" ? "" : ` rf-newsletter-${layout}`}`}
       aria-labelledby={`${id}-heading`}
     >
-      <div className="rf-newsletter-head">
-        <p className="rf-utility text-rf-flow-soft">{NEWSLETTER.eyebrow}</p>
-        <h2
-          id={`${id}-heading`}
-          className={layout === "split" ? "rf-h2 mt-4 max-w-[16ch]" : "rf-h3 mt-3"}
-        >
-          {NEWSLETTER.heading}
-        </h2>
-      </div>
+      {compact ? (
+        <>
+          <p id={`${id}-heading`} className="rf-utility">
+            {NEWSLETTER.eyebrow}
+          </p>
+          <p className="rf-body mt-3 max-w-[34ch]">{NEWSLETTER.short}</p>
+        </>
+      ) : (
+        <div className="rf-newsletter-head">
+          <p className="rf-utility text-rf-flow-soft">{NEWSLETTER.eyebrow}</p>
+          <h2
+            id={`${id}-heading`}
+            className={layout === "split" ? "rf-h2 mt-4 max-w-[16ch]" : "rf-h3 mt-3"}
+          >
+            {NEWSLETTER.heading}
+          </h2>
+        </div>
+      )}
       <div className="rf-newsletter-main">
-        <p className="rf-newsletter-body">{NEWSLETTER.body}</p>
+        {compact ? null : <p className="rf-newsletter-body">{NEWSLETTER.body}</p>}
 
         <form action={action} className="rf-newsletter-form">
           <input type="hidden" name="source" value={source} />
@@ -99,6 +112,13 @@ export default function NewsletterSignup({
             </p>
           ) : null}
         </div>
+
+        <p className="rf-form-note mt-3">
+          {NEWSLETTER.fine}{" "}
+          <Link href="/privacy" className="rf-text-link">
+            Privacy
+          </Link>
+        </p>
       </div>
     </section>
   );

@@ -691,6 +691,29 @@
     color: var(--color-rf-slate);
   }
 
+  /* An opt-in checkbox with its sentence beside it. The native control, tinted,
+     so focus and keyboard behaviour come for free; the whole label is the hit
+     area. */
+  .rf-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    max-width: 46ch;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--color-rf-slate);
+    cursor: pointer;
+  }
+
+  .rf-check input {
+    flex: none;
+    width: 1.05rem;
+    height: 1.05rem;
+    margin-top: 0.12rem;
+    accent-color: var(--color-rf-flow);
+    cursor: pointer;
+  }
+
   /* Off-screen rather than `display: none` or `hidden`: a bot reading the DOM
      skips anything obviously hidden, and this only works if it looks reachable.
      `tabindex="-1"` and `autocomplete="off"` on the input keep it away from
@@ -1681,6 +1704,14 @@
       flex-direction: row;
       align-items: stretch;
     }
+  }
+
+  /* The footer's: narrow column, so the field and button stack at every width
+     and the form takes the column rather than its band maximum. */
+  .rf-newsletter-compact .rf-newsletter-form {
+    flex-direction: column;
+    margin-top: 1rem;
+    max-width: 22rem;
   }
 
   /* The inline CTA: one line between hairlines, opened by the route tick. The

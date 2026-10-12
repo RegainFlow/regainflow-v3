@@ -14,6 +14,10 @@ export const NEWSLETTER = {
   heading: "Get new posts by email.",
   body: "We send each new post and report when it is published, and nothing else. Every email has a one-click unsubscribe.",
   label: "Subscribe",
+  /** The fine print under every signup, before the privacy link. */
+  fine: "Confirm by email. Unsubscribe anytime.",
+  /** The footer's one-line version of `body`. */
+  short: "New posts and reports by email, when they are published.",
 } as const;
 
 /** How long a confirmation link stays valid. Stated in the email too. */

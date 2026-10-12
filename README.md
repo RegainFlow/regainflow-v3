@@ -472,12 +472,23 @@ because it has no author page.
 
 ### Newsletter
 
-`components/NewsletterSignup.tsx` sits at the end of every post and on the blog index. It is
-double opt-in: the action writes a `pending` row to `newsletter_subscribers` and mails a
-confirmation link through Resend; the link opens a page whose button confirms (mail gateways
-fetch every link, so a GET must not). Confirmation adds the address to Resend's contacts, in
-`RESEND_SEGMENT_ID` when set, and Resend handles sending and unsubscribes from there. The
-table is the record of consent.
+`components/NewsletterSignup.tsx` sits at the end of every post, on the Insights, blog,
+reports and case studies indexes, and in the footer of every page (`layout="compact"`). The
+report gate has an unticked "also email me" box that runs the same signup. It is double
+opt-in: `startSubscription` (`lib/newsletter.server.ts`, rule in `lib/newsletter.ts`) writes
+a `pending` row to `newsletter_subscribers` and mails a confirmation link through Resend;
+the link opens a page whose button confirms (mail gateways fetch every link, so a GET must
+not). Confirmation adds the address to Resend's contacts, in `RESEND_SEGMENT_ID` when set,
+and Resend handles sending (Broadcasts) and unsubscribes from there. The table is the record
+of consent, and its `source` column says which form each signup came from (`footer`,
+`blog_post:<slug>`, `report_gate:<slug>`, ...).
+
+Without Resend keys locally, the confirmation link for a `localhost` signup is printed to
+the server console so it can be opened by hand.
+
+`pnpm newsletter:sync` lists confirmed subscribers; `--apply` adds any Resend is missing
+(the confirm-time sync is best-effort). `pnpm newsletter:sync:prod` does the same against
+production. Every signup links to `/privacy`, which describes what each form collects.
 
 ### Database migrations
 

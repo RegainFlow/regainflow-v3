@@ -113,6 +113,12 @@ export async function sendNewsletterConfirm(
     console.warn(
       "[mail] RESEND_API_KEY or RESEND_FROM unset — newsletter confirmation skipped. The pending row was still recorded.",
     );
+    // Without mail, a local signup could never be confirmed. A link back to a
+    // local server goes to the console so it can be opened by hand; nothing
+    // that points at a real deployment is ever printed.
+    if (/^http:\/\/(localhost|127\.0\.0\.1)[:/]/.test(confirmUrl)) {
+      console.warn(`[mail] local confirmation link: ${confirmUrl}`);
+    }
     return;
   }
 
