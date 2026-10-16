@@ -1,6 +1,6 @@
 ---
 name: publish-blog-post
-description: Use when writing, publishing, refreshing, or taking down a RegainFlow blog post on regainflow.com/insights/blog. Covers the interview, collecting photos and screenshots, follow-up questions, the outline, the draft, the SEO and accessibility checks, the draft preview, and the Supabase write through `pnpm blog`. Trigger on "new blog post", "write a post about…", "publish this post", "update/refresh the post on…", "add this to the blog", or "unpublish the post". Runs only from the regainflow-v3 repository. Apply regainflow-brand-guidelines for voice and the repository's no-ai-slop skill to the prose.
+description: Use when writing, publishing, refreshing, or taking down a RegainFlow blog post on regainflow.com/insights/blog. Covers the interview, collecting photos and screenshots, follow-up questions, the outline, the draft, the SEO and accessibility checks, the draft preview, and the Supabase write through `pnpm blog`. Trigger on "new blog post", "write a post about…", "publish this post", "update/refresh the post on…", "add this to the blog", or "unpublish the post". Runs only from the regainflow-v3 repository. Write to docs/WRITING.md (the RegainFlow voice and house rules), then apply the repository's no-ai-slop skill to the prose.
 ---
 
 # Publish a RegainFlow blog post
@@ -87,14 +87,14 @@ For a post **built on one of our reports**, tie the two together:
 - lead the `title` with the report's named idea, then say what the post adds: "The AI ROI problem: what AI really costs", not the report's exact title (that would compete with the report page in search);
 - put the question a reader would type in `meta_title` ("What AI really costs, and how to budget for it"), so the page has both;
 - link the report in the first paragraph, with its exact title as the link text (`[*The AI ROI Problem*](/insights/reports/the-ai-roi-problem)`). Check `/insights/reports` for the real slug; do not guess it;
-- footnote any figure taken from it as "as cited in RegainFlow, *Report title* (year)".
+- footnote any figure taken from it to the **original** source, after opening the link and confirming it holds the exact figure. Fall back to "as cited in RegainFlow, *Report title* (year)" only when the original cannot be reached.
 
 The same goes for a case study: link `/insights/<slug>`. The link is what lists the post under "Related reading" on that page.
 
 ### 5. Draft
 
-Write `.blog/<slug>/post.md` from `assets/post-template.md`:
-- answer or stakes in the first paragraph, short;
+Write `.blog/<slug>/post.md` from `assets/post-template.md`, following `docs/WRITING.md`:
+- the answer in the first sentence, then the concrete situation; no `#` title or italic subtitle in the body (they come from the intake file);
 - a descriptive `##` every 200–400 words, `###` below it, never `#`;
 - short paragraphs, bullets for parallel items, tables where they compare;
 - figures from `references/figures.md` (callout, steps, bars, video) where they carry information;
@@ -106,7 +106,9 @@ Takeaways (3–5) are claims, and **none is repeated word for word in the body**
 
 ### 6. Edit
 
-Run the **no-ai-slop** skill on the draft, then check voice against **regainflow-brand-guidelines**. Keep the author's voice; cut hedging and throat-clearing.
+Run the **no-ai-slop** skill on the draft, then the house rules and final checklist in `docs/WRITING.md`. Keep the author's voice; cut reflexive hedging, verdict sentences and recap endings.
+
+When the person brings a draft written elsewhere, treat it as their voice: keep their wording, make the house-rule edits, and list what changed. Rewrite the intake file's summary, takeaways and meta description to match the new body.
 
 ### 7. Intake, prepare, stage
 
