@@ -9,7 +9,7 @@ description: Use when publishing, drafting, or replacing a RegainFlow case study
 
 Turn an engagement into a published case study. You do the editorial work; `scripts/case-study-pipeline.mts` does everything that must not be improvised — validation, image generation, upload, the database write, cleanup, and verification.
 
-A published study is live the moment the row commits. The site reads the table on every request and there is no build step between a typo and a visitor.
+A published study is live the moment the row commits. The site rebuilds its pages from the table at most once a minute and there is no build step between a typo and a visitor.
 
 ## Precondition
 
@@ -32,7 +32,7 @@ The pipeline scans for violations of both. It cannot detect compliance, which is
 
 1. **Interview.** Collect the six spine answers — context, constraints, RegainFlow's role, what was engineered, outcome, what changed next — plus scope facts, deliverables, and capability tags. Ask explicitly for the **deny list**: every client, program, platform, and project name that must never appear. Ask how every number was measured.
 2. **Apply the brand.** Use **regainflow-brand-guidelines** for voice and for art direction. Use the repository's **no-ai-slop** skill on the prose.
-3. **Write the intake** to `.case-study/<slug>/intake.yaml` (gitignored). Start from `assets/case-study-intake.yaml`; field rules are in `references/case-study-schema.md`.
+3. **Write the intake** to `.case-study/<slug>/intake.yaml` (gitignored). The slugs `blog`, `reports` and `case-studies` are refused: they are index pages beside the study route. Start from `assets/case-study-intake.yaml`; field rules are in `references/case-study-schema.md`.
 4. **Prepare.**
    ```
    pnpm case-study prepare .case-study/<slug>/intake.yaml
@@ -45,7 +45,7 @@ The pipeline scans for violations of both. It cannot detect compliance, which is
    ```
    pnpm case-study publish .case-study/<slug>/preview
    ```
-7. **Report** the live URLs the command prints. If the study should *lead* an industry page rather than merely appear on it, that is still a repository edit to `INDUSTRY_GROUPS[].proof` in `lib/content/industries.ts` — say so.
+7. **Report** the live URLs the command prints, and the `IndexNow:` line (the study, the two listings and its industry pages are announced to Bing; "skipped" means `INDEXNOW_KEY` is unset). A published study also appears on `/insights/case-studies` (the index), the hub at `/insights`, and "Related reading" on report and other study pages; its own page lists any blog post that links to `/insights/<slug>`, so offer a companion post (**publish-blog-post**). If the study should *lead* an industry page rather than merely appear on it, that is still a repository edit to `INDUSTRY_GROUPS[].proof` in `lib/content/industries.ts` — say so.
 
 ## The approval gate
 

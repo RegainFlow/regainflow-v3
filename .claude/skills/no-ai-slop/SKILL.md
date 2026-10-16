@@ -105,4 +105,5 @@ Often-empty phrases: it's worth noting, it's important to note, at the end of th
 - **Claim-then-evidence** ("A pilot is not a result.") is DESIGN.md rule 1, not a binary
   contrast to strip. The manifesto and stage copy stay as written.
 
-Everything else applies in full to new copy.
+Everything else applies in full to new copy. For blog posts and other long-form copy,
+`docs/WRITING.md` adds the RegainFlow voice, the house rules and before/after examples.

@@ -3,22 +3,54 @@ import type { ReactNode } from "react";
 
 import { GovFooter, GovHeader } from "@/components/gov/GovChrome";
 import { GOV_THEME_KEY } from "@/lib/content/gov";
-import { GOV_SITE_URL, SITE_NAME } from "@/lib/site";
+import { GOV_DESCRIPTION, GOV_SITE_URL, SITE_NAME, SITE_URL } from "@/lib/site";
 
 /**
  * Everything under here is served at gov.regainflow.com (see `proxy.ts`), so
  * relative canonicals resolve against the subdomain rather than `SITE_URL`.
  */
+const GOV_TITLE = `${SITE_NAME} for Government | Capability Statement & Past Performance`;
+
+/**
+ * The main site's card, by absolute URL: `opengraph-image` is excluded from the
+ * proxy so the subdomain serves it too, but a share preview should not depend
+ * on that.
+ */
+const GOV_CARD = {
+  url: `${SITE_URL}/opengraph-image`,
+  width: 1200,
+  height: 630,
+  type: "image/png",
+  alt: `${SITE_NAME}, AI engineering & transformation partner`,
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(GOV_SITE_URL),
   title: {
-    default: `${SITE_NAME} for Government | Capability Statement & Past Performance`,
+    default: GOV_TITLE,
     template: `%s | ${SITE_NAME} for Government`,
   },
-  description:
-    "RegainFlow's capability statement and past performance for federal, state, local, and public-safety buyers. UEI XD3FZFEHMCD7, CAGE 20BV9.",
+  description: GOV_DESCRIPTION,
   alternates: { canonical: "/" },
-  openGraph: { url: GOV_SITE_URL, siteName: `${SITE_NAME} for Government` },
+  // Stated in full. A page that declares `openGraph` or `twitter` replaces the
+  // root layout's object rather than merging into it, so the two-field version
+  // this used to be shipped no title, description or image, and the Twitter
+  // tags fell through to the main site's wording.
+  openGraph: {
+    title: GOV_TITLE,
+    description: GOV_DESCRIPTION,
+    url: GOV_SITE_URL,
+    siteName: `${SITE_NAME} for Government`,
+    type: "website",
+    locale: "en_US",
+    images: [GOV_CARD],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: GOV_TITLE,
+    description: GOV_DESCRIPTION,
+    images: [GOV_CARD],
+  },
 };
 
 /** Light, unlike the rest of the site — see `.rf-gov` in `globals.css`. */

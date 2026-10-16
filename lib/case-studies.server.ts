@@ -35,7 +35,7 @@ const PUBLISHED = "published";
  * including one added for internal notes — into a page and its structured data.
  */
 const COLUMNS =
-  "slug, title, industry, eyebrow, summary, capability_tags, meta_title, meta_description, context, constraints, role, engineered, outcome, next_label, next_body, image_url, image_alt, cta, at_a_glance, deliverables, stages, tracks, artifacts, section_headings, industries, sort_order";
+  "slug, title, industry, eyebrow, summary, capability_tags, meta_title, meta_description, context, constraints, role, engineered, outcome, next_label, next_body, image_url, image_alt, cta, at_a_glance, deliverables, stages, tracks, artifacts, section_headings, industries, sort_order, updated_at";
 
 /** The row as PostgREST returns it. snake_case, and only what `COLUMNS` asks for. */
 interface CaseStudyRow {
@@ -69,6 +69,7 @@ interface CaseStudyRow {
   section_headings: SectionHeadings | null;
   industries: string[] | null;
   sort_order: number;
+  updated_at: string;
 }
 
 /**
@@ -107,6 +108,7 @@ function toCaseStudy(row: CaseStudyRow): CaseStudy {
     ...(row.artifacts?.length ? { artifacts: row.artifacts } : {}),
     ...(row.section_headings ? { sectionHeadings: row.section_headings } : {}),
     ...(row.industries?.length ? { industries: row.industries } : {}),
+    updated: row.updated_at.slice(0, 10),
   };
 }
 

@@ -3,6 +3,7 @@
 import { getReport } from "@/lib/reports.server";
 import { RATE_LIMIT_MESSAGE, isBot, readEmail, type FormState } from "@/lib/forms";
 import { ipHash, isRateLimited } from "@/lib/forms.server";
+import { NEWSLETTER_TABLE, startSubscription } from "@/lib/newsletter.server";
 import { supabase } from "@/lib/supabase";
 
 const TABLE = "report_leads";
@@ -100,5 +101,27 @@ export async function captureReader(
     console.error("[report gate] lead not recorded", error);
   }
 
-  return { status: "ok", email: parsed.email };
+  // The opt-in box: unticked unless the reader ticks it, and the same double
+  // opt-in as the signup block, so ticking it sends a confirmation link rather
+  // than subscribing anyone. Best-effort like the lead: a failure here must not
+  // keep the report closed. The newsletter table has its own rate limit, and a
+  // limited request is skipped quietly for the same reason.
+  let subscribed = false;
+
+  if (data.get("newsletter") === "on") {
+    try {
+      if (!(await isRateLimited(NEWSLETTER_TABLE, hash))) {
+        await startSubscription({
+          email: parsed.email,
+          source: `report_gate:${slug}`,
+          ipHash: hash,
+        });
+        subscribed = true;
+      }
+    } catch (error) {
+      console.error("[report gate] newsletter signup not recorded", error);
+    }
+  }
+
+  return { status: "ok", email: parsed.email, subscribed };
 }

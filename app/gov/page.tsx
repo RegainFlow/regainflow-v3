@@ -13,10 +13,17 @@ import {
   PSC_CODES,
   isVisible,
 } from "@/lib/content/gov";
-import { GOV_CAPABILITY_PDF, GOV_PREVIEWS } from "@/lib/site";
+import { govPageJsonLd, serializeJsonLd } from "@/lib/seo";
+import {
+  GOV_CAPABILITY_PDF,
+  GOV_DESCRIPTION,
+  GOV_PREVIEWS,
+} from "@/lib/site";
+
+const TITLE = "RegainFlow | Capability Statement & Past Performance";
 
 export const metadata: Metadata = {
-  title: { absolute: "RegainFlow | Capability Statement & Past Performance" },
+  title: { absolute: TITLE },
   alternates: { canonical: "/" },
 };
 
@@ -221,6 +228,15 @@ export default function GovPage() {
           </div>
         </div>
       </section>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: serializeJsonLd(
+            govPageJsonLd({ title: TITLE, description: GOV_DESCRIPTION }),
+          ),
+        }}
+      />
     </>
   );
 }

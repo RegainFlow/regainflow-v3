@@ -19,6 +19,10 @@ import { INDUSTRY_GROUPS } from "@/lib/content/industries";
  *  rather than a Postgres constraint name after an image has been paid for. */
 export const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
+/** Static segments beside `insights/[slug]`: resolved first, so a study with
+ *  one of these slugs would be unreachable. */
+export const RESERVED_SLUGS = ["blog", "reports", "case-studies"];
+
 const GROUP_SLUGS = INDUSTRY_GROUPS.map((group) => group.slug);
 
 const nonEmpty = z.string().trim().min(1);
@@ -78,10 +82,11 @@ const sectionHeadings = z
 
 export const IntakeSchema = z
   .object({
-    slug: nonEmpty.regex(
-      SLUG_PATTERN,
-      "must be kebab-case: lowercase letters, digits, single hyphens",
-    ),
+    slug: nonEmpty
+      .regex(SLUG_PATTERN, "must be kebab-case: lowercase letters, digits, single hyphens")
+      .refine((slug) => !RESERVED_SLUGS.includes(slug), {
+        message: "is a static route under /insights/ (an index page), not a free slug",
+      }),
     title: nonEmpty,
     industry: nonEmpty,
     eyebrow: nonEmpty.optional(),

@@ -13,9 +13,9 @@ import {
 } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Contact",
+  title: "Contact us about an AI project",
   description:
-    "Tell RegainFlow what you are trying to move into production. We reply to everything, usually within one business day — or book a call directly.",
+    "Tell RegainFlow what you are trying to move into production. We reply to everything, usually within one business day, or you can book a call directly.",
   path: "/contact",
 });
 

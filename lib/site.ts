@@ -28,6 +28,10 @@ export const CAPABILITY_STATEMENT_HREF =
  */
 export const GOV_SITE_URL = "https://gov.regainflow.com";
 
+/** The subdomain's meta description, shared by its layout and its JSON-LD. */
+export const GOV_DESCRIPTION =
+  "RegainFlow's capability statement and past performance for federal, state, local, and public-safety buyers. UEI XD3FZFEHMCD7, CAGE 20BV9.";
+
 /**
  * The capability statement PDF, served from this origin.
  *
@@ -113,6 +117,9 @@ export const PROFILES: Profile[] = [
 ];
 
 export const LOCATION = "Orlando, Florida";
+
+/** Year and month the company was founded, as schema.org `foundingDate`. */
+export const FOUNDED = "2025-01";
 
 /**
  * Cased for use mid-sentence as well as in the eyebrow, which is why "AI" is
@@ -273,13 +280,18 @@ export const NAV: NavGroup[] = [
     items: [
       {
         label: "Case studies",
-        href: "/insights#case-studies",
+        href: "/insights/case-studies",
         hint: "Our own engagements",
       },
       {
-        label: "Reports & Guides",
+        label: "Reports",
         href: "/insights/reports",
-        hint: "Written research, with an audio version",
+        hint: "Research, with an audio version",
+      },
+      {
+        label: "Blog",
+        href: "/insights/blog",
+        hint: "Shorter notes from the work",
       },
     ],
   },
@@ -334,7 +346,9 @@ export const ROUTES = [
   "/services",
   "/industries",
   "/insights",
+  "/insights/case-studies",
   "/insights/reports",
+  "/insights/blog",
   "/company",
   CONTACT_PATH,
 ] as const;

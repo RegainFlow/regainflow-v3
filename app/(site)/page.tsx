@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import ClosingCTA from "@/components/ClosingCTA";
 import FreeAssessment from "@/components/FreeAssessment";
 import Hero from "@/components/Hero";
@@ -9,17 +11,25 @@ import StageSummary from "@/components/StageSummary";
 
 /**
  * **Required, and not obviously so.** `ProofStrip` reads the case studies
- * table, but it does that inside the component rather than here — so without
- * this flag Next happily prerenders the home page, and if the fetch is cold or
+ * table, but it does that inside the component rather than here — so with no
+ * flag at all Next prerenders the home page once, and if the fetch is cold or
  * failing at build time it bakes in a page with no proof section that never
- * recovers. The build output says `○ /` and looks correct right up until you
- * notice the section is missing.
+ * recovers.
  *
- * The most-visited route on the site is server-rendered per request as a
- * result. That is the acknowledged cost of putting case studies in a table —
- * see the migration, and `export const revalidate` if it needs walking back.
+ * `revalidate` is what makes it recover, and what makes the page fast: the
+ * rendered page is served from the cache and rebuilt in the background at most
+ * once a minute. It used to be `force-dynamic`, which put a database round
+ * trip in front of every visit to the most-visited route on the site. See
+ * `docs/content-cache.md` for the rule every content page follows.
  */
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
+
+/**
+ * Title, description and the share card come from the root layout's defaults,
+ * which are written for this page. Only the canonical is stated here: it used
+ * to sit in the root layout, where every page without its own inherited it.
+ */
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 export default function Home() {
   return (

@@ -33,10 +33,18 @@ lockfile that ships.
 | `/services`                                                    | Full Discover / Implement / Scale, the engagement path, the four capability layers, free assessment |
 | `/industries`                                                  | Hub: four large cards into the group pages, then the selected engagements                       |
 | `/industries/[slug]`                                           | One group: sectors, where the work stalls, what we install, proof, and the assessment callout   |
-| `/insights`                                                    | The three case studies, then the reports band                                                   |
-| `/insights/[slug]`                                             | One case study in full: context, constraints, our role, what we engineered, outcome, what next  |
-| `/insights/reports`                                            | Published reports. Renders an empty state until the first is authored                           |
-| `/insights/reports/[slug]`                                     | One report: cover, findings, audio overview, and the email gate in front of the PDF             |
+| `/insights`                                                    | The hub: section pills, case studies, the newest report featured, blog rows, newsletter         |
+| `/insights/case-studies`                                       | Every case study, then the reports behind the work. A static segment, so `case-studies` is not a usable study slug |
+| `/insights/[slug]`                                             | One case study in full: context, constraints, our role, what we engineered, outcome, what next, then Related reading |
+| `/insights/reports`                                            | Published reports, the newest featured with its findings. Renders an empty state until the first is authored |
+| `/insights/reports/[slug]`                                     | One report: cover, numbered findings, audio overview, the email gate in front of the PDF, then Related reading |
+| `/insights/blog`                                               | Blog index: two featured posts, topic pills, every post newest first (two columns), newsletter. Pages at `/insights/blog/page/[n]` |
+| `/insights/blog/[slug]`                                        | One post. Template in `components/BlogPostView.tsx`, laid out to `docs/blogs_seo/`             |
+| `/insights/blog/topics/[topic]`, `/insights/blog/authors/[slug]` | Topic hubs (pillar first) and author pages                                                   |
+| `/insights/blog/preview/[slug]?token=…`                        | Draft preview for `pnpm blog stage`. `noindex`; 404 without `BLOG_PREVIEW_TOKEN`                |
+| `/insights/blog/feed.xml`                                      | RSS 2.0, the twenty newest posts                                                                |
+| `/newsletter/*`                                                | Double opt-in: check-email, confirm (a button, never on GET), confirmed. All `noindex`          |
+| `/indexnow.txt`                                                | The IndexNow key from `INDEXNOW_KEY`; 404 when unset. All three publishing pipelines (blog, reports, case studies) ping IndexNow with it |
 | `/company`                                                     | Who we are, the partner network, manifesto, contact                                             |
 | `/contact`                                                     | The contact form. The canonical contact route — every contact CTA points here                   |
 | `/contact/thanks`                                              | Post-submission confirmation. `noindex`, reachable only by submitting                           |
@@ -292,13 +300,16 @@ of each report's PDF. Both go through Server Actions, and **neither makes a rout
 dynamic** — a Server Action does not opt its page into dynamic rendering, and nothing on
 this site reads `cookies()` or `searchParams`.
 
-The routes that *are* dynamic (`ƒ` in `pnpm build`) are the ones that read the `reports`
-table: `/insights`, `/insights/reports`, `/insights/reports/[slug]` and its OG image,
-`/sitemap.xml`, and `/llms.txt`. That is the deliberate price of publishing a report by
-adding a row rather than by deploying. Everything else — `/`, `/services`, `/industries` and
-its four group pages, `/company`, `/contact`, `/llm-info`, and all three case studies — must
-still show `○` or `●`, and a new `ƒ` among them means something opted a route into dynamic
-rendering by accident.
+The pages that read a content table (reports, case studies, blog posts) are **cached and
+rebuilt at most once a minute** (`export const revalidate = 60`): `/`, `/industries` and its
+group pages, `/llm-info`, and everything under `/insights`. A row published in Supabase is
+live within a minute, a new slug renders on its first visit, and no visitor or crawler waits
+on the database. `docs/content-cache.md` has the rule and the reasons.
+
+The routes that are still dynamic (`ƒ` in `pnpm build`) are `/sitemap.xml` and `/llms.txt`
+(they must fail, not serve stale, when the database is down), the draft preview, the
+generated card images, and the two newsletter pages that read the query string. A new `ƒ`
+on any other route means something opted it into per-request rendering by accident.
 
 **Both forms work with JavaScript disabled, and that is measured.** Replaying the native
 `multipart/form-data` POST that a scripting-off browser sends — the four `$ACTION_*` fields React
@@ -376,13 +387,18 @@ page 1, `pages` is counted against the file, `audio_length` is measured off the 
 storage URLs are read back from the API rather than string-built. Those were the columns most
 likely to be wrong, because they are the ones nobody can check by eye.
 
+For local development, `supabase/seed/reports.sql` holds the four published reports with their
+committed covers (`public/reports/`), and no PDF or audio. **Local only; never run it against
+production.** Apply it alone with
+`docker exec -i supabase_db_regainflow-v3 psql -U postgres < supabase/seed/reports.sql`.
+
 `--dry-run` renders, counts, and measures without touching anything remote. `.claude/skills/publish-report/`
 drives all of this conversationally, including drafting the copy.
 
 **Publishing is two commands on purpose.** The content run leaves the row at its `draft` default and
 never writes `status` — on insert or on update — so re-running against a corrected PDF cannot flip a
 report's visibility as a side effect. Approving copy stays an act someone takes rather than a flag
-someone forgets. The pages read this table on every request, so there is no build step standing
+someone forgets. The pages rebuild from this table at most once a minute, so there is no build step standing
 between a half-checked row and a visitor.
 
 The script defaults to **`.env`** and prints the target host on every run: `.env.local` points at a
@@ -408,6 +424,71 @@ measure a PNG by hand in a table editor.
 
 One gotcha worth keeping: pdfjs rejects a plain `Uint8Array` when handing data to its worker
 ("Cannot transfer object of unsupported type"). The script converts to a Node `Buffer`.
+
+### Publishing a blog post
+
+**Ask Claude to write or publish it.** `.claude/skills/publish-blog-post/` is the front door: it
+interviews for the first-hand angle, asks for photos and screenshots, drafts, edits, and runs
+the pipeline. Under it:
+
+```bash
+pnpm blog list                                   # published posts by topic
+pnpm blog prepare .blog/<slug>/intake.yaml       # validate, measure images, write a preview folder
+pnpm blog stage   .blog/<slug>/preview           # upload images, write a draft under preview--<slug>
+pnpm blog publish .blog/<slug>/preview           # a separate, deliberate act
+pnpm blog unpublish <slug>                       # takes it down, keeps the row
+```
+
+`pnpm blog` targets `.env.local`; `pnpm blog:prod` targets `.env`, which is production. Run
+`bootstrap` once per environment to create the `blog` storage bucket. `.blog/` is gitignored.
+
+`prepare` enforces what `docs/blogs_seo/` asks of a post (`scripts/blog/guards.mts`): real
+author and topic, heading order, alt text and clearance on every image, figures and footnotes
+that parse, links only to published posts, no deny-listed names, takeaways not repeated in the
+body. Snippet lengths, unsourced numbers and thin internal linking are warnings for the person
+approving. Writes go through `publish_blog_post` (a SECURITY DEFINER function), as the case
+studies do; the secret key still has `select` only on the table.
+
+Staging writes to `preview--<slug>`, so a refresh of a live post is reviewed at
+`/insights/blog/preview/<slug>?token=…` without touching the live row. `--replace
+--substantive` moves the visible "Updated" date; `--replace` alone does not.
+
+`supabase/seed/blog-posts.sql` holds sample posts with placeholder images, inserted as
+`published`. **Never run it against production.**
+
+Two conventions the pipeline does not enforce:
+
+- **A post built on one of our reports leads its title with the report's named idea**, then
+  says what the post adds ("The AI ROI problem: what AI really costs"). The question a reader
+  would type goes in `meta_title`, so the page gets both. It does not reuse the report's exact
+  title, which would compete with the report page in search.
+- **Cite a report or case study by linking its page**, with the report's exact title as the
+  link text. That link is what lists the post under "Related reading" on the report or study
+  page, so changing a report's slug after posts link to it breaks both directions.
+
+The byline is a founder (`will-baltus`, `leo-ramirez`) or, for a company post written by both,
+`regainflow`, which renders the organization with the app icon and earns a pipeline warning
+because it has no author page.
+
+### Newsletter
+
+`components/NewsletterSignup.tsx` sits at the end of every post, on the Insights, blog,
+reports and case studies indexes, and in the footer of every page (`layout="compact"`). The
+report gate has an unticked "also email me" box that runs the same signup. It is double
+opt-in: `startSubscription` (`lib/newsletter.server.ts`, rule in `lib/newsletter.ts`) writes
+a `pending` row to `newsletter_subscribers` and mails a confirmation link through Resend;
+the link opens a page whose button confirms (mail gateways fetch every link, so a GET must
+not). Confirmation adds the address to Resend's contacts, in `RESEND_SEGMENT_ID` when set,
+and Resend handles sending (Broadcasts) and unsubscribes from there. The table is the record
+of consent, and its `source` column says which form each signup came from (`footer`,
+`blog_post:<slug>`, `report_gate:<slug>`, ...).
+
+Without Resend keys locally, the confirmation link for a `localhost` signup is printed to
+the server console so it can be opened by hand.
+
+`pnpm newsletter:sync` lists confirmed subscribers; `--apply` adds any Resend is missing
+(the confirm-time sync is best-effort). `pnpm newsletter:sync:prod` does the same against
+production. Every signup links to `/privacy`, which describes what each form collects.
 
 ### Database migrations
 
@@ -490,7 +571,13 @@ With three studies, grouping is degenerate and gone: `CaseStudyGroup`, `GROUPS`,
 `studiesInGroup`, `FEATURED_SLUGS`, and `HOME_SLUGS` were all removed, along with the
 `/insights` disclosure, the "more in this category" band, and the `all_work` / `related`
 analytics surfaces they fed. All three studies render on `/`, `/insights`, and the
-`/industries` hub. Filter chips and pagination land when the library needs them, not before.
+`/industries` hub, and on their own index at `/insights/case-studies`. Filter chips and
+pagination land when the library needs them, not before.
+
+A shelf did come back, in a different form: **Related reading** (`components/RelatedReading.tsx`)
+closes every case study and report page. It lists blog posts that link to the page first, found
+by their links (`getPostsLinkingTo` in `lib/blog.server.ts`), then the other libraries. Its
+clicks carry the `related_reading` surface.
 
 > **The prose in these three entries was expanded from one-line briefs** and has not had a
 > factual pass from either founder. Before treating any sentence as fact, check it.
@@ -509,8 +596,8 @@ Deliberately absent:
 - Rate and retainer figures, named success measures, and per-project promises.
   The engagement path describes the shape of the commitment and nothing more
   specific, because anything more would be committing before we have seen the work.
-- A blog and a podcast. Both were placeholders and are now off the site and out of
-  the navigation; they come back when there is something to publish.
+- A podcast. It was a placeholder and is off the site and out of the navigation. (The
+  blog is back, at `/insights/blog`, with a publishing pipeline behind it.)
 
 ### Industries
 

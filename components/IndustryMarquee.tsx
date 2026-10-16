@@ -3,7 +3,9 @@ import Link from "next/link";
 import {
   GROUP_BY_INDUSTRY,
   INDUSTRY_NAMES,
-} from "@/lib/content/industries";
+} from "@/lib/content/industries";
+import { RF_EVENTS } from "@/lib/analytics/events";
+import { GOV_SITE_URL } from "@/lib/site";
 
 /**
  * Who the site is for, said once and kept moving.
@@ -26,7 +28,20 @@ export default function IndustryMarquee() {
 
       <div className="rf-marquee-viewport">
         <ul className="rf-marquee-track">
-          {INDUSTRY_NAMES.map((name) => (
+          {INDUSTRY_NAMES.map((name) =>
+            // Government sectors open gov.regainflow.com: `IndustryGroup.govFirst`.
+            GROUP_BY_INDUSTRY[name].govFirst ? (
+              <li key={name}>
+                <a
+                  href={GOV_SITE_URL}
+                  className="rf-marquee-link"
+                  data-rf-event={RF_EVENTS.capabilityStatementOpened}
+                  data-rf-location="home_marquee"
+                >
+                  {name}
+                </a>
+              </li>
+            ) : (
             <li key={name}>
               {/* Not `.rf-nav-link` — it sets its own `font-size` and
                   `padding-block`, which would break the row out of the mono
@@ -35,11 +50,15 @@ export default function IndustryMarquee() {
               <Link
                 href={`/industries/${GROUP_BY_INDUSTRY[name].slug}`}
                 className="rf-marquee-link"
+                data-rf-event={RF_EVENTS.industryOpened}
+                data-rf-industry={GROUP_BY_INDUSTRY[name].slug}
+                data-rf-surface="home_marquee"
               >
                 {name}
               </Link>
             </li>
-          ))}
+            ),
+          )}
         </ul>
         <ul className="rf-marquee-track" aria-hidden="true">
           {INDUSTRY_NAMES.map((name) => (

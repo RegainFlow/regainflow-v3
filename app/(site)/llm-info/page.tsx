@@ -9,6 +9,8 @@ import {
   REPORT_TERMS,
 } from "@/lib/content/assessment";
 import { getCaseStudies } from "@/lib/case-studies.server";
+import { reportDate } from "@/lib/content/reports";
+import { getReports } from "@/lib/reports.server";
 import { MANIFESTO, MISSION, TEAM, VISION } from "@/lib/content/company";
 import { FAQ } from "@/lib/content/faq";
 import { PARTNERS } from "@/lib/content/partners";
@@ -51,7 +53,7 @@ import {
  */
 export const metadata: Metadata = pageMetadata({
   title: "AI fact sheet",
-  description: `A factual overview of ${SITE_NAME} — what it does, who it works with, how engagements run, and what it will not take on. Written to be quoted accurately by AI assistants and search engines.`,
+  description: `A factual overview of ${SITE_NAME}: what it does, who it works with, how engagements run and what it will not take on. Written for AI assistants to quote.`,
   path: "/llm-info",
 });
 
@@ -65,11 +67,12 @@ const KEY_FACTS: { term: string; detail: string }[] = [
   { term: "Contact", detail: CONTACT_EMAIL },
 ];
 
-// The case-study section reads the table.
-export const dynamic = "force-dynamic";
+// The case-study and report sections read their tables. Cached, and rebuilt
+// at most once a minute: see `docs/content-cache.md`.
+export const revalidate = 60;
 
 export default async function LlmInfoPage() {
-  const studies = await getCaseStudies();
+  const [studies, reports] = await Promise.all([getCaseStudies(), getReports()]);
 
   return (
     <>
@@ -186,7 +189,9 @@ export default async function LlmInfoPage() {
                 </div>
 
                 <div className="col-span-full lg:col-span-8">
-                  <p className="rf-body max-w-[68ch]">{group.lead}</p>
+                  <p className="rf-body max-w-[68ch]">
+                    {group.answer} {group.lead}
+                  </p>
 
                   <p className="rf-utility mt-6">Where the work stalls</p>
                   <ul className="mt-2 flex flex-col gap-2">
@@ -555,6 +560,34 @@ export default async function LlmInfoPage() {
           </ul>
         </div>
       </section>
+
+      {/* The reports, as `llms.txt` lists them: title, date and summary, so an
+          assistant asked what RegainFlow has published can answer from here. */}
+      {reports.length > 0 ? (
+        <section id="reports" className="rf-section">
+          <div className="rf-shell py-14 md:py-18">
+            <p className="rf-eyebrow">Reports</p>
+            <h2 className="rf-h2 mt-5 max-w-[26ch]">Research we have published.</h2>
+
+            <ul className="mt-10 grid gap-x-10 gap-y-6 border-t border-rf-hairline pt-6 sm:grid-cols-2">
+              {reports.map((report) => (
+                <li key={report.slug}>
+                  <h3 className="rf-h3">
+                    <Link
+                      href={`/insights/reports/${report.slug}`}
+                      className="rf-nav-link"
+                    >
+                      {report.title}
+                    </Link>
+                  </h3>
+                  <p className="rf-utility mt-2">{reportDate(report.published)}</p>
+                  <p className="rf-body mt-2 max-w-[46ch]">{report.summary}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      ) : null}
 
       <section id="faq" className="rf-section bg-rf-navy">
         <div className="rf-shell py-14 md:py-18">

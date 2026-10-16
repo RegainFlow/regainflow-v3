@@ -44,7 +44,7 @@ export default async function Image({
       eyebrow: study ? study.industry : POSITIONING,
       title: study ? study.title : "Case studies",
       lead: study ? study.summary : "Engineering work RegainFlow delivered.",
-      meta: study?.industry,
+      meta: study ? "Case study" : undefined,
     }),
     { ...size, fonts: await ogFonts() },
   );

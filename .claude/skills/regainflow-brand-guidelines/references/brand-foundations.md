@@ -69,7 +69,7 @@ Do not use serif typography. Do not use Space Grotesk 600 for ordinary headings.
 ## Spatial and surface language
 
 - Use right angles, hairline rules, precise grids, square terminals, and visible structure.
-- Surfaces are square. Only button-like controls may use a 2 px corner radius.
+- Surfaces are square. Only button-like controls may use a 2 px corner radius. (One scoped exception on the website: the Insights pages (blog, report and case study pages, and the hub) use round avatars, pills and tags and a 6–8 px radius. It does not apply to report PDFs, collateral, or any other page.)
 - Establish depth with drawn geometry, containment, or the mark extrusion—never blurred elevation shadows.
 - Use Flow for 1–2.5 px route strokes, nodes, ticks, and active edges. Give every diagram route a node at each end.
 - Number content only when order carries meaning. Use an icon only when it honestly represents a parallel item; otherwise use no marker.

@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import AskAi from "@/components/AskAi";
 import NavItemLink from "@/components/NavItemLink";
+import NewsletterSignup from "@/components/NewsletterSignup";
 import { RF_EVENTS } from "@/lib/analytics/events";
 import { CONTACT_PATH, LOCATION, NAV, PROFILES, TAGLINE } from "@/lib/site";
 
@@ -32,6 +33,8 @@ export default function SiteFooter() {
                   <a
                     href={profile.href}
                     className="rf-nav-link"
+                    data-rf-event={RF_EVENTS.socialProfileOpened}
+                    data-rf-network={profile.label.toLowerCase()}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -40,6 +43,13 @@ export default function SiteFooter() {
                 </li>
               ))}
             </ul>
+
+            {/* On every page, so the home, services and industry pages can
+                capture a reader too. `source="footer"` keeps these apart from
+                the in-content signups in `newsletter_subscribers`. */}
+            <div className="mt-10">
+              <NewsletterSignup source="footer" layout="compact" />
+            </div>
           </div>
 
           {NAV.map((group) => (
@@ -80,6 +90,9 @@ export default function SiteFooter() {
                   print. It still needs a crawlable link to be found. */}
               <Link href="/llm-info" className="rf-nav-link">
                 AI fact sheet
+              </Link>
+              <Link href="/privacy" className="rf-nav-link">
+                Privacy
               </Link>
               <Link
                 href={CONTACT_PATH}

@@ -36,6 +36,36 @@ export const RF_EVENTS = {
   /** Non-converting CTAs, kept separate so they cannot inflate the above. */
   secondaryClicked: "cta_secondary_clicked",
   caseStudyOpened: "case_study_opened",
+  /**
+   * An industry page, opened from a card or the home marquee. Carries
+   * `industry` (the group slug) and `surface`. The menu is not counted here:
+   * the question is which on-page route into a sector earns the click.
+   */
+  industryOpened: "industry_opened",
+  /**
+   * A pill: a section jump on `/insights` or a topic filter on the blog.
+   * Carries `target` (the pill's label) and `surface` (which row of pills).
+   */
+  insightsNavClicked: "insights_nav_clicked",
+  /** A breadcrumb link above a post, report or case study. Carries `target`. */
+  breadcrumbClicked: "breadcrumb_clicked",
+  /** LinkedIn or GitHub from the footer. Carries `network`. */
+  socialProfileOpened: "social_profile_opened",
+  /** The blog's RSS link. A reader subscribing without giving an email. */
+  feedOpened: "rss_feed_opened",
+  /**
+   * The 404 page, rendered. PostHog attaches `$pathname` and `$referrer`, so
+   * this is the list of dead links and where they are linked from.
+   */
+  notFoundViewed: "not_found_viewed",
+  /**
+   * A visit that arrived from an AI assistant (ChatGPT, Perplexity, Claude,
+   * Gemini, Copilot…), once per browser session. Carries `ai_source`, and the
+   * same value is registered on every later event in the session, so any
+   * funnel can be split by it. See `lib/analytics/ai-source.ts` for what it
+   * can and cannot detect.
+   */
+  aiReferralLanded: "ai_referral_landed",
   assessmentStepOpened: "assessment_step_opened",
   /**
    * A footer assistant link. Carries `assistant` — which of them was picked.
@@ -74,6 +104,48 @@ export const RF_EVENTS = {
   govPdfViewed: "gov_pdf_viewed",
   /** A report card, from the listing or from a report page. */
   reportOpened: "report_opened",
+  /** A blog post card, from the blog index, the `/insights` band, or a post. */
+  blogPostOpened: "blog_post_opened",
+  /**
+   * A post's own next step, inline or at the end (named in `location`).
+   * Separate from `bookingClicked` because the destination varies by post — a
+   * report, a case study, or the assessment — and the question it answers is
+   * whether a post-specific offer earns the click.
+   */
+  blogCtaClicked: "blog_cta_clicked",
+  /** The share button on a post, report or case study: native share sheet or
+   *  copy-link. Carries `method` and `page` (blog_post, report, case_study). */
+  pageShared: "page_shared",
+  /** Reading mode switched on a post. Carries `theme`. */
+  readingModeChanged: "reading_mode_changed",
+  /** "Ask ChatGPT" / "Ask Claude" on a post, report or case study. `target`
+   *  names the assistant and `surface` the kind of page. */
+  exploreAi: "explore_ai",
+  /** A video facade in a post, pressed. Carries `video` (the YouTube id). */
+  blogVideoPlayed: "blog_video_played",
+  /**
+   * How far through the article body a reader got: 25, 50, 75 and 90, each
+   * once per page view (carries `depth` and `post`). PostHog's pageleave only
+   * records the last position; this records where the drop-offs happen, which
+   * is what the UX research says to look at.
+   */
+  blogScrollDepth: "blog_scroll_depth",
+  /**
+   * The FT-style "quality read": at least half the article scrolled *and* at
+   * least half its expected reading time spent with the tab visible. Once per
+   * page view. Plotted against views per post, it separates posts people open
+   * from posts people read (`docs/blogs_seo/blog_ui_ux.md`, Part 10).
+   */
+  blogQualityRead: "blog_quality_read",
+  /**
+   * The newsletter form, submitted and written: fired from
+   * `/newsletter/check-email`, which only a successful submission reaches.
+   * Not yet a subscriber: that is `newsletterConfirmed`, and the gap between
+   * the two is how many confirmation emails go unanswered.
+   */
+  newsletterSubmitted: "newsletter_submitted",
+  /** Double opt-in completed. Fired from `/newsletter/confirmed`. */
+  newsletterConfirmed: "newsletter_confirmed",
   /**
    * The email gate on a report, accepted. Carries `report`.
    *
@@ -145,7 +217,22 @@ export type RfLocation =
   /** A report page, outside the gate. */
   | "report"
   /** Any page on gov.regainflow.com. */
-  | "gov";
+  | "gov"
+  /** The government card on `/industries`, which opens gov.regainflow.com. */
+  | "industries_hub"
+  /** A government sector in the home marquee, which opens gov.regainflow.com. */
+  | "home_marquee"
+  /** The three home sections that link into `/services` and `/company`. */
+  | "home_production_gap"
+  | "home_stage_summary"
+  | "home_partnership"
+  /** "All case studies" under the home proof strip. */
+  | "home_proof"
+  /** The "All …" links closing each band of `/insights`. Carries `target`. */
+  | "insights_hub"
+  /** The way back in from the 404 and error pages. */
+  | "not_found"
+  | "error_page";
 
 /**
  * Which surface a case study card was opened from.
@@ -172,4 +259,8 @@ export type RfSurface =
    * into a sector went looking for evidence — the strongest qualifying signal
    * the site can observe short of a booking.
    */
-  | "industry";
+  | "industry"
+  /** The "Related reading" shelf on a report or case study page. */
+  | "related_reading"
+  /** The `/insights/case-studies` index. */
+  | "case_studies_index";

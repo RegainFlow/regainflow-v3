@@ -28,6 +28,8 @@ import { parse as parseYaml } from "yaml";
 
 import { SITE_URL } from "@/lib/site";
 
+import { pingIndexNow } from "./blog/remote.mjs";
+
 import {
   EXIT,
   PipelineError,
@@ -405,6 +407,16 @@ async function publish(flags: Flags): Promise<void> {
   for (const group of payload.industries) {
     console.log(`  ${SITE_URL}/industries/${group}`);
   }
+
+  // Bing and the other IndexNow engines, as the blog pipeline does. The study's
+  // page, the two listings it joins, and each industry page it now proves.
+  const ping = await pingIndexNow(SITE_URL, [
+    `${SITE_URL}/insights/${manifest.slug}`,
+    `${SITE_URL}/insights/case-studies`,
+    `${SITE_URL}/insights`,
+    ...payload.industries.map((group) => `${SITE_URL}/industries/${group}`),
+  ]);
+  console.log(`  IndexNow: ${ping}`);
   console.log("");
 }
 

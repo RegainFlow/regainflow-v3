@@ -47,7 +47,12 @@ export const HONEYPOT = "company_website";
 export type FormState =
   | { status: "idle" }
   | { status: "error"; errors: Record<string, string>; formError?: string }
-  | { status: "ok"; email: string };
+  | {
+      status: "ok";
+      email: string;
+      /** The report gate's opt-in box was ticked and a confirmation link is on its way. */
+      subscribed?: boolean;
+    };
 
 export const IDLE: FormState = { status: "idle" };
 

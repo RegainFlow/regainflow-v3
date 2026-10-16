@@ -6,8 +6,12 @@ import { notFound } from "next/navigation";
 import Artifact from "@/components/case-study/Artifact";
 import TrackMap from "@/components/case-study/TrackMap";
 import ClosingCTA from "@/components/ClosingCTA";
-import PageHeader from "@/components/PageHeader";
-import { getCaseStudy } from "@/lib/case-studies.server";
+import Crumbs from "@/components/Crumbs";
+import ExploreWithAI from "@/components/ExploreWithAI";
+import RelatedReading, { type RelatedItem } from "@/components/RelatedReading";
+import ShareButton from "@/components/ShareButton";
+import { getPostsLinkingTo } from "@/lib/blog.server";
+import { getCaseStudies, getCaseStudy } from "@/lib/case-studies.server";
 import {
   DEFAULT_NEXT_LABEL,
   DEFAULT_SECTION_HEADINGS,
@@ -18,16 +22,31 @@ import {
   pageMetadata,
   serializeJsonLd,
 } from "@/lib/seo";
+import { getReports } from "@/lib/reports.server";
+import { SITE_URL } from "@/lib/site";
 
 type Params = { slug: string };
 
+/** "Related reading" holds this many cards: one row at desktop. */
+const RELATED_COUNT = 3;
+
+const CRUMBS = [
+  { name: "Insights", path: "/insights" },
+  { name: "Case studies", path: "/insights/case-studies" },
+];
+
 /**
- * No `generateStaticParams`. The slugs live in Supabase now, so prerendering
- * them would freeze the set at deploy time and a study inserted afterwards
- * would 404 until the next build — which is the staleness the table exists to
- * remove. See the migration for what this costs.
+ * Nothing is prerendered at build. The slugs live in Supabase, so a list frozen
+ * at deploy time would 404 a study inserted afterwards until the next build,
+ * which is the staleness the table exists to remove. `generateStaticParams`
+ * returns nothing; each study is rendered on its first visit, cached, and
+ * rebuilt at most once a minute. See `docs/content-cache.md`.
  */
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
+
+export function generateStaticParams(): Params[] {
+  return [];
+}
 
 export async function generateMetadata({
   params,
@@ -49,12 +68,9 @@ export async function generateMetadata({
     title: study.metaTitle ?? study.title,
     description: study.metaDescription ?? study.summary,
     path: `/insights/${study.slug}`,
-    // This segment generates its own card in `opengraph-image.tsx`; naming it
-    // here is what stops the default site card from being used instead.
-    image: {
-      url: `/insights/${study.slug}/opengraph-image`,
-      alt: study.title,
-    },
+    // This segment generates its own card in `opengraph-image.tsx`, and the
+    // file convention emits its (hashed) URL — see `segmentCard`.
+    segmentCard: true,
   });
 }
 
@@ -89,6 +105,23 @@ export default async function CaseStudyPage({
 
   if (!study) notFound();
 
+  const path = `/insights/${study.slug}`;
+  const url = `${SITE_URL}${path}`;
+
+  const [citing, studies, reports] = await Promise.all([
+    getPostsLinkingTo(path, RELATED_COUNT),
+    getCaseStudies(),
+    getReports(),
+  ]);
+
+  const related: RelatedItem[] = [
+    ...citing.map((post) => ({ kind: "post" as const, post })),
+    ...studies
+      .filter((other) => other.slug !== study.slug)
+      .map((other) => ({ kind: "study" as const, study: other })),
+    ...reports.slice(0, 1).map((report) => ({ kind: "report" as const, report })),
+  ].slice(0, RELATED_COUNT);
+
   const before = [
     { label: "Context", body: study.context },
     { label: "Constraints", body: study.constraints },
@@ -120,54 +153,19 @@ export default async function CaseStudyPage({
   };
 
   return (
-    <>
-      <PageHeader
-        eyebrow={study.eyebrow ?? study.industry}
-        title={study.title}
-        lead={study.summary}
-      />
-
+    <div className="rf-soft">
       <article className="rf-article">
-        <section className="rf-section">
-          <div className="rf-shell rf-band-tight">
-            {/* Above the fold-line of the article, not under the header, so a
-                reader who arrived from search can see where they are before
-                they start reading. */}
-            <nav aria-label="Breadcrumb">
-              <ol className="rf-crumbs rf-utility">
-                <li>
-                  <Link href="/insights" className="rf-nav-link">
-                    Insights
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/insights#case-studies" className="rf-nav-link">
-                    Case studies
-                  </Link>
-                </li>
-              </ol>
-            </nav>
+        <header className="rf-section rf-section-open">
+          <div className="rf-shell rf-post-head">
+            <Crumbs items={CRUMBS} />
 
-            {/* A lead image belongs after the reader knows what they are
-                looking at and before they commit to reading. Absent on a study
-                without art, and the page closes up rather than leaving a
-                frame. */}
-            {study.image ? (
-              <div className="rf-case-cover rf-case-hero mt-8">
-                <Image
-                  src={study.image}
-                  alt={study.imageAlt ?? study.title}
-                  fill
-                  // The LCP element on this route when it exists.
-                  priority
-                  sizes="(min-width: 1280px) 1120px, 100vw"
-                />
-              </div>
-            ) : null}
+            <p className="rf-eyebrow mt-8">{study.eyebrow ?? study.industry}</p>
+            <h1 className="rf-h1 rf-post-title">{study.title}</h1>
+            <p className="rf-post-deck">{study.summary}</p>
 
             {/* A real list, not a pipe-separated `.rf-mech` run. Each tag wraps
                 as a unit, so a long one breaks the line rather than itself. */}
-            <ul className="rf-tags mt-8">
+            <ul className="rf-tags mt-8" aria-label="Capabilities">
               {study.capabilityTags.map((tag) => (
                 <li key={tag} className="rf-tag">
                   {tag}
@@ -175,25 +173,55 @@ export default async function CaseStudyPage({
               ))}
             </ul>
 
-            {/* Scope facts. What was delivered, never what it returned — see
-                the figure rule in `lib/content/case-studies.ts`. */}
-            {study.atAGlance?.length ? (
-              <dl className="rf-glance mt-10">
-                {study.atAGlance.map((fact) => (
-                  <div key={fact.label}>
-                    <dd>{fact.value}</dd>
-                    <dt className="rf-utility mt-2">{fact.label}</dt>
-                  </div>
-                ))}
-              </dl>
-            ) : null}
+            <div className="rf-byline">
+              <div className="rf-byline-controls">
+                <ShareButton title={study.title} url={url} kind="case_study" />
+              </div>
+              <ExploreWithAI url={url} kind="case_study" />
+            </div>
           </div>
-        </section>
+        </header>
+
+        {study.image || study.atAGlance?.length ? (
+          <section className="rf-section rf-section-open">
+            <div className="rf-shell rf-band-tight">
+              {/* A lead image belongs after the reader knows what they are
+                  looking at and before they commit to reading. Absent on a
+                  study without art, and the page closes up rather than
+                  leaving a frame. */}
+              {study.image ? (
+                <div className="rf-case-cover rf-case-hero">
+                  <Image
+                    src={study.image}
+                    alt={study.imageAlt ?? study.title}
+                    fill
+                    // The LCP element on this route when it exists.
+                    priority
+                    sizes="(min-width: 1280px) 1120px, 100vw"
+                  />
+                </div>
+              ) : null}
+
+              {/* Scope facts. What was delivered, never what it returned — see
+                  the figure rule in `lib/content/case-studies.ts`. */}
+              {study.atAGlance?.length ? (
+                <dl className={`rf-glance${study.image ? " mt-10" : ""}`}>
+                  {study.atAGlance.map((fact) => (
+                    <div key={fact.label}>
+                      <dd>{fact.value}</dd>
+                      <dt className="rf-utility mt-2">{fact.label}</dt>
+                    </div>
+                  ))}
+                </dl>
+              ) : null}
+            </div>
+          </section>
+        ) : null}
 
         {/* The three opening answers. No rule between them: spacing and the
             heading carry the hierarchy, and a divider under every block was
             what made every section on this page look identical. */}
-        <section className="rf-section">
+        <section className="rf-section rf-section-open">
           <div className="rf-shell rf-band">
             <div className="flex flex-col gap-12">
               {before.map((section) => (
@@ -211,7 +239,7 @@ export default async function CaseStudyPage({
         </section>
 
         {study.tracks?.length ? (
-          <section className="rf-section bg-rf-navy">
+          <section className="rf-section rf-section-open bg-rf-navy">
             <div className="rf-shell rf-band">
               <div className="rf-grid gap-y-6">
                 <div className="col-span-full lg:col-span-5">
@@ -232,7 +260,7 @@ export default async function CaseStudyPage({
           </section>
         ) : null}
 
-        <section className="rf-section">
+        <section className="rf-section rf-section-open">
           <div className="rf-shell rf-band">
             <h2 className="rf-h2 max-w-[22ch]">What RegainFlow engineered</h2>
 
@@ -242,10 +270,7 @@ export default async function CaseStudyPage({
             {study.stages?.length ? (
               <ol className="mt-10 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
                 {study.stages.map((stage, i) => (
-                  <li
-                    key={stage.name}
-                    className="border-t border-rf-hairline pt-4"
-                  >
+                  <li key={stage.name}>
                     <span className="rf-index">
                       {String(i + 1).padStart(2, "0")}
                     </span>
@@ -268,7 +293,7 @@ export default async function CaseStudyPage({
         </section>
 
         {study.artifacts?.length ? (
-          <section className="rf-section">
+          <section className="rf-section rf-section-open">
             <div className="rf-shell rf-band-tight">
               <p className="rf-eyebrow">{headings.artifacts.eyebrow}</p>
               <h2 className="rf-h2 mt-5 max-w-[22ch]">
@@ -285,7 +310,7 @@ export default async function CaseStudyPage({
         ) : null}
 
         {study.deliverables?.length ? (
-          <section className="rf-section bg-rf-navy">
+          <section className="rf-section rf-section-open bg-rf-navy">
             <div className="rf-shell rf-band-tight">
               <div className="rf-grid gap-y-6">
                 <h2 className="rf-h2 col-span-full max-w-[20ch] lg:col-span-4">
@@ -304,7 +329,7 @@ export default async function CaseStudyPage({
           </section>
         ) : null}
 
-        <section className="rf-section">
+        <section className="rf-section rf-section-open">
           <div className="rf-shell rf-band">
             <div className="flex flex-col gap-12">
               {after.map((section) => (
@@ -320,7 +345,7 @@ export default async function CaseStudyPage({
             </div>
 
             <p className="mt-14">
-              <Link href="/insights#case-studies" className="rf-nav-link">
+              <Link href="/insights/case-studies" className="rf-nav-link">
                 &larr; All case studies
               </Link>
             </p>
@@ -328,9 +353,10 @@ export default async function CaseStudyPage({
         </section>
       </article>
 
-      {/* No "more in this category" band. With three studies, a related-work
-          shelf is the other two every time, which is what `/insights` already
-          shows one click away. */}
+      {/* Posts that cite this study first, then the other studies, then a
+          report: with three studies, a shelf of studies alone was the other
+          two every time, which `/insights` already shows. */}
+      <RelatedReading items={related} />
 
       <ClosingCTA override={study.cta} />
 
@@ -338,10 +364,7 @@ export default async function CaseStudyPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: serializeJsonLd(
-            breadcrumbJsonLd(study.title, `/insights/${study.slug}`, {
-              name: "Insights",
-              path: "/insights",
-            }),
+            breadcrumbJsonLd(study.title, `/insights/${study.slug}`, CRUMBS),
           ),
         }}
       />
@@ -354,6 +377,6 @@ export default async function CaseStudyPage({
           __html: serializeJsonLd(caseStudyJsonLd(study)),
         }}
       />
-    </>
+    </div>
   );
 }

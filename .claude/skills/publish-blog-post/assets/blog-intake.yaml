@@ -1,0 +1,86 @@
+# RegainFlow blog post intake
+#
+# Copy to .blog/<slug>/intake.yaml and fill in. The body goes in
+# .blog/<slug>/post.md, images in .blog/<slug>/images/. Field rules are in
+# references/blog-post-schema.md.
+#
+#   pnpm blog prepare .blog/<slug>/intake.yaml
+#
+# Unknown keys are rejected rather than ignored.
+
+# --- Identity ---------------------------------------------------------------
+
+# The URL. Kebab-case, short, no year. Cannot change later without a redirect.
+slug:
+
+# The H1. Specific, and leads with the topic.
+title:
+
+# The deck under the title, the card copy, and the search description fallback.
+# One or two sentences.
+summary:
+
+# will-baltus | leo-ramirez (regainflow only for a company post by both founders)
+author:
+
+# production-ai | retrieval-and-data | public-sector-ai
+topic:
+
+tags: []
+
+# --- Reading aids -------------------------------------------------------------
+
+# 3–5 claims. None may appear word for word in the body.
+takeaways:
+  -
+  -
+  -
+
+# Published slugs for "Keep reading", in order. `pnpm blog:prod list` shows them.
+related: []
+
+# The post's own next step. Delete the block (or set `cta: null`) for the
+# default free assessment.
+# cta:
+#   eyebrow: Free assessment
+#   heading:
+#   body:
+#   label: Book a free assessment
+#   href: https://cal.com/regainflow/free-assessment
+
+featured: false
+pillar: false
+
+# Optional. First-publish date, YYYY-MM-DD. Defaults to the day prepare runs.
+# published:
+
+# Optional search overrides: about 60 and 120–160 characters. When the title
+# leads with one of our reports' names, put the reader's question in meta_title.
+# meta_title:
+# meta_description:
+
+# --- Images -------------------------------------------------------------------
+
+# A real image, cleared to show:
+# cover:
+#   file: images/cover.jpg
+#   alt: What the image shows.
+#   credit: "Photo: RegainFlow"
+#   cleared: true
+#
+# Or, only when there is no real image, a generated illustration (paid):
+# cover:
+#   generate: An abstract subject. No text, people, logos or UI.
+#   alt: What the illustration shows.
+
+# Every local image referenced in post.md. Alt text and captions live there.
+images: []
+#  - file: images/example.png
+#    cleared: true
+#    credit: "Screenshot: RegainFlow"
+
+# --- Governance ---------------------------------------------------------------
+
+# Client, agency, program, platform and project names that must not appear.
+# Asked every time; an empty list is a recorded answer.
+deny_terms: []

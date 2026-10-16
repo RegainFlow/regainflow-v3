@@ -1,4 +1,5 @@
-import Link from "next/link";
+import Link from "next/link";
+import { RF_EVENTS } from "@/lib/analytics/events";
 
 /**
  * The three states a client is usually in when they call, and what we do about
@@ -63,7 +64,13 @@ export default function ProductionGap() {
               className="rf-grid gap-y-4 border-t border-rf-hairline py-7 md:py-9"
             >
               <p className="col-span-full lg:col-span-2 lg:pt-1">
-                <Link href={item.href} className="rf-index rf-nav-link">
+                <Link
+                  href={item.href}
+                  className="rf-index rf-nav-link"
+                  data-rf-event={RF_EVENTS.secondaryClicked}
+                  data-rf-location="home_production_gap"
+                  data-rf-target={item.href}
+                >
                   {item.service}
                 </Link>
               </p>

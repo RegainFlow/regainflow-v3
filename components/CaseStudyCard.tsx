@@ -65,7 +65,7 @@ export default function CaseStudyCard({
 
       {/* `mt-auto` pins this row to the bottom of the card, so a short and a
           long study still line up in the same row of the grid. */}
-      <div className="mt-auto border-t border-rf-hairline pt-5">
+      <div className="mt-auto pt-6">
         <p className="rf-mech">
           {study.capabilityTags.slice(0, 3).map((tag) => (
             <span key={tag}>{tag}</span>
